@@ -68,7 +68,7 @@ class PantsRunIntegrationTest(unittest.TestCase):
     env.update(extra_env or {})
 
     pants_command = ([os.path.join(get_buildroot(), self.PANTS_SCRIPT_NAME)] + command +
-                     ['--no-lock', '--kill-nailguns'])
+                     ['--no-lock', '--kill-nailguns', '--print-exception-stacktrace'])
 
     proc = subprocess.Popen(pants_command, env=env, stdin=subprocess.PIPE,
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
