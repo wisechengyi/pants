@@ -86,7 +86,7 @@ PANTS_ARGS=(
 if [[ "${skip_bootstrap:-false}" == "false" ]]; then
   banner "Bootstrapping pants"
   (
-    ./build-support/python/clean.sh && \
+    #./build-support/python/clean.sh && \
     PANTS_DEV=1 PANTS_VERBOSE=1 PEX_VERBOSE=1 PYTHON_VERBOSE=1 \
       ./pants goal ${PANTS_ARGS[@]} binary src/python/pants/bin:pants_local_binary && \
     mv dist/pants_local_binary.pex ./pants.pex && \
@@ -104,7 +104,7 @@ if [ ! -z "${R}" ]; then
 fi
 
 # Sanity checks
-./pants.pex goal clean-all ${PANTS_ARGS[@]} || die "Failed to clean-all."
+#./pants.pex goal clean-all ${PANTS_ARGS[@]} || die "Failed to clean-all."
 ./pants.pex goal goals ${PANTS_ARGS[@]} || die "Failed to list goals."
 ./pants.pex goal list :: ${PANTS_ARGS[@]} || die "Failed to list all targets."
 ./pants.pex goal targets ${PANTS_ARGS[@]} || die "Failed to show target help."
