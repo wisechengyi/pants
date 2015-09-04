@@ -132,7 +132,7 @@ class BootstrapOptionsTest(unittest.TestCase):
       [compile.apt]
       strategy: global
 
-      [fruit]
+      [fruit] 
       apple: red
       """))
       fp.close()
