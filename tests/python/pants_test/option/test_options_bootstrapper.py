@@ -171,7 +171,6 @@ class BootstrapOptionsTest(unittest.TestCase):
         opts_double_config.register('compile.apt', '--strategy')
         opts_double_config.register('fruit', '--apple')
 
-        # print(opts.for_scope('compile'))
         self.assertEquals('isolated', opts_double_config.for_scope('compile.apt').strategy)
         self.assertEquals('red', opts_double_config.for_scope('fruit').apple)
 
