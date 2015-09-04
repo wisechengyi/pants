@@ -1,7 +1,157 @@
 RELEASE HISTORY
 ===============
 
-0.0.45 (??/??/2015)
+0.0.46 (9/4/2015)
+-----------------
+
+Release Notes
+~~~~~~~~~~~~~
+
+This release includes more support for Node.js!
+
+Support for the environment variables `PANTS_VERBOSE` and `PANTS_BUILD_ROOT` have been removed in
+this release.  Instead, use `--level` to turn on debugging in pants.  Pants recursively searches from
+the current directory to the root directory until it finds the `pants.ini` file in order to find
+the build root.
+
+The `pants()` syntax in BUILD files has been removed (deprecated since 0.0.29).
+
+API Changes
+~~~~~~~~~~~
+
+* Kill PANTS_VERBOSE and PANTS_BUILD_ROOT.
+  `RB #2760 <https://rbcommons.com/s/twitter/r/2760>`_
+
+* [classpath products] introduce ResolvedJar and M2Coordinate and use them for improved exclude handling
+  `RB #2654 <https://rbcommons.com/s/twitter/r/2654>`_
+
+* Kill the `pants()` pointer, per discussion in Slack: https://pantsbuild.slack.com/archives/general/p1440451305004760
+  `RB #2650 <https://rbcommons.com/s/twitter/r/2650>`_
+
+* Make Globs classes and Bundle stand on their own.
+  `RB #2740 <https://rbcommons.com/s/twitter/r/2740>`_
+
+* Rid all targets of sources_rel_path parameters.
+  `RB #2738 <https://rbcommons.com/s/twitter/r/2738>`_
+
+* Collapse SyntheticAddress up into Address. [API]
+  `RB #2730 <https://rbcommons.com/s/twitter/r/2730>`_
+
+Bugfixes
+~~~~~~~~
+
+* Fix + test 3rd party missing dep for zinc
+  `RB #2764 <https://rbcommons.com/s/twitter/r/2764>`_
+
+* Implement a synthetic jar that sets Class-Path to bypass ARG_MAX limit
+  `RB #2672 <https://rbcommons.com/s/twitter/r/2672>`_
+
+* Fixed changed goal for BUILD files in build root
+  `RB #2749 <https://rbcommons.com/s/twitter/r/2749>`_
+
+* Refactor / bug-fix for checking jars during dep check
+  `RB #2739 <https://rbcommons.com/s/twitter/r/2739>`_
+
+* PytestRun test failures parsing is broken for tests in a class
+  `RB #2714 <https://rbcommons.com/s/twitter/r/2714>`_
+
+* Make nailgun_client error when the client socket is closed.
+  `RB #2727 <https://rbcommons.com/s/twitter/r/2727>`_
+
+New Features
+~~~~~~~~~~~~
+
+* Initial support for `resolve.npm`.
+  `RB #2723 <https://rbcommons.com/s/twitter/r/2723>`_
+
+* Add support for `repl.node`.
+  `RB #2766 <https://rbcommons.com/s/twitter/r/2766>`_
+
+* Setup the node contrib for release.
+  `RB #2768 <https://rbcommons.com/s/twitter/r/2768>`_
+
+* Add annotation processor settings to goal idea
+  `RB #2753 <https://rbcommons.com/s/twitter/r/2753>`_
+
+* Introduce job prioritization to ExecutionGraph
+  `RB #2601 <https://rbcommons.com/s/twitter/r/2601>`_
+
+* Provide include paths to thrift-linter to allow for more complex checks
+  `RB #2712 <https://rbcommons.com/s/twitter/r/2712>`_
+
+* JVM dependency usage task
+  `RB #2757 <https://rbcommons.com/s/twitter/r/2757>`_
+
+Small improvements, Refactoring and Tooling
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Re-work REPL mutual exclusion.
+  `RB #2765 <https://rbcommons.com/s/twitter/r/2765>`_
+
+* Return cached_chroots instead of yielding them.
+  `RB #2762 <https://rbcommons.com/s/twitter/r/2762>`_
+
+* Normalize and decompose GoalRunner initialization and setup
+  `RB #2715 <https://rbcommons.com/s/twitter/r/2715>`_
+
+* Fixed pre-commit hook for CI
+  `RB #2758 <https://rbcommons.com/s/twitter/r/2758>`_
+
+* Code added check valid arguments for glob, test added as well
+  `RB #2750 <https://rbcommons.com/s/twitter/r/2750>`_
+
+* Fix newline style nits and enable newline check in pants.ini
+  `RB #2756 <https://rbcommons.com/s/twitter/r/2756>`_
+
+* Add the class name and scope name to the uninitialized subsystem error message
+  `RB #2698 <https://rbcommons.com/s/twitter/r/2698>`_
+
+* Make nailgun killing faster.
+  `RB #2685 <https://rbcommons.com/s/twitter/r/2685>`_
+
+* Switch JVM missing dep detection to use compile_classpath
+  `RB #2729 <https://rbcommons.com/s/twitter/r/2729>`_
+
+* Add transitive flag to ClasspathProduct.get_for_target[s]
+  `RB #2744 <https://rbcommons.com/s/twitter/r/2744>`_
+
+* Add transitive parameter to UnionProducts.get_for_target[s]
+  `RB #2741 <https://rbcommons.com/s/twitter/r/2741>`_
+
+* Tighten up the node target hierarchy.
+  `RB #2736 <https://rbcommons.com/s/twitter/r/2736>`_
+
+* Ensure pipeline failuires fail CI.
+  `RB #2731 <https://rbcommons.com/s/twitter/r/2731>`_
+
+* Record the BUILD target alias in BuildFileAddress.
+  `RB #2726 <https://rbcommons.com/s/twitter/r/2726>`_
+
+* Use BaseCompileIT to double-check missing dep failure and whitelist success.
+  `RB #2732 <https://rbcommons.com/s/twitter/r/2732>`_
+
+* Use Target.subsystems to expose UnknownArguments.
+  `RB #2725 <https://rbcommons.com/s/twitter/r/2725>`_
+
+* Populate classes_by_target using the context jar for the isolated strategy
+  `RB #2720 <https://rbcommons.com/s/twitter/r/2720>`_
+
+* Push OSX CI's over to pantsbuild-osx.
+  `RB #2724 <https://rbcommons.com/s/twitter/r/2724>`_
+
+Documentation
+~~~~~~~~~~~~~
+
+* Update a few references to options moved to the jvm subsystem in docs and comments
+  `RB #2751 <https://rbcommons.com/s/twitter/r/2751>`_
+
+* Update developer docs mention new testing idioms
+  `RB #2743 <https://rbcommons.com/s/twitter/r/2743>`_
+
+* Clarify the RBCommons/pants-reviews setup step.
+  `RB #2733 <https://rbcommons.com/s/twitter/r/2733>`_
+
+0.0.45 (8/28/2015)
 -------------------
 
 Release Notes
@@ -11,6 +161,89 @@ In this release, the methods `with_sources()`, `with_docs()` and `with_artifact(
 were removed from the jar() syntax in BUILD files.   They have been deprecated since
 Pants version 0.0.29.
 
+API Changes
+~~~~~~~~~~~
+
+* Remove with_artifact(), with_sources(), and with_docs() from JarDependency
+  `RB #2687 <https://rbcommons.com/s/twitter/r/2687>`_
+
+Bugfixes
+~~~~~~~~
+
+* Upgrade zincutils to 0.3.1 for parse_deps bug fix
+  `RB #2705 <https://rbcommons.com/s/twitter/r/2705>`_
+
+* Fix PythonThriftBuilder to operate on 1 target.
+  `RB #2696 <https://rbcommons.com/s/twitter/r/2696>`_
+
+* Ensure stdlib check uses normalized paths.
+  `RB #2693 <https://rbcommons.com/s/twitter/r/2693>`_
+
+* Hack around a few Distribution issues in py tests.
+  `RB #2692 <https://rbcommons.com/s/twitter/r/2692>`_
+
+* Fix GoBuildgen classname and a comment typo.
+  `RB #2689 <https://rbcommons.com/s/twitter/r/2689>`_
+
+* Making --coverage-open work for cobertura.
+  `RB #2670 <https://rbcommons.com/s/twitter/r/2670>`_
+
+New Features
+~~~~~~~~~~~~
+
+* Implementing support for Wire 2.0 multiple proto paths.
+  `RB #2717 <https://rbcommons.com/s/twitter/r/2717>`_
+
+* [pantsd] PantsService, FSEventService & WatchmanLauncher
+  `RB #2686 <https://rbcommons.com/s/twitter/r/2686>`_
+
+* Add NodeDistribution to seed a node backend.
+  `RB #2703 <https://rbcommons.com/s/twitter/r/2703>`_
+
+* Created DistributionLocator subsystem with jvm-distributions option-space.
+  `RB #2677 <https://rbcommons.com/s/twitter/r/2677>`_
+
+* Added support for wire 2.0 arguments and beefed up tests
+  `RB #2688 <https://rbcommons.com/s/twitter/r/2688>`_
+
+* Initial commit of checkstyle
+  `RB #2593 <https://rbcommons.com/s/twitter/r/2593>`_
+
+Small improvements, Refactoring and Tooling
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Removed scan workunit; mapping workunits now debug
+  `RB #2721 <https://rbcommons.com/s/twitter/r/2721>`_
+
+* Implement caching for the thrift linter.
+  `RB #2718 <https://rbcommons.com/s/twitter/r/2718>`_
+
+* Refactor JvmDependencyAnalyzer into a task
+  `RB #2668 <https://rbcommons.com/s/twitter/r/2668>`_
+
+* Refactor plugin system to allow for easier extension by others
+  `RB #2706 <https://rbcommons.com/s/twitter/r/2706>`_
+
+* Indented code which prints warnings for unrecognized os's.
+  `RB #2713 <https://rbcommons.com/s/twitter/r/2713>`_
+
+* Fixup existing docs and add missing docs.
+  `RB #2708 <https://rbcommons.com/s/twitter/r/2708>`_
+
+* Requiring explicit dependency on the DistributionLocator subsystem.
+  `RB #2707 <https://rbcommons.com/s/twitter/r/2707>`_
+
+* Reorganize option help.
+  `RB #2695 <https://rbcommons.com/s/twitter/r/2695>`_
+
+* Set 'pants-reviews' as the default group.
+  `RB #2702 <https://rbcommons.com/s/twitter/r/2702>`_
+
+* Update to zinc 1.0.9 and sbt 0.13.9
+  `RB #2658 <https://rbcommons.com/s/twitter/r/2658>`_
+
+* Test the individual style checks and only disable the check that is currently failing CI
+  `RB #2697 <https://rbcommons.com/s/twitter/r/2697>`_
 
 0.0.44 (8/21/2015)
 ------------------

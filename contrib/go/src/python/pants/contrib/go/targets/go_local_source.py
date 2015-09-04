@@ -6,8 +6,9 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
                         unicode_literals, with_statement)
 
 import os
-from glob import glob
 
+from pants.backend.core.wrapped_globs import Globs
+from pants.base.build_environment import get_buildroot
 from pants.base.payload import Payload
 
 from pants.contrib.go.targets.go_target import GoTarget
@@ -32,11 +33,13 @@ class GoLocalSource(GoTarget):
     return cls.package_path(source_root, address.spec_path)
 
   def __init__(self, address=None, payload=None, **kwargs):
-    sources = glob(os.path.join(address.spec_path, '*.go'))
+    globs = Globs(rel_path=os.path.join(get_buildroot(), address.spec_path))
+    sources = globs('*.go')
+
     payload = payload or Payload()
     payload.add_fields({
       'sources': self.create_sources_field(sources=sources,
-                                           sources_rel_path='',
+                                           sources_rel_path=address.spec_path,
                                            key_arg='sources'),
     })
     super(GoLocalSource, self).__init__(address=address, payload=payload, **kwargs)

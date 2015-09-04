@@ -149,6 +149,7 @@ class _JUnitRunner(object):
       return
 
     bootstrapped_cp = self._task_exports.tool_classpath('junit')
+
     def compute_complete_classpath():
       return self._task_exports.classpath(targets, cp=bootstrapped_cp)
 
@@ -226,11 +227,21 @@ class _JUnitRunner(object):
       # If there are some junit_test targets in the graph, find ones that match the requested
       # test(s).
       tests_with_targets = {}
+      unknown_tests = []
       for test in self._get_tests_to_run():
         # A test might contain #specific_method, which is not needed to find a target.
         test_class_name = test.partition('#')[0]
         target = tests_from_targets.get(test_class_name)
-        tests_with_targets[test] = target
+        if target is None:
+          unknown_tests.append(test)
+        else:
+          tests_with_targets[test] = target
+
+      if len(unknown_tests) > 0:
+        raise TaskError("No target found for test specifier(s):\n\n  '{}'\n\nPlease change " \
+                        "specifier or bring in the proper target(s)."
+                        .format("'\n  '".join(unknown_tests)))
+
       return tests_with_targets
     else:
       return tests_from_targets
@@ -329,7 +340,6 @@ class _JUnitRunner(object):
 
     return self._tests_by_property(tests_to_targets, combined_property)
 
-
   def _partition(self, tests):
     stride = min(self._batch_size, len(tests))
     for i in range(0, len(tests), stride):
@@ -384,6 +394,7 @@ class _JUnitRunner(object):
     else:  # It's a classname.
       classname = classname_or_srcfile
       yield classname + methodname
+
 
 #TODO(jtrobec): move code coverage into tasks, and out of the general UT code.
 class _Coverage(_JUnitRunner):
