@@ -125,7 +125,7 @@ class BootstrapOptionsTest(unittest.TestCase):
 
 
   def test_create_bootstrapped_multiple_config_override(self):
-    # check with multiple config file, the latest value always gets taken
+    # check with multiple config files, the latest values always get taken
     # in this case strategy will be overwritten, while fruit stays the same
     with temporary_file() as fp:
       fp.write(dedent("""
