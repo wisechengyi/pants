@@ -123,6 +123,50 @@ class BootstrapOptionsTest(unittest.TestCase):
     self.assertEquals('/qux/baz', opts.for_scope('foo').bar)
     self.assertEquals('/pear/banana', opts.for_scope('fruit').apple)
 
+
+  def test_create_bootstrapped_multiple_config_override(self):
+    # Check that we can set a bootstrap option from a cmd-line flag and have that interpolate
+    # correctly into regular config.
+    with temporary_file() as fp:
+      fp.write(dedent("""
+      [compile.apt]
+      strategy: global
+      """))
+      fp.close()
+
+      bootstrapper_single_config = OptionsBootstrapper(args=['--config-override={}'.format(fp.name)])
+
+      opts_single_config  = bootstrapper_single_config.get_full_options(known_scope_infos=[
+          ScopeInfo('', ScopeInfo.GLOBAL),
+          ScopeInfo('compile.apt', ScopeInfo.TASK),
+      ])
+      opts_single_config.register('', '--config-override')  # So we don't choke on it on the cmd line.
+      opts_single_config.register('compile.apt', '--strategy')
+      self.assertEquals('global', opts_single_config.for_scope('compile.apt').strategy)
+
+      with temporary_file() as fp2:
+        fp2.write(dedent("""
+        [compile.apt]
+        strategy: isolated
+        """))
+        fp2.close()
+
+        bootstrapper_double_config = OptionsBootstrapper(
+            args=['--config-override={}'.format(fp.name),
+                  '--config-override={}'.format(fp2.name)])
+
+        opts_double_config = bootstrapper_double_config.get_full_options(known_scope_infos=[
+          ScopeInfo('', ScopeInfo.GLOBAL),
+          ScopeInfo('compile.apt', ScopeInfo.TASK),
+        ])
+        opts_double_config.register('', '--config-override')  # So we don't choke on it on the cmd line.
+        opts_double_config.register('compile.apt', '--strategy')
+
+        # print(opts.for_scope('compile'))
+        self.assertEquals('isolated', opts_double_config.for_scope('compile.apt').strategy)
+
+
+
   def test_full_options_caching(self):
     with temporary_file_path() as config:
       bootstrapper = OptionsBootstrapper(env={}, configpath=config, args=[])
