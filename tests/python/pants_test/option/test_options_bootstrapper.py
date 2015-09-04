@@ -131,8 +131,7 @@ class BootstrapOptionsTest(unittest.TestCase):
       fp.write(dedent("""
       [compile.apt]
       strategy: global
-
-      [fruit] 
+      [fruit]
       apple: red
       """))
       fp.close()
