@@ -1,13 +1,13 @@
 java_thrift_library(
-  name='android_generator',
-  sources=['struct.thrift'],
+  name='dummy_generator',
+  sources=['dummy.thrift'],
   compiler='scrooge',
   language='android',
   rpc_style='finagle',
   dependencies=['3rdparty:thrift'],
   provides=artifact(
     org='org.archimedes',
-    name='android_generator',
+    name='dummy_generator',
     repo=Repository(name='test',
       url='https://dl.bintray.com/somerandom/url',
       push_db_basedir='/tmp')
