@@ -456,9 +456,10 @@ class Target(AbstractTarget):
     """
     id_candidate = self.address.path_safe_spec
     if len(id_candidate) > 200:
-        return id_candidate[:80] + unicode(sha1(id_candidate).hexdigest()) + id_candidate[-80:]
-    else:
-        return id_candidate
+        return id_candidate[:80] + '.' + unicode(sha1(id_candidate).hexdigest()) + '.' + id_candidate[-80:]
+    # else:
+    #     return id_candidate
+    return id_candidate
 
   @property
   def identifier(self):
