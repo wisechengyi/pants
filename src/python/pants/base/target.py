@@ -28,14 +28,14 @@ from pants.subsystem.subsystem import Subsystem
 
 logger = logging.getLogger(__name__)
 
-# Enable target id hash logging
-target_id_logger = logging.getLogger('myapp')
-hdlr = logging.FileHandler('/var/tmp/target_id_hash.log')
-formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-hdlr.setFormatter(formatter)
-target_id_logger.addHandler(hdlr)
-target_id_logger.setLevel(logging.INFO)
-target_id_logger.propagate = False
+# # Enable target id hash logging
+# target_id_logger = logging.getLogger('myapp')
+# hdlr = logging.FileHandler('/var/tmp/target_id_hash.log')
+# formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+# hdlr.setFormatter(formatter)
+# target_id_logger.addHandler(hdlr)
+# target_id_logger.setLevel(logging.INFO)
+# target_id_logger.propagate = False
 
 
 class AbstractTarget(object):
@@ -255,7 +255,7 @@ class Target(AbstractTarget):
     if kwargs:
       self.UnknownArguments.check(self, kwargs)
 
-    target_id_logger.info(self.address.path_safe_spec + ' -> ' + self.id)
+    # target_id_logger.info(self.address.path_safe_spec + ' -> ' + self.id)
 
   @property
   def type_alias(self):
