@@ -24,9 +24,19 @@ from pants.base.target_addressable import TargetAddressable
 from pants.base.validation import assert_list
 from pants.option.custom_types import dict_option
 from pants.subsystem.subsystem import Subsystem
+from pants.util.dirutil import safe_mkdir
 
 
 logger = logging.getLogger(__name__)
+
+# Enable target id hash logging
+target_id_logger = logging.getLogger('myapp')
+hdlr = logging.FileHandler('/var/tmp/target_id_hash.log')
+formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+hdlr.setFormatter(formatter)
+target_id_logger.addHandler(hdlr)
+target_id_logger.setLevel(logging.INFO)
+target_id_logger.propagate = False
 
 
 class AbstractTarget(object):
@@ -245,6 +255,8 @@ class Target(AbstractTarget):
     self._cached_transitive_fingerprint_map = {}
     if kwargs:
       self.UnknownArguments.check(self, kwargs)
+
+    target_id_logger.info(self.address.path_safe_spec + ' -> ' + self.id)
 
   @property
   def type_alias(self):
