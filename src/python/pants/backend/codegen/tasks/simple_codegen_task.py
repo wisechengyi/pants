@@ -466,10 +466,10 @@ class SimpleCodegenTask(Task):
           messages.append('\t{} also generated:'.format(dependency.address.spec))
           messages.extend(['\t\t{}'.format(source) for source in duplicates_by_targets[dependency]])
         message = '\n'.join(messages)
-        if self._task.get_options().allow_dups:
-          logger.warn(message)
-        else:
-          raise self.DuplicateSourceError(message)
+        # if self._task.get_options().allow_dups:
+        logger.warn(message)
+        # else:
+        #   raise self.DuplicateSourceError(message)
 
       self._generated_sources_cache[target.id] = strict
       return strict
