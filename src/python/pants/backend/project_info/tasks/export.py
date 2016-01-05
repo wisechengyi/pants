@@ -37,7 +37,7 @@ from pants.util.memo import memoized_property
 
 
 # Changing the behavior of this task may affect the IntelliJ Pants plugin.
-# Please add fkorotkov, tdesai to reviews for this file.
+# Please add tdesai to reviews for this file.
 class ExportTask(IvyTaskMixin, PythonTask):
   """Base class for generating a json-formattable blob of data about the target graph.
 
