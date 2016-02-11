@@ -14,7 +14,7 @@ from pants.option.ranked_value import RankedValue
 class OptionTracker(object):
   """Records a history of what options are set and where they came from."""
 
-  OptionHistoryRecord = namedtuple('OptionHistoryRecord', ['value', 'rank', 'details'])
+  OptionHistoryRecord = namedtuple('OptionHistoryRecord', ['value', 'rank', 'deprecation_version', 'details'])
 
   class OptionHistory(object):
     """Tracks the history of an individual option."""
@@ -22,7 +22,7 @@ class OptionTracker(object):
     def __init__(self):
       self.values = []
 
-    def record_value(self, value, rank, details=None):
+    def record_value(self, value, rank, deprecation_version, details=None):
       """Record that the option was set to the given value at the given rank.
 
       :param value: the value the option was set to.
@@ -30,12 +30,17 @@ class OptionTracker(object):
       :param string details: optional elaboration of where the option came from (eg, a particular
         config file).
       """
+      deprecation_version_to_write = deprecation_version
+
       if self.values:
         if self.latest.rank > rank:
           return
         if self.latest.value == value:
           return # No change.
-      self.values.append(OptionTracker.OptionHistoryRecord(value, rank, details))
+        if self.latest.deprecation_version:
+          deprecation_version_to_write = self.latest.deprecation_version or deprecation_version
+
+      self.values.append(OptionTracker.OptionHistoryRecord(value, rank, deprecation_version_to_write, details))
 
     @property
     def was_overridden(self):
@@ -59,7 +64,7 @@ class OptionTracker(object):
   def __init__(self):
     self.option_history_by_scope = defaultdict(dict)
 
-  def record_option(self, scope, option, value, rank, details=None):
+  def record_option(self, scope, option, value, rank, deprecation_version=None, details=None):
     """Records that the given option was set to the given value.
 
     :param string scope: scope of the option.
@@ -73,4 +78,4 @@ class OptionTracker(object):
     scoped_options = self.option_history_by_scope[scope]
     if option not in scoped_options:
       scoped_options[option] = self.OptionHistory()
-    scoped_options[option].record_value(value, rank, details)
+    scoped_options[option].record_value(value, rank, deprecation_version, details)

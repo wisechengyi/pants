@@ -456,7 +456,8 @@ class Parser(object):
     for ranked_val in ranked_vals:
       details = config_details if ranked_val.rank == RankedValue.CONFIG else None
       self._option_tracker.record_option(scope=self._scope, option=dest, value=ranked_val.value,
-                                         rank=ranked_val.rank, details=details)
+                                         rank=ranked_val.rank, deprecation_version=kwargs.get('deprecated_version'),
+                                         details=details)
 
     def check(val):
       if choices is not None and val is not None and val not in choices:
