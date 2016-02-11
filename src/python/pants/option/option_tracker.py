@@ -27,6 +27,7 @@ class OptionTracker(object):
 
       :param value: the value the option was set to.
       :param int rank: the rank of the option when it was set to this value.
+      :param deprecation_version: Deprecation version for this option.
       :param string details: optional elaboration of where the option came from (eg, a particular
         config file).
       """
@@ -38,6 +39,8 @@ class OptionTracker(object):
         if self.latest.value == value:
           return # No change.
         if self.latest.deprecation_version:
+          # Higher RankedValue may not contain deprecation version, so this make sure
+          # deprecation_version propagate to later and higher ranked value since it is immutable
           deprecation_version_to_write = self.latest.deprecation_version or deprecation_version
 
       self.values.append(OptionTracker.OptionHistoryRecord(value, rank, deprecation_version_to_write, details))
@@ -72,6 +75,7 @@ class OptionTracker(object):
     :param string value: value the option was set to.
     :param int rank: the rank of the option (Eg, RankedValue.HARDCODED), to keep track of where the
       option came from.
+    :param deprecation_version: Deprecation version for this option.
     :param string details: optional additional details about how the option was set (eg, the name of a
       particular config file, if the rank is RankedValue.CONFIG).
     """

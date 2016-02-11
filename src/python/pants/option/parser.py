@@ -455,8 +455,11 @@ class Parser(object):
     choices = kwargs.get('choices')
     for ranked_val in ranked_vals:
       details = config_details if ranked_val.rank == RankedValue.CONFIG else None
-      self._option_tracker.record_option(scope=self._scope, option=dest, value=ranked_val.value,
-                                         rank=ranked_val.rank, deprecation_version=kwargs.get('deprecated_version'),
+      self._option_tracker.record_option(scope=self._scope,
+                                         option=dest,
+                                         value=ranked_val.value,
+                                         rank=ranked_val.rank,
+                                         deprecation_version=kwargs.get('deprecated_version'),
                                          details=details)
 
     def check(val):
