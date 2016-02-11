@@ -33,7 +33,8 @@ class ExplainOptionsTask(ConsoleTask):
     register('--only-overridden', action='store_true', default=False,
              help='Only show values that overrode defaults.')
     register('--only-functioning', action='store_true', default=False,
-             help='Show only functioning options, equivalent to all options except deprecated no-op options.')
+             help='Show only functioning options. That is, options in normal and deprecated state. '
+             'Explanation: an option can be in normal, deprecated, or non-functioning state.')
 
   def _scope_filter(self, scope):
     pattern = self.get_options().scope
@@ -102,6 +103,7 @@ class ExplainOptionsTask(ConsoleTask):
           continue
         # Deprecated and noop options
         if self.get_options().only_functioning and history.latest.deprecation_version:
+          # Skip if the option has already passed its deprecation period
           if Revision.semver(VERSION) >= Revision.semver(history.latest.deprecation_version):
             continue
         yield '{} = {}'.format(self._format_scope(scope, option),
