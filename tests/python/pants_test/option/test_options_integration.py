@@ -100,4 +100,4 @@ class TestOptionsIntegration(PantsRunIntegrationTest):
       self.assert_success(pants_run)
 
       self.assertIn('dummy-options.dummy_crufty_deprecated_but_still_functioning', pants_run.stdout_data)
-      self.assertNotIn('--dummy-crufty-expired', pants_run.stdout_data)
+      self.assertNotIn('dummy-options.dummy_crufty_expired', pants_run.stdout_data)
