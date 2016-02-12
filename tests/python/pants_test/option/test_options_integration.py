@@ -78,3 +78,26 @@ class TestOptionsIntegration(PantsRunIntegrationTest):
       self.assert_success(pants_run)
       self.assertIn('options.only_overridden = True', pants_run.stdout_data)
       self.assertIn('(from CONFIG in {})'.format(config_path), pants_run.stdout_data)
+
+  def test_options_deprecation_from_config(self):
+    with temporary_dir(root_dir=os.path.abspath('.')) as tempdir:
+      config_path = os.path.relpath(os.path.join(tempdir, 'config.ini'))
+      with open(config_path, 'w+') as f:
+        f.write(dedent('''
+          [DEFAULT]
+          pythonpath: [
+              "%(buildroot)s/contrib/dummy_options/src/python",
+            ]
+
+          backend_packages: [
+              "pants.contrib.dummy_options",
+            ]
+
+          [options]
+          colors: False
+        '''))
+      pants_run = self.run_pants(['--config-override={}'.format(config_path), 'options'])
+      self.assert_success(pants_run)
+
+      self.assertIn('dummy-options.dummy_crufty_deprecated_but_still_functioning', pants_run.stdout_data)
+      self.assertNotIn('--dummy-crufty-expired', pants_run.stdout_data)

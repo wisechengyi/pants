@@ -10,14 +10,5 @@ from pants.goal.task_registrar import TaskRegistrar as task
 from pants.contrib.dummy_options.tasks.dummy_options import DummyOptionsTask
 
 
-#
-# def build_file_aliases():
-#   return BuildFileAliases(
-#     targets={
-#       'spindle_thrift_library': SpindleThriftLibrary,
-#     }
-#   )
-#
-
 def register_goals():
   task(name='dummy-options', action=DummyOptionsTask).install()
