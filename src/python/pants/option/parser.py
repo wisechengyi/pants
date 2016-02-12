@@ -25,7 +25,7 @@ from pants.option.errors import (BooleanOptionImplicitVal, BooleanOptionNameWith
 from pants.option.option_util import is_boolean_flag
 from pants.option.ranked_value import RankedValue
 from pants.option.scope import ScopeInfo
-from pants.version import VERSION
+from pants.version import PANTS_SEMVER
 
 
 class Parser(object):
@@ -299,7 +299,7 @@ class Parser(object):
                removal_version=deprecated_ver,
                hint=kwargs.get('deprecated_hint', ''))
 
-      if Revision.semver(VERSION) >= Revision.semver(deprecated_ver):
+      if PANTS_SEMVER >= Revision.semver(deprecated_ver):
         # Once we've hit the deprecated_version, raise an error instead of warning. This allows for
         # more actionable options hinting to continue beyond the deprecation period until removal.
         raise DeprecatedOptionError(msg)

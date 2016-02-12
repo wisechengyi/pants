@@ -10,4 +10,4 @@ from pants.base.revision import Revision
 
 VERSION = '0.0.71'
 
-PARSED_VERSION = Revision.semver(VERSION)
+PANTS_SEMVER = Revision.semver(VERSION)
