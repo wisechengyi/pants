@@ -5,9 +5,9 @@
 from __future__ import (absolute_import, division, generators, nested_scopes, print_function,
                         unicode_literals, with_statement)
 
-from pants.goal.task_registrar import TaskRegistrar as task
+from plugins.dummy_options.tasks.dummy_options import DummyOptionsTask
 
-from pants.contrib.dummy_options.tasks.dummy_options import DummyOptionsTask
+from pants.goal.task_registrar import TaskRegistrar as task
 
 
 def register_goals():

@@ -10,7 +10,7 @@ from colors import black, blue, cyan, green, magenta, red, white
 from pants.base.revision import Revision
 from pants.option.ranked_value import RankedValue
 from pants.task.console_task import ConsoleTask
-from pants.version import VERSION
+from pants.version import PARSED_VERSION
 
 
 class ExplainOptionsTask(ConsoleTask):
@@ -98,8 +98,8 @@ class ExplainOptionsTask(ConsoleTask):
         if not self._rank_filter(history.latest.rank): continue
         if self.get_options().only_overridden and not history.was_overridden:
           continue
-        # Skip the option if it has already passed the deprecation period
-        if history.latest.deprecation_version and Revision.semver(VERSION) >= Revision.semver(
+        # Skip the option if it has already passed the deprecation period.
+        if history.latest.deprecation_version and PARSED_VERSION >= Revision.semver(
           history.latest.deprecation_version):
           continue
         yield '{} = {}'.format(self._format_scope(scope, option),

@@ -21,3 +21,4 @@ class DummyOptionsTask(Task):
                 deprecated_hint='blah')
     register('--dummy-crufty-deprecated-but-still-functioning', deprecated_version='999.99.9',
                 deprecated_hint='blah')
+    register('--normal-option')

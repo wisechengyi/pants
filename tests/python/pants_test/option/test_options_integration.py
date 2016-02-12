@@ -86,11 +86,11 @@ class TestOptionsIntegration(PantsRunIntegrationTest):
         f.write(dedent('''
           [DEFAULT]
           pythonpath: [
-              "%(buildroot)s/contrib/dummy_options/src/python",
+              "%(buildroot)s/testprojects/src/python",
             ]
 
           backend_packages: [
-              "pants.contrib.dummy_options",
+              "plugins.dummy_options",
             ]
 
           [options]
@@ -99,5 +99,7 @@ class TestOptionsIntegration(PantsRunIntegrationTest):
       pants_run = self.run_pants(['--config-override={}'.format(config_path), 'options'])
       self.assert_success(pants_run)
 
+
+      self.assertIn('dummy-options.normal_option', pants_run.stdout_data)
       self.assertIn('dummy-options.dummy_crufty_deprecated_but_still_functioning', pants_run.stdout_data)
       self.assertNotIn('dummy-options.dummy_crufty_expired', pants_run.stdout_data)
