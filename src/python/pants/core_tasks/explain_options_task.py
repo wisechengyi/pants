@@ -32,9 +32,6 @@ class ExplainOptionsTask(ConsoleTask):
              help='Show the previous values options had before being overridden.')
     register('--only-overridden', action='store_true', default=False,
              help='Only show values that overrode defaults.')
-    register('--only-functioning', action='store_true', default=False,
-             help='Show only functioning options. That is, options in normal and deprecated state. '
-             'Explanation: an option can be in normal, deprecated, or non-functioning state.')
 
   def _scope_filter(self, scope):
     pattern = self.get_options().scope
@@ -101,11 +98,10 @@ class ExplainOptionsTask(ConsoleTask):
         if not self._rank_filter(history.latest.rank): continue
         if self.get_options().only_overridden and not history.was_overridden:
           continue
-        # Deprecated and noop options
-        if self.get_options().only_functioning and history.latest.deprecation_version:
-          # Skip if the option has already passed its deprecation period
-          if Revision.semver(VERSION) >= Revision.semver(history.latest.deprecation_version):
-            continue
+        # Skip the option if it has already passed the deprecation period
+        if history.latest.deprecation_version and Revision.semver(VERSION) >= Revision.semver(
+          history.latest.deprecation_version):
+          continue
         yield '{} = {}'.format(self._format_scope(scope, option),
                                self._format_record(history.latest))
         if self.get_options().show_history:
