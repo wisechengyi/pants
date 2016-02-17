@@ -381,7 +381,7 @@ class Parser(object):
       raise ParseError('Cannot fromfile {} with an action ({}) in scope {}'
                        .format(dest, action, self._scope))
 
-    config_section = 'DEFAULT' if self._scope == GLOBAL_SCOPE else self._scope
+    config_section = 'PANTS_GLOBAL' if self._scope == GLOBAL_SCOPE else self._scope
     udest = dest.upper()
     if self._scope == GLOBAL_SCOPE:
       # For convenience, we allow three forms of env var for global scope options.
