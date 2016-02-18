@@ -306,6 +306,41 @@ class OptionsTest(unittest.TestCase):
     self.assertFalse(options.for_global_scope().store_false_def_false_flag)
     self.assertFalse(options.for_global_scope().store_false_def_true_flag)
 
+  def test_designdoc_example_pants_global(self):
+    # The example from the design doc.
+    # Get defaults from config and environment.
+    config = {
+      'PANTS_GLOBAL': {'b': '99'},
+      'compile': {'a': '88', 'c': '77'},
+    }
+
+    env = {
+      'PANTS_COMPILE_C': '66'
+    }
+
+    options = self._parse('./pants --a=1 compile --b=2 compile.java --a=3 --c=4',
+                          env=env, config=config)
+
+    self.assertEqual(1, options.for_global_scope().a)
+    self.assertEqual(99, options.for_global_scope().b)
+    with self.assertRaises(AttributeError):
+      _ = options.for_global_scope().c
+
+    self.assertEqual(1, options.for_scope('compile').a)
+    self.assertEqual(2, options.for_scope('compile').b)
+    self.assertEqual(66, options.for_scope('compile').c)
+
+    self.assertEqual(3, options.for_scope('compile.java').a)
+    self.assertEqual(2, options.for_scope('compile.java').b)
+    self.assertEqual(4, options.for_scope('compile.java').c)
+
+  def test_pants_global_config_override(self):
+    options = self._parse('./pants', config={'PANTS_GLOBAL': {'store_true_flag': True,
+                                                         'store_false_flag': False,
+                                                         }})
+    self.assertTrue(options.for_global_scope().store_true_flag)
+    self.assertFalse(options.for_global_scope().store_false_flag)
+
   def test_boolean_invalid_value(self):
     with self.assertRaises(Parser.BooleanConversionError):
       self._parse('./pants', config={'DEFAULT': {'store_true_flag': 11,
