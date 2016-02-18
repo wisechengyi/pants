@@ -842,7 +842,7 @@ class OptionsTest(unittest.TestCase):
     with self.assertRaises(Options.OptionTrackerRequiredError):
       Options.create(None, None, [])
 
-  def test_designdoc_example_pants_global(self):
+  def test_pants_global_designdoc_example(self):
     # The example from the design doc.
     # Get defaults from config and environment.
     config = {
@@ -870,7 +870,10 @@ class OptionsTest(unittest.TestCase):
     self.assertEqual(2, options.for_scope('compile.java').b)
     self.assertEqual(4, options.for_scope('compile.java').c)
 
-  def test_pants_global_config_override(self):
+  def test_pants_global_with_default(self):
+    """
+    This test makes sure values under [DEFAULT] still gets read.
+    """
     config = {'DEFAULT': {'b': '99'},
               'PANTS_GLOBAL': {'store_true_flag': True}
               }
