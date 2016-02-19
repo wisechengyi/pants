@@ -21,6 +21,7 @@ from pants.option.options import Options
 
 logger = logging.getLogger(__name__)
 
+
 class OptionsBootstrapper(object):
   """An object that knows how to create options in two stages: bootstrap, and then full options."""
 
@@ -124,7 +125,6 @@ class OptionsBootstrapper(object):
     return self._full_options[key]
 
   def verify_configs_against_valid_options(self, options):
-    global_options = set(options.for_scope(GLOBAL_SCOPE))
     for config in Config.load(self._final_full_configpaths).configs:
       for section in config.sections():
         if section == 'PANTS_GLOBAL':
