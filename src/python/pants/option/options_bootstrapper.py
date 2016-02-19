@@ -11,6 +11,7 @@ import sys
 
 from pants.option.arg_splitter import GLOBAL_SCOPE
 from pants.option.config import Config
+from pants.option.errors import OptionsError
 from pants.option.global_options import GlobalOptionsRegistrar
 from pants.option.option_tracker import OptionTracker
 from pants.option.option_util import is_boolean_flag
@@ -23,6 +24,7 @@ class OptionsBootstrapper(object):
   def __init__(self, env=None, configpath=None, args=None):
     self._env = env if env is not None else os.environ.copy()
     self._configpath = configpath
+    self._final_full_configpaths = None
     self._post_bootstrap_config = None  # Will be set later.
     self._args = sys.argv if args is None else args
     self._bootstrap_options = None  # We memoize the bootstrap options here.
@@ -94,7 +96,7 @@ class OptionsBootstrapper(object):
       # Now recompute the bootstrap options with the full config. This allows us to pick up
       # bootstrap values (such as backends) from a config override file, for example.
       self._bootstrap_options = bootstrap_options_from_config(self._post_bootstrap_config)
-
+      self._final_full_configpaths = full_configpaths
     return self._bootstrap_options
 
   def get_full_options(self, known_scope_infos):
@@ -117,3 +119,29 @@ class OptionsBootstrapper(object):
                                                bootstrap_option_values=bootstrap_option_values,
                                                option_tracker=self._option_tracker)
     return self._full_options[key]
+
+  def verify_configs_with_options(self, options, known_scopes):
+    configs = Config.load(self._final_full_configpaths)
+    global_options = set(options.for_scope(GLOBAL_SCOPE))
+    # for config in configs.configs:
+    for config in configs.configs:
+      for section in config.sections():
+        if section == 'PANTS_GLOBAL':
+          continue
+          scope = GLOBAL_SCOPE
+        else:
+          scope = section
+        try:
+          valid_options_under_scope = set(options.for_scope(scope))
+          all_options_under_scope = set(config.configparser.options(section)) - set(config.configparser.defaults())
+        except OptionsError as e:
+          raise OptionsError("{} in {}".format(e.message, config.configpath))
+        else:
+          for option in all_options_under_scope:
+            if option in valid_options_under_scope or option in global_options:
+              continue
+            else:
+              # print(option)
+              raise OptionsError("Invalid option '{}' under [{}] in {}".format(option, section, config.configpath))
+          pass
+    pass

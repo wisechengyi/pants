@@ -179,6 +179,9 @@ class _SingleFileConfig(Config):
       return self.sources()[0]
     return None
 
+  def get_options_under_section(self, section):
+    return list(self.configparser._sections[section])
+
 
 class _ChainedConfig(Config):
   """Config read from multiple sources."""
