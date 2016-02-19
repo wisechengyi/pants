@@ -122,12 +122,10 @@ class OptionsInitializer(object):
     options = options_bootstrapper.get_full_options(known_scope_infos)
     self._register_options(subsystems, options)
 
-
     # Make the options values available to all subsystems.
     Subsystem.set_options(options)
 
     # Verify the configs here
-
     options_bootstrapper.verify_configs_against_valid_options(options)
 
     return options, build_configuration
