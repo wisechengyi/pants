@@ -128,7 +128,7 @@ class OptionsInitializer(object):
 
     # Verify the configs here
 
-    options_bootstrapper.verify_configs_with_options(options, known_scope_infos)
+    options_bootstrapper.verify_configs_against_valid_options(options)
 
     return options, build_configuration
 

@@ -120,14 +120,11 @@ class OptionsBootstrapper(object):
                                                option_tracker=self._option_tracker)
     return self._full_options[key]
 
-  def verify_configs_with_options(self, options, known_scopes):
-    configs = Config.load(self._final_full_configpaths)
+  def verify_configs_against_valid_options(self, options):
     global_options = set(options.for_scope(GLOBAL_SCOPE))
-    # for config in configs.configs:
-    for config in configs.configs:
+    for config in Config.load(self._final_full_configpaths).configs:
       for section in config.sections():
         if section == 'PANTS_GLOBAL':
-          continue
           scope = GLOBAL_SCOPE
         else:
           scope = section
@@ -141,7 +138,4 @@ class OptionsBootstrapper(object):
             if option in valid_options_under_scope or option in global_options:
               continue
             else:
-              # print(option)
               raise OptionsError("Invalid option '{}' under [{}] in {}".format(option, section, config.configpath))
-          pass
-    pass
