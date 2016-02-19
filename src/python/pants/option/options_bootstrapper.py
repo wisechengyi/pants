@@ -10,7 +10,7 @@ import logging
 import os
 import sys
 
-from pants.option.arg_splitter import GLOBAL_SCOPE
+from pants.option.arg_splitter import GLOBAL_SCOPE, PANTS_GLOBAL_SCOPE_NAME
 from pants.option.config import Config
 from pants.option.errors import OptionsError
 from pants.option.global_options import GlobalOptionsRegistrar
@@ -124,25 +124,23 @@ class OptionsBootstrapper(object):
                                                option_tracker=self._option_tracker)
     return self._full_options[key]
 
-  def verify_configs_against_valid_options(self, options):
+  def verify_configs_against_valid_options(self, fully_bootstrapped_options):
     for config in Config.load(self._final_full_configpaths).configs:
       for section in config.sections():
-        if section == 'PANTS_GLOBAL':
+        if section == PANTS_GLOBAL_SCOPE_NAME:
           scope = GLOBAL_SCOPE
         else:
           scope = section
+
         try:
-          valid_options_under_scope = set(options.for_scope(scope))
+          valid_options_under_scope = set(fully_bootstrapped_options.for_scope(scope))
         except OptionsError:
+          # Warn upon invalid section, because some subsystems are not necessarily loaded
           logger.warn("scope [{}] is not recognized in {}".format(section, config.configpath))
           continue
         else:
-          try:
-            all_options_under_scope = set(config.configparser.options(section)) - set(config.configparser.defaults())
-          except OptionsError as e:
-            raise OptionsError("{} in {}".format(e.message, config.configpath))
+          # All the options specified under the `section` in the config file excluding bootstrap defaults
+          all_options_under_scope = set(config.configparser.options(section)) - set(config.configparser.defaults())
           for option in all_options_under_scope:
-            if option in valid_options_under_scope:
-              continue
-            else:
+            if option not in valid_options_under_scope:
               raise OptionsError("Invalid option '{}' under [{}] in {}".format(option, section, config.configpath))
