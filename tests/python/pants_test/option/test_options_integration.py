@@ -103,3 +103,55 @@ class TestOptionsIntegration(PantsRunIntegrationTest):
       self.assertIn('dummy-options.normal_option', pants_run.stdout_data)
       self.assertIn('dummy-options.dummy_crufty_deprecated_but_still_functioning', pants_run.stdout_data)
       self.assertNotIn('dummy-options.dummy_crufty_expired', pants_run.stdout_data)
+
+  def test_from_config_invalid_section(self):
+    with temporary_dir(root_dir=os.path.abspath('.')) as tempdir:
+      config_path = os.path.relpath(os.path.join(tempdir, 'config.ini'))
+      with open(config_path, 'w+') as f:
+        f.write(dedent('''
+          [DEFAULT]
+          some_crazy_thing: 123
+
+          [invalid_section]
+          colors: False
+          scope: options
+          only_overridden: True
+          show_history: True
+        '''))
+      pants_run = self.run_pants(['--config-override={}'.format(config_path), 'goals'])
+      self.assert_success(pants_run)
+      self.assertIn('WARN] scope [invalid_section] is not recognized', pants_run.stderr_data)
+
+  def test_from_config_invalid_option(self):
+    with temporary_dir(root_dir=os.path.abspath('.')) as tempdir:
+      config_path = os.path.relpath(os.path.join(tempdir, 'config.ini'))
+      with open(config_path, 'w+') as f:
+        f.write(dedent('''
+          [DEFAULT]
+          some_crazy_thing: 123
+
+          [test.junit]
+          fail_fast: True
+          invalid_option: True
+        '''))
+      pants_run = self.run_pants(['--config-override={}'.format(config_path), 'goals'])
+      self.assert_failure(pants_run)
+      self.assertIn("Exception message: Invalid option 'invalid_option' under [test.junit]", pants_run.stderr_data)
+
+  def test_from_config_invalid_global_option(self):
+    with temporary_dir(root_dir=os.path.abspath('.')) as tempdir:
+      config_path = os.path.relpath(os.path.join(tempdir, 'config.ini'))
+      with open(config_path, 'w+') as f:
+        f.write(dedent('''
+          [DEFAULT]
+          some_crazy_thing: 123
+
+          [PANTS_GLOBAL]
+          invalid_global: True
+
+          [test.junit]
+          fail_fast: True
+        '''))
+      pants_run = self.run_pants(['--config-override={}'.format(config_path), 'goals'])
+      self.assert_failure(pants_run)
+      self.assertIn("Exception message: Invalid option 'invalid_global' under [PANTS_GLOBAL]", pants_run.stderr_data)
