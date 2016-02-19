@@ -6,6 +6,7 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
                         unicode_literals, with_statement)
 
 import itertools
+import logging
 import os
 import sys
 
@@ -17,6 +18,8 @@ from pants.option.option_tracker import OptionTracker
 from pants.option.option_util import is_boolean_flag
 from pants.option.options import Options
 
+
+logger = logging.getLogger(__name__)
 
 class OptionsBootstrapper(object):
   """An object that knows how to create options in two stages: bootstrap, and then full options."""
@@ -130,12 +133,16 @@ class OptionsBootstrapper(object):
           scope = section
         try:
           valid_options_under_scope = set(options.for_scope(scope))
-          all_options_under_scope = set(config.configparser.options(section)) - set(config.configparser.defaults())
-        except OptionsError as e:
-          raise OptionsError("{} in {}".format(e.message, config.configpath))
+        except OptionsError:
+          logger.warn("scope [{}] is not recognized in {}".format(section, config.configpath))
+          continue
         else:
+          try:
+            all_options_under_scope = set(config.configparser.options(section)) - set(config.configparser.defaults())
+          except OptionsError as e:
+            raise OptionsError("{} in {}".format(e.message, config.configpath))
           for option in all_options_under_scope:
-            if option in valid_options_under_scope or option in global_options:
+            if option in valid_options_under_scope:
               continue
             else:
               raise OptionsError("Invalid option '{}' under [{}] in {}".format(option, section, config.configpath))
