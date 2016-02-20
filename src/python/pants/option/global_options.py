@@ -90,7 +90,7 @@ class GlobalOptionsRegistrar(Optionable):
     register('--target-spec-file', action='append', dest='target_spec_files',
              help='Read additional specs from this file, one per line')
     register('--verify-config', action='store_true', default=False,
-             help='Verify config files when invoking pants')
+             help='Verify config files when invoking pants.')
 
     # These logging options are registered in the bootstrap phase so that plugins can log during
     # registration and not so that their values can be interpolated in configs.
