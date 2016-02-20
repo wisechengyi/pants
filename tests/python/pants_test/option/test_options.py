@@ -846,7 +846,7 @@ class OptionsTest(unittest.TestCase):
     # The example from the design doc.
     # Get defaults from config and environment.
     config = {
-      'PANTS_GLOBAL': {'b': '99'},
+      'GLOBAL': {'b': '99'},
       'compile': {'a': '88', 'c': '77'},
     }
 
@@ -875,7 +875,7 @@ class OptionsTest(unittest.TestCase):
     This test makes sure values under [DEFAULT] still gets read.
     """
     config = {'DEFAULT': {'b': '99'},
-              'PANTS_GLOBAL': {'store_true_flag': True}
+              'GLOBAL': {'store_true_flag': True}
               }
     options = self._parse('./pants', config=config)
 

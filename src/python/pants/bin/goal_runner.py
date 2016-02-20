@@ -125,8 +125,9 @@ class OptionsInitializer(object):
     # Make the options values available to all subsystems.
     Subsystem.set_options(options)
 
-    # Verify the configs here
-    options_bootstrapper.verify_configs_against_valid_options(options)
+    # Verify the configs here.
+    if options.for_global_scope().verify_config:
+      options_bootstrapper.verify_configs_against_options(options)
 
     return options, build_configuration
 
