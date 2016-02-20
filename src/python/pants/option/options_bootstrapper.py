@@ -139,7 +139,7 @@ class OptionsBootstrapper(object):
         except OptionsError:
           raise OptionsError("Invalid scope [{}] in {}".format(section, config.configpath))
         else:
-          # All the options specified under [`section`] in the config file excluding bootstrap defaults.
+          # All the options specified under [`section`] in `config` excluding bootstrap defaults.
           all_options_under_scope = set(config.configparser.options(section)) - set(config.configparser.defaults())
           for option in all_options_under_scope:
             if option not in valid_options_under_scope:
