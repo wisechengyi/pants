@@ -123,7 +123,7 @@ class OptionsBootstrapper(object):
     return self._full_options[key]
 
   def verify_configs_against_options(self, options):
-    """Verify all the loaded configs have the correct scopes and options.
+    """Verify all loaded configs have correct scopes and options.
 
     :param options: Fully bootstrapped valid options.
     :return: None.
