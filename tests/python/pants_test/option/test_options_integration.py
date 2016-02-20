@@ -115,12 +115,15 @@ class TestOptionsIntegration(PantsRunIntegrationTest):
           [invalid_scope]
           colors: False
           scope: options
-          only_overridden: True
-          show_history: True
+
+          [another_invalid_scope]
+          colors: False
+          scope: options
         '''))
       pants_run = self.run_pants(['--config-override={}'.format(config_path), '--verify-config', 'goals'])
       self.assert_failure(pants_run)
-      self.assertIn('Exception message: Invalid scope [invalid_scope]', pants_run.stderr_data)
+      self.assertIn('ERROR] Invalid scope [invalid_scope]', pants_run.stderr_data)
+      self.assertIn('ERROR] Invalid scope [another_invalid_scope]', pants_run.stderr_data)
 
   def test_from_config_invalid_option(self):
     with temporary_dir(root_dir=os.path.abspath('.')) as tempdir:
@@ -136,7 +139,7 @@ class TestOptionsIntegration(PantsRunIntegrationTest):
         '''))
       pants_run = self.run_pants(['--config-override={}'.format(config_path),'--verify-config', 'goals'])
       self.assert_failure(pants_run)
-      self.assertIn("Exception message: Invalid option 'invalid_option' under [test.junit]", pants_run.stderr_data)
+      self.assertIn("ERROR] Invalid option 'invalid_option' under [test.junit]", pants_run.stderr_data)
 
   def test_from_config_invalid_global_option(self):
     """
@@ -153,10 +156,12 @@ class TestOptionsIntegration(PantsRunIntegrationTest):
 
           [GLOBAL]
           invalid_global: True
+          another_invalid_global: False
 
           [test.junit]
           fail_fast: True
         '''))
       pants_run = self.run_pants(['--config-override={}'.format(config_path), '--verify-config', 'goals'])
       self.assert_failure(pants_run)
-      self.assertIn("Exception message: Invalid option 'invalid_global' under [GLOBAL]", pants_run.stderr_data)
+      self.assertIn("ERROR] Invalid option 'invalid_global' under [GLOBAL]", pants_run.stderr_data)
+      self.assertIn("ERROR] Invalid option 'another_invalid_global' under [GLOBAL]", pants_run.stderr_data)
