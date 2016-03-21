@@ -203,6 +203,10 @@ class RoundEngine(Engine):
     if len(goals) == 0:
       raise TaskError('No goals to prepare')
 
+    # Preemptively validate command line options.
+    for scope in context.options.scope_to_flags.keys():
+      context.options.for_scope(scope)
+
     goal_info_by_goal = OrderedDict()
     target_roots_replacement = self.TargetRootsReplacement()
     for goal in reversed(OrderedSet(goals)):
