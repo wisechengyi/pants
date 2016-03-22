@@ -203,7 +203,7 @@ class RoundEngine(Engine):
     if len(goals) == 0:
       raise TaskError('No goals to prepare')
 
-    # Preemptively validate command line options.
+    # Option values are usually computed lazily on demand, but command line options are eagerly computed for validation.
     for scope in context.options.scope_to_flags.keys():
       context.options.for_scope(scope)
 
