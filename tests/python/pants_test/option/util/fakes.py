@@ -113,6 +113,9 @@ def create_options(options, passthru_args=None):
     def items(self):
       return options.items()
 
+    def scope_to_flags(self):
+      return {}
+
     def get_fingerprintable_for_scope(self, scope):
       return []
 
