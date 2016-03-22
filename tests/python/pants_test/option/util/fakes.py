@@ -113,6 +113,7 @@ def create_options(options, passthru_args=None):
     def items(self):
       return options.items()
 
+    @property
     def scope_to_flags(self):
       return {}
 
