@@ -14,12 +14,13 @@ from pants.base.cmd_line_spec_parser import CmdLineSpecParser
 from pants.build_graph.address import Address
 from pants.engine.exp.addressable import Addresses
 from pants.engine.exp.engine import LocalSerialEngine
+from pants.engine.exp.examples.graph_validator import PartiallyConsumedInputsError
 from pants.engine.exp.examples.planners import (ApacheThriftJavaConfiguration, Classpath, GenGoal,
                                                 Jar, JavaSources, ThriftSources,
                                                 setup_json_scheduler)
 from pants.engine.exp.nodes import (ConflictingProducersError, DependenciesNode, Return, SelectNode,
                                     Throw, Waiting)
-from pants.engine.exp.scheduler import PartiallyConsumedInputsError, ProductGraph
+from pants.engine.exp.scheduler import ProductGraph
 from pants.engine.exp.storage import Key
 
 
