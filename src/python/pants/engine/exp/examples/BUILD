@@ -5,6 +5,7 @@ python_library(
   name='planners',
   sources=['planners.py'],
   dependencies=[
+    ':graph_validator',
     'src/python/pants/base:exceptions',
     'src/python/pants/build_graph',
     'src/python/pants/base:file_system_project_tree',
