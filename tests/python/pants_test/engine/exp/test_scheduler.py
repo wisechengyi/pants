@@ -214,7 +214,6 @@ class SchedulerTest(unittest.TestCase):
                             SelectNode(self.java_multi, Classpath, None, None),
                             ConflictingProducersError)
 
-
   def test_descendant_specs(self):
     """Test that Addresses are produced via recursive globs of the 3rdparty/jvm directory."""
     spec = self.spec_parser.parse_spec('3rdparty/jvm::')

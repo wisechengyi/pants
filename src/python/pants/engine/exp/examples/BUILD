@@ -23,6 +23,14 @@ python_library(
 )
 
 python_library(
+  name='graph_validator',
+  sources=['graph_validator.py'],
+  dependencies=[
+    'src/python/pants/engine/exp:nodes',
+  ]
+)
+
+python_library(
   name='visualizer',
   sources=['visualizer.py'],
   dependencies=[

@@ -5,11 +5,13 @@
 from __future__ import (absolute_import, division, generators, nested_scopes, print_function,
                         unicode_literals, with_statement)
 
+import unittest
+
 from pants.engine.exp.examples.graph_validator import PartiallyConsumedInputsError
 from pants_test.engine.exp.test_scheduler import SchedulerTest
 
 
-class ExperimentalSchedulerTest(SchedulerTest):
+class ExperimentalSchedulerTest(SchedulerTest, unittest.TestCase):
   def test_no_variant_thrift(self):
     """No `thrift` variant is configured, and so no configuration is selected."""
     build_request = self.request(['compile'], self.no_variant_thrift)
