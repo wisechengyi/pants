@@ -535,6 +535,8 @@ class LocalScheduler(object):
   def validate(self):
     """Validates the generated product graph with the configured GraphValidator."""
     if self._graph_validator is None:
-      raise ValueError("Graph validator not set in scheduler.")
+      print("WARN: Graph validator not set in scheduler. Validation Skipped.")
+      return
+
     with self._product_graph_lock:
       self._graph_validator.validate(self._product_graph)
