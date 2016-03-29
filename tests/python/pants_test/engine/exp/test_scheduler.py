@@ -14,7 +14,6 @@ from pants.base.cmd_line_spec_parser import CmdLineSpecParser
 from pants.build_graph.address import Address
 from pants.engine.exp.addressable import Addresses
 from pants.engine.exp.engine import LocalSerialEngine
-from pants.engine.exp.examples.graph_validator import PartiallyConsumedInputsError
 from pants.engine.exp.examples.planners import (ApacheThriftJavaConfiguration, Classpath, GenGoal,
                                                 Jar, JavaSources, ThriftSources,
                                                 setup_json_scheduler)
@@ -215,22 +214,6 @@ class SchedulerTest(unittest.TestCase):
                             SelectNode(self.java_multi, Classpath, None, None),
                             ConflictingProducersError)
 
-  def test_no_variant_thrift(self):
-    """No `thrift` variant is configured, and so no configuration is selected."""
-    build_request = self.request(['compile'], self.no_variant_thrift)
-
-    with self.assertRaises(PartiallyConsumedInputsError):
-      self.build_and_walk(build_request)
-
-  def test_unconfigured_thrift(self):
-    """The BuildPropertiesPlanner is able to produce a Classpath, but we should still fail.
-
-    A target with ThriftSources doesn't have a thrift config: that input is partially consumed.
-    """
-    build_request = self.request(['compile'], self.unconfigured_thrift)
-
-    with self.assertRaises(PartiallyConsumedInputsError):
-      self.build_and_walk(build_request)
 
   def test_descendant_specs(self):
     """Test that Addresses are produced via recursive globs of the 3rdparty/jvm directory."""

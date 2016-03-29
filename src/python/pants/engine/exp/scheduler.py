@@ -12,7 +12,6 @@ from collections import defaultdict
 from pants.base.specs import DescendantAddresses, SiblingAddresses, SingleAddress
 from pants.build_graph.address import Address
 from pants.engine.exp.addressable import Addresses
-from pants.engine.exp.examples.graph_validator import GraphValidator
 from pants.engine.exp.fs import PathGlobs, Paths
 from pants.engine.exp.nodes import (DependenciesNode, FilesystemNode, Node, Noop, Return,
                                     SelectNode, State, StepContext, TaskNode, Throw, Waiting)
@@ -341,7 +340,7 @@ class StepResult(datatype('Step', ['state_key', 'dependencies'])):
 class LocalScheduler(object):
   """A scheduler that expands a ProductGraph by executing user defined tasks."""
 
-  def __init__(self, goals, tasks, symbol_table_cls, storage, project_tree, graph_lock=None):
+  def __init__(self, goals, tasks, storage, project_tree, graph_lock=None, graph_validator=None):
     """
     :param goals: A dict from a goal name to a product type. A goal is just an alias for a
            particular (possibly synthetic) product.
@@ -358,7 +357,7 @@ class LocalScheduler(object):
     self._project_tree = project_tree
     self._node_builder = NodeBuilder.create(self._tasks)
 
-    self._graph_validator = GraphValidator(symbol_table_cls)
+    self._graph_validator = graph_validator
     self._product_graph = ProductGraph()
     self._product_graph_lock = graph_lock or threading.RLock()
     self._step_id = 0
@@ -535,5 +534,7 @@ class LocalScheduler(object):
 
   def validate(self):
     """Validates the generated product graph with the configured GraphValidator."""
+    if self._graph_validator is None:
+      raise ValueError("Graph validator not set in scheduler.")
     with self._product_graph_lock:
       self._graph_validator.validate(self._product_graph)
