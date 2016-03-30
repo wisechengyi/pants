@@ -16,13 +16,13 @@ from pants.base.specs import DescendantAddresses, SingleAddress
 from pants.build_graph.address import Address
 from pants.engine.exp.addressable import SubclassesOf, addressable_list
 from pants.engine.exp.engine import LocalSerialEngine
-from pants.engine.exp.graph import UnhydratedStruct
+from pants.engine.exp.examples.parsers import JsonParser
+from pants.engine.exp.graph import UnhydratedStruct, create_graph_tasks
 from pants.engine.exp.mapper import (AddressFamily, AddressMap, AddressMapper,
                                      DifferingFamiliesError, DuplicateNameError, ResolveError,
                                      UnaddressableObjectError)
 from pants.engine.exp.nodes import Throw
-from pants.engine.exp.parsers import JsonParser, SymbolTable
-from pants.engine.exp.register import create_graph_tasks
+from pants.engine.exp.parser import SymbolTable
 from pants.engine.exp.storage import Storage
 from pants.engine.exp.struct import HasStructs, Struct
 from pants.util.dirutil import safe_open
@@ -188,10 +188,10 @@ class AddressMapperTest(unittest.TestCase, SchedulerTestBase):
       raise result.error
 
     # Expect a single root.
-    state_key, = result.root_products.values()
-    if state_key.type is Throw:
-      raise self.storage.get(state_key).exc
-    return self.storage.get(state_key).value
+    state, = result.root_products.values()
+    if type(state) is Throw:
+      raise state.exc
+    return state.value
 
   def resolve_multi(self, spec):
     return {uhs.address: uhs.struct for uhs in self.resolve(spec)}

@@ -13,9 +13,12 @@ from pants.base.specs import DescendantAddresses, SiblingAddresses, SingleAddres
 from pants.build_graph.address import Address
 from pants.engine.exp.addressable import Addresses
 from pants.engine.exp.fs import PathGlobs, Paths
-from pants.engine.exp.nodes import (DependenciesNode, FilesystemNode, Node, Noop, Return,
-                                    SelectNode, State, StepContext, TaskNode, Throw, Waiting)
+from pants.engine.exp.nodes import (DependenciesNode, FilesystemNode, Node, Noop, ProjectionNode,
+                                    Return, SelectNode, State, StepContext, TaskNode, Throw,
+                                    Waiting)
 from pants.engine.exp.objects import Closable
+from pants.engine.exp.selectors import (Select, SelectDependencies, SelectLiteral, SelectProjection,
+                                        SelectVariant)
 from pants.util.objects import datatype
 
 
@@ -35,14 +38,14 @@ class ProductGraph(object):
     # context specific error messages when they are introduced.
     self._cyclic_dependencies = defaultdict(set)
 
-  def _set_state(self, node, state_key):
-    existing_state_key = self._node_results.get(node, None)
-    if existing_state_key is not None:
+  def _set_state(self, node, state):
+    existing_state = self._node_results.get(node, None)
+    if existing_state is not None:
       raise ValueError('Node {} is already completed:\n  {}\n  {}'
-                       .format(node, existing_state_key, state_key))
-    elif state_key.type not in [Return, Throw, Noop]:
-      raise ValueError('Cannot complete Node {} with state_key {}'.format(node, state_key))
-    self._node_results[node] = state_key
+                       .format(node, existing_state, state))
+    elif type(state) not in [Return, Throw, Noop]:
+      raise ValueError('Cannot complete Node {} with state {}'.format(node, state))
+    self._node_results[node] = state
 
   def is_complete(self, node):
     return node in self._node_results
@@ -50,14 +53,14 @@ class ProductGraph(object):
   def state(self, node):
     return self._node_results.get(node, None)
 
-  def update_state(self, node, state_key, dependencies=None):
+  def update_state(self, node, state):
     """Updates the Node with the given State."""
-    if state_key.type in [Return, Throw, Noop]:
-      self._set_state(node, state_key)
-    elif state_key.type is Waiting:
-      self._add_dependencies(node, dependencies)
+    if type(state) in [Return, Throw, Noop]:
+      self._set_state(node, state)
+    elif type(state) is Waiting:
+      self._add_dependencies(node, state.dependencies)
     else:
-      raise State.raise_unrecognized(state_key)
+      raise State.raise_unrecognized(state)
 
   def _detect_cycle(self, src, dest):
     """Given a src and a dest, each of which _might_ already exist in the graph, detect cycles.
@@ -183,8 +186,8 @@ class ProductGraph(object):
     allow them to request it specifically.
     """
     def _default_walk_predicate(entry):
-      node, state_key = entry
-      return state_key.type is not Noop
+      node, state = entry
+      return type(state) is not Noop
     predicate = predicate or _default_walk_predicate
 
     def _filtered_entries(nodes):
@@ -197,7 +200,7 @@ class ProductGraph(object):
     adjacencies = self.dependents_of if dependents else self.dependencies_of
     def _walk(entries):
       for entry in entries:
-        node, state_key = entry
+        node, state = entry
         if node in walked:
           continue
         walked.add(node)
@@ -274,6 +277,27 @@ class NodeBuilder(Closable):
     for task, anded_clause in self._tasks[product]:
       yield TaskNode(subject, product, variants, task, anded_clause)
 
+  def select_node(self, selector, subject, variants):
+    """Constructs a Node for the given Selector and the given Subject/Variants.
+
+    This method is decoupled from Selector classes in order to allow the `selector` package to not
+    need a dependency on the `nodes` package.
+    """
+    selector_type = type(selector)
+    if selector_type is Select:
+      return SelectNode(subject, selector.product, variants, None)
+    elif selector_type is SelectVariant:
+      return SelectNode(subject, selector.product, variants, selector.variant_key)
+    elif selector_type is SelectDependencies:
+      return DependenciesNode(subject, selector.product, variants, selector.deps_product, selector.field)
+    elif selector_type is SelectProjection:
+      return ProjectionNode(subject, selector.product, variants, selector.projected_subject, selector.fields, selector.input_product)
+    elif selector_type is SelectLiteral:
+      # NB: Intentionally ignores subject parameter to provide a literal subject.
+      return SelectNode(selector.subject, selector.product, variants, None)
+    else:
+      raise ValueError('Unrecognized Selector type "{}" for: {}'.format(selector_type, selector))
+
 
 class StepRequest(datatype('Step', ['step_id', 'node', 'dependencies', 'project_tree'])):
   """Additional inputs needed to run Node.step for the given Node.
@@ -286,38 +310,12 @@ class StepRequest(datatype('Step', ['step_id', 'node', 'dependencies', 'project_
   :param project_tree: A FileSystemProjectTree instance.
   """
 
-  def __call__(self, node_builder, storage):
-    def from_keys():
-      """Translate keys into dependency nodes and their respective states."""
-      dependencies = {}
-      for dep_key, state_key in self.dependencies.items():
-        dependencies[storage.get(dep_key)] = storage.get(state_key)
-      return dependencies
-
-    def to_key(state):
-      """Introduce a potentially new State, and returns its key and optional dependencies."""
-      state_key = storage.put(state)
-      dependencies = state.dependencies if type(state) is Waiting else None
-      return state_key, dependencies
+  def __call__(self, node_builder):
 
     """Called by the Engine in order to execute this Step."""
-    step_context = StepContext(node_builder, storage, self.project_tree)
-
-    dependencies = from_keys()
-    state = self.node.step(dependencies, step_context)
-
-    state_key, dependencies = to_key(state)
-    return StepResult(state_key, dependencies)
-
-  def keyable_fields(self):
-    """Return fields for the purpose of computing the cache key of this step request.
-
-    Some special handling is needed to compute cache key for step request.
-    First step_id should be dropped, because it's only an identifier not part
-    of the input for execution. We also want to sort the dependencies map by
-    keys, i.e, node_keys, to eliminate non-determinism.
-    """
-    return (self.node, sorted(self.dependencies.items()), self.project_tree)
+    step_context = StepContext(node_builder, self.project_tree)
+    state = self.node.step(self.dependencies, step_context)
+    return (StepResult(state,))
 
   def __eq__(self, other):
     return type(self) == type(other) and self.step_id == other.step_id
@@ -329,11 +327,10 @@ class StepRequest(datatype('Step', ['step_id', 'node', 'dependencies', 'project_
     return hash(self.step_id)
 
 
-class StepResult(datatype('Step', ['state_key', 'dependencies'])):
+class StepResult(datatype('Step', ['state'])):
   """The result of running a Step, passed back to the Scheduler via the Promise class.
 
-  :param state_key: The key of the State that is returned by the Step.
-  :param dependencies: Optional dependency nodes when the type of `State` is `Waiting`.
+  :param state: The State value returned by the Step.
   """
 
 
@@ -346,14 +343,12 @@ class LocalScheduler(object):
            particular (possibly synthetic) product.
     :param tasks: A set of (output, input selection clause, task function) triples which
            is used to compute values in the product graph.
-    :param storage: Content address storage instance, shared with engine.
     :param project_tree: An instance of ProjectTree for the current build root.
     :param graph_lock: A re-entrant lock to use for guarding access to the internal ProductGraph
                        instance. Defaults to creating a new threading.RLock().
     """
     self._products_by_goal = goals
     self._tasks = tasks
-    self._storage = storage
     self._project_tree = project_tree
     self._node_builder = NodeBuilder.create(self._tasks)
 
@@ -375,14 +370,14 @@ class LocalScheduler(object):
     # See whether all of the dependencies for the node are available.
     deps = dict()
     for dep in self._product_graph.dependencies_of(node):
-      state_key = self._product_graph.state(dep)
-      if state_key is None:
+      state = self._product_graph.state(dep)
+      if state is None:
         return None
-      deps[self._storage.put(dep)] = state_key
+      deps[dep] = state
     # Additionally, include Noops for any dependencies that were cyclic.
     for dep in self._product_graph.cyclic_dependencies_of(node):
       noop_state = Noop('Dep from {} to {} would cause a cycle.'.format(node, dep))
-      deps[self._storage.put(dep)] = self._storage.put(noop_state)
+      deps[dep] = noop_state
 
     # Ready.
     self._step_id += 1
@@ -402,7 +397,7 @@ class LocalScheduler(object):
     :param goals: The list of goal names supplied on the command line.
     :type goals: list of string
     :param subjects: A list of Spec and/or PathGlobs objects.
-    :type subject_keys: list of :class:`pants.base.specs.Spec`, `pants.build_graph.Address`, and/or
+    :type subject: list of :class:`pants.base.specs.Spec`, `pants.build_graph.Address`, and/or
       :class:`pants.engine.exp.fs.PathGlobs` objects.
     :returns: An ExecutionRequest for the given goals and subjects.
     """
@@ -421,8 +416,9 @@ class LocalScheduler(object):
 
     :param products: A list of product types to request for the roots.
     :type products: list of types
-    :param subject_keys: A list of Keys that reference Spec and/or PathGlobs objects in the storage.
-    :type subject_keys: list of :class:`pants.engine.exp.Key`.
+    :param subjects: A list of Spec and/or PathGlobs objects.
+    :type subject: list of :class:`pants.base.specs.Spec`, `pants.build_graph.Address`, and/or
+      :class:`pants.engine.exp.fs.PathGlobs` objects.
     :returns: An ExecutionRequest for the given products and subjects.
     """
 
@@ -452,9 +448,9 @@ class LocalScheduler(object):
 
   def _complete_step(self, node, step_result):
     """Given a StepResult for the given Node, complete the step."""
-    state_key, dependencies = step_result.state_key, step_result.dependencies
+    result = step_result.state
     # Update the Node's state in the graph.
-    self._product_graph.update_state(node, state_key, dependencies=dependencies)
+    self._product_graph.update_state(node, result)
 
   def invalidate(self, predicate=None):
     """Calls `ProductGraph.invalidate()` against an internal ProductGraph instance under
@@ -524,12 +520,12 @@ class LocalScheduler(object):
               # All deps are already completed: mark this Node as a candidate for another step.
               candidates.add(step.node)
 
-      print('created {} total nodes in {} scheduling iterations and {} steps, '
-            'with {} nodes in the executed path.'.format(
-              len(self._product_graph.dependencies()),
+      print('executed {} nodes in {} scheduling iterations. '
+            'there have been {} total steps for {} total nodes.'.format(
+              sum(1 for _ in self._product_graph.walk(execution_request.roots)),
               scheduling_iterations,
               self._step_id,
-              sum(1 for _ in self._product_graph.walk(execution_request.roots))),
+              len(self._product_graph.dependencies())),
             file=sys.stderr)
 
       if self._graph_validator is not None:
