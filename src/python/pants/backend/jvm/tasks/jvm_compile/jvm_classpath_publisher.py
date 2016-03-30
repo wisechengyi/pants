@@ -35,15 +35,14 @@ class RuntimeClasspathPublisher(Task):
     runtime_classpath = self.context.products.get_data('runtime_classpath')
     targets = self.context.targets()
     if self.get_options().manifest_only:
-      classpath_manifest_jar = os.path.join(basedir, "classpath_manifest.jar")
+      manifest_jar = os.path.join(basedir, "manifest.jar")
       classpath = ClasspathUtil.classpath(targets, runtime_classpath)
       # Safely create e.g. dist/export-classpath/tmp2oLDYp.jar
       temp_jar = safe_classpath(classpath, basedir)[0]
-      # Clean up any old "classpath_manifest_jar",
-      # and rename `temp_jar` to "classpath_manifest.jar".
-      if os.path.exists(classpath_manifest_jar):
-        rm_rf(classpath_manifest_jar)
-      os.rename(temp_jar, classpath_manifest_jar)
+      # Clean up any old "manifest.jar".
+      if os.path.exists(manifest_jar):
+        rm_rf(manifest_jar)
+      os.rename(temp_jar, manifest_jar)
     else:
       ClasspathUtil.create_canonical_classpath(runtime_classpath,
                                                targets,
