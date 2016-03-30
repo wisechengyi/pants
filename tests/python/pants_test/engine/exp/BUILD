@@ -118,11 +118,6 @@ python_tests(
   sources=['test_graph_validator.py'],
   coverage=['pants.engine.exp.nodes', 'pants.engine.exp.scheduler'],
   dependencies=[
-    # 'src/python/pants/build_graph',
-    # 'src/python/pants/engine/exp/examples:planners',
-    # 'src/python/pants/engine/exp/examples:graph_validator',
-    # 'src/python/pants/engine/exp:engine',
-    # 'src/python/pants/engine/exp:scheduler',
     ':scheduler',
   ]
 )
