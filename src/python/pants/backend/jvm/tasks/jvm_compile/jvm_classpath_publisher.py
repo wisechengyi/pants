@@ -8,7 +8,9 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
 import os
 
 from pants.backend.jvm.tasks.classpath_util import ClasspathUtil
+from pants.java.util import safe_classpath
 from pants.task.task import Task
+from pants.util.dirutil import rm_rf
 
 
 class RuntimeClasspathPublisher(Task):
@@ -17,6 +19,8 @@ class RuntimeClasspathPublisher(Task):
   @classmethod
   def register_options(cls, register):
     super(Task, cls).register_options(register)
+    register('--synthetic-classpath-only', type=bool, default=False,
+             help='Only export classpath in a synthetic jar.')
 
   @classmethod
   def prepare(cls, options, round_manager):
@@ -29,7 +33,15 @@ class RuntimeClasspathPublisher(Task):
   def execute(self):
     basedir = os.path.join(self.get_options().pants_distdir, self._output_folder)
     runtime_classpath = self.context.products.get_data('runtime_classpath')
-    ClasspathUtil.create_canonical_classpath(runtime_classpath,
-                                             self.context.targets(),
-                                             basedir,
-                                             save_classpath_file=True)
+    targets = self.context.targets()
+    if self.get_options().synthetic_classpath_only:
+      synthetic_jar_path = os.path.join(basedir, "current.jar")
+      classpath = ClasspathUtil.classpath(targets, runtime_classpath)
+      synthetic_jar = safe_classpath(classpath, basedir)
+      rm_rf(synthetic_jar_path)
+      os.rename(synthetic_jar[0], synthetic_jar_path)
+    else:
+      ClasspathUtil.create_canonical_classpath(runtime_classpath,
+                                               targets,
+                                               basedir,
+                                               save_classpath_file=True)
