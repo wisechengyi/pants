@@ -42,22 +42,21 @@ class GraphValidator(object):
 
   def _collect_partially_consumed_inputs(self, product_graph, consumed_inputs, root):
     """Walks below a failed node and collects cases where additional literal products could be used.
-
     Returns:
       dict(subject, dict(tuple(input_product, output_product), list(tuple(task, missing_products))))
     """
     partials = defaultdict(lambda: defaultdict(list))
     # Walk all nodes for the same subject under this root.
     def predicate(entry):
-      node, state_key = entry
+      node, state = entry
       return root.subject == node.subject
-    for ((node, state_key), dependencies) in product_graph.walk([root], predicate=predicate):
+    for ((node, state), dependencies) in product_graph.walk([root], predicate=predicate):
       # Look for unsatisfied TaskNodes with at least one unsatisfied dependency.
       if type(node) is not TaskNode:
         continue
-      if state_key.type is not Noop:
+      if type(state) is not Noop:
         continue
-      missing_products = {dep.product for dep, state_key in dependencies if state_key.type is Noop}
+      missing_products = {dep.product for dep, state in dependencies if type(state) is Noop}
       if not missing_products:
         continue
 
