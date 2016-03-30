@@ -32,8 +32,8 @@ class GraphValidator(object):
     consumed_inputs = set()
     # Walk into successful nodes for the same subject under this root.
     def predicate(entry):
-      node, state_key = entry
-      return root.subject == node.subject and state_key.type is Return
+      node, state = entry
+      return root.subject == node.subject and type(state) is Return
     # If a product was successfully selected, record it.
     for ((node, _), _) in product_graph.walk([root], predicate=predicate):
       if type(node) is SelectNode:
