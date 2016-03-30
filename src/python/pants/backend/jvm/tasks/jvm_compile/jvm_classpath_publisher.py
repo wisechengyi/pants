@@ -19,8 +19,8 @@ class RuntimeClasspathPublisher(Task):
   @classmethod
   def register_options(cls, register):
     super(Task, cls).register_options(register)
-    register('--synthetic-only', type=bool, default=False,
-             help='Only export classpath in a synthetic jar.')
+    register('--classpath-manifest-only', type=bool, default=False,
+             help='Only export classpath in a manifest jar.')
 
   @classmethod
   def prepare(cls, options, round_manager):
@@ -34,12 +34,16 @@ class RuntimeClasspathPublisher(Task):
     basedir = os.path.join(self.get_options().pants_distdir, self._output_folder)
     runtime_classpath = self.context.products.get_data('runtime_classpath')
     targets = self.context.targets()
-    if self.get_options().synthetic_only:
-      synthetic_jar_path = os.path.join(basedir, "current.jar")
+    if self.get_options().classpath_manifest_only:
+      classpath_manifest_jar = os.path.join(basedir, "classpath_manifest.jar")
       classpath = ClasspathUtil.classpath(targets, runtime_classpath)
-      synthetic_jar = safe_classpath(classpath, basedir)
-      rm_rf(synthetic_jar_path)
-      os.rename(synthetic_jar[0], synthetic_jar_path)
+      # Safely create e.g. dist/export-classpath/tmp2oLDYp.jar
+      temp_jar = safe_classpath(classpath, basedir)[0]
+      # Clean up any old "classpath_manifest_jar",
+      # and rename `temp_jar` to "classpath_manifest.jar".
+      if os.path.exists(classpath_manifest_jar):
+        rm_rf(classpath_manifest_jar)
+      os.rename(temp_jar, classpath_manifest_jar)
     else:
       ClasspathUtil.create_canonical_classpath(runtime_classpath,
                                                targets,
