@@ -532,11 +532,5 @@ class LocalScheduler(object):
               sum(1 for _ in self._product_graph.walk(execution_request.roots))),
             file=sys.stderr)
 
-  def validate(self):
-    """Validates the generated product graph with the configured GraphValidator."""
-    if self._graph_validator is None:
-      print("WARN: Graph validator not set in scheduler. Validation Skipped.")
-      return
-
-    with self._product_graph_lock:
-      self._graph_validator.validate(self._product_graph)
+      if self._graph_validator is not None:
+        self._graph_validator.validate(self._product_graph)
