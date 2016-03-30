@@ -16,11 +16,10 @@ class GraphValidator(object):
   TODO: The name "literal" here is overloaded with SelectLiteral, which is a better fit
   for the name. The values here are more "user-specified/configured" than "literal".
 
-  TODO: If this abstraction seems useful, we should extract an interface and allow plugin
-  implementers to install their own. But currently the API isn't great: in particular, it
-  would be very, very helpful to be able to run validation _during_ graph execution as
-  subgraphs are completing. This would limit their performance impact, and allow for better
-  locality of errors.
+  This class offers the abstraction to allow plugin implementers to install their own.
+  TODO: The current implementation is slow, and ideally validation _during_ graph
+  should run while subgraphs are completing. This would limit their performance
+  impact, and allow for better locality of errors.
   """
 
   def __init__(self, symbol_table_cls):
