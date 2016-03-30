@@ -19,7 +19,7 @@ class RuntimeClasspathPublisher(Task):
   @classmethod
   def register_options(cls, register):
     super(Task, cls).register_options(register)
-    register('--synthetic-classpath-only', type=bool, default=False,
+    register('--synthetic-only', type=bool, default=False,
              help='Only export classpath in a synthetic jar.')
 
   @classmethod
@@ -34,7 +34,7 @@ class RuntimeClasspathPublisher(Task):
     basedir = os.path.join(self.get_options().pants_distdir, self._output_folder)
     runtime_classpath = self.context.products.get_data('runtime_classpath')
     targets = self.context.targets()
-    if self.get_options().synthetic_classpath_only:
+    if self.get_options().synthetic_only:
       synthetic_jar_path = os.path.join(basedir, "current.jar")
       classpath = ClasspathUtil.classpath(targets, runtime_classpath)
       synthetic_jar = safe_classpath(classpath, basedir)
