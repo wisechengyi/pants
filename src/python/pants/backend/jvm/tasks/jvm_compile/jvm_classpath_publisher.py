@@ -10,7 +10,6 @@ import os
 from pants.backend.jvm.tasks.classpath_util import ClasspathUtil
 from pants.java.util import safe_classpath
 from pants.task.task import Task
-from pants.util.dirutil import rm_rf
 
 
 class RuntimeClasspathPublisher(Task):
