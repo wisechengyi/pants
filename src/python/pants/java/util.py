@@ -15,7 +15,7 @@ from pants.java.executor import Executor, SubprocessExecutor
 from pants.java.jar.manifest import Manifest
 from pants.java.nailgun_executor import NailgunExecutor
 from pants.util.contextutil import open_zip, temporary_file
-from pants.util.dirutil import safe_mkdir, safe_mkdtemp
+from pants.util.dirutil import safe_concurrent_rename, safe_mkdir, safe_mkdtemp
 from pants.util.process_handler import ProcessHandler, SubprocessProcessHandler
 
 
@@ -272,15 +272,13 @@ def safe_classpath(classpath, synthetic_jar_dir, custom_name=None):
   manifest = Manifest()
   manifest.addentry(Manifest.CLASS_PATH, ' '.join(bundled_classpath))
 
-  def write_manifest_to_jar(jar_file, manifest):
-    with open_zip(jar_file, mode='w', compression=ZIP_STORED) as jar_file:
-      jar_file.writestr(Manifest.PATH, manifest.contents())
-    return [jar_file.name]
+  with temporary_file(root_dir=synthetic_jar_dir, cleanup=False, suffix='.jar') as jar_file:
+    with open_zip(jar_file, mode='w', compression=ZIP_STORED) as jar:
+      jar.writestr(Manifest.PATH, manifest.contents())
 
-  if custom_name:
-    full_path = os.path.join(synthetic_jar_dir, custom_name)
-    with open(full_path, 'w+') as jar_file:
-      return write_manifest_to_jar(jar_file, manifest)
-  else:
-    with temporary_file(root_dir=synthetic_jar_dir, cleanup=False, suffix='.jar') as jar_file:
-      return write_manifest_to_jar(jar_file, manifest)
+    if custom_name:
+      custom_path = os.path.join(synthetic_jar_dir, custom_name)
+      safe_concurrent_rename(jar_file.name, custom_path)
+      return [custom_path]
+    else:
+      return [jar_file.name]
