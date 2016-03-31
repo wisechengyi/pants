@@ -248,7 +248,7 @@ def relativize_classpath(classpath, root_dir, followlinks=True):
 
 
 # VisibleForTesting
-def safe_classpath(classpath, synthetic_jar_dir):
+def safe_classpath(classpath, synthetic_jar_dir, custom_name=None):
   """Bundles classpath into one synthetic jar that includes original classpath in its manifest.
 
   This is to ensure classpath length never exceeds platform ARG_MAX.
@@ -257,6 +257,7 @@ def safe_classpath(classpath, synthetic_jar_dir):
   :param string synthetic_jar_dir: directory to store the synthetic jar, if `None`
     a temp directory will be provided and cleaned up upon process exit. Otherwise synthetic
     jar will remain in the supplied directory, only for debugging purpose.
+  :param custom_name: filename of the synthetic jar to be created.
 
   :returns: A classpath (singleton list with just the synthetic jar).
   :rtype: list of strings
@@ -274,4 +275,9 @@ def safe_classpath(classpath, synthetic_jar_dir):
   with temporary_file(root_dir=synthetic_jar_dir, cleanup=False, suffix='.jar') as jar_file:
     with open_zip(jar_file, mode='w', compression=ZIP_STORED) as jar:
       jar.writestr(Manifest.PATH, manifest.contents())
-    return [jar_file.name]
+    if custom_name:
+      full_path = os.path.join(synthetic_jar_dir, custom_name)
+      os.rename(jar_file.name, full_path)
+      return [full_path]
+    else:
+      return [jar_file.name]

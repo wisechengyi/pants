@@ -19,7 +19,7 @@ class RuntimeClasspathPublisher(Task):
   @classmethod
   def register_options(cls, register):
     super(Task, cls).register_options(register)
-    register('--manifest-only', type=bool, default=False,
+    register('--manifest-jar-only', type=bool, default=False,
              help='Only export classpath in a manifest jar.')
 
   @classmethod
@@ -34,15 +34,10 @@ class RuntimeClasspathPublisher(Task):
     basedir = os.path.join(self.get_options().pants_distdir, self._output_folder)
     runtime_classpath = self.context.products.get_data('runtime_classpath')
     targets = self.context.targets()
-    if self.get_options().manifest_only:
-      manifest_jar = os.path.join(basedir, "manifest.jar")
+    if self.get_options().manifest_jar_only:
       classpath = ClasspathUtil.classpath(targets, runtime_classpath)
-      # Safely create e.g. dist/export-classpath/tmp2oLDYp.jar
-      temp_jar = safe_classpath(classpath, basedir)[0]
-      # Clean up any old "manifest.jar".
-      if os.path.exists(manifest_jar):
-        rm_rf(manifest_jar)
-      os.rename(temp_jar, manifest_jar)
+      # Safely create e.g. dist/export-classpath/manifest.jar
+      safe_classpath(classpath, basedir, "manifest.jar")
     else:
       ClasspathUtil.create_canonical_classpath(runtime_classpath,
                                                targets,
