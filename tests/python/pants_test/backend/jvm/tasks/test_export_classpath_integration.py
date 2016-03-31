@@ -26,4 +26,4 @@ class ExportClasspathIntegrationTest(PantsRunIntegrationTest):
       # ctime is only accurate to second.
       time.sleep(1)
 
-    self.assertTrue(ctimes[1] > ctimes[0], "manifest.jar is not overwritten")
+    self.assertTrue(ctimes[1] > ctimes[0], "{} is not overwritten.".format(manifest_jar_path))
