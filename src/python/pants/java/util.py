@@ -272,12 +272,15 @@ def safe_classpath(classpath, synthetic_jar_dir, custom_name=None):
   manifest = Manifest()
   manifest.addentry(Manifest.CLASS_PATH, ' '.join(bundled_classpath))
 
-  with temporary_file(root_dir=synthetic_jar_dir, cleanup=False, suffix='.jar') as jar_file:
-    with open_zip(jar_file, mode='w', compression=ZIP_STORED) as jar:
-      jar.writestr(Manifest.PATH, manifest.contents())
-    if custom_name:
-      full_path = os.path.join(synthetic_jar_dir, custom_name)
-      os.rename(jar_file.name, full_path)
-      return [full_path]
-    else:
-      return [jar_file.name]
+  def write_manifest_to_jar(jar_file, manifest):
+    with open_zip(jar_file, mode='w', compression=ZIP_STORED) as jar_file:
+      jar_file.writestr(Manifest.PATH, manifest.contents())
+    return [jar_file.name]
+
+  if custom_name:
+    full_path = os.path.join(synthetic_jar_dir, custom_name)
+    with open(full_path, 'w+') as jar_file:
+      return write_manifest_to_jar(jar_file, manifest)
+  else:
+    with temporary_file(root_dir=synthetic_jar_dir, cleanup=False, suffix='.jar') as jar_file:
+      return write_manifest_to_jar(jar_file, manifest)
