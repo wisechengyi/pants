@@ -106,7 +106,6 @@ PKG_SCALAJS=(
 function pkg_scalajs_install_test() {
   execute_packaged_pants_with_internal_backends \
       --plugins="['pantsbuild.pants.contrib.scalajs==$(local_version)']" \
-      --no-verify-config \
       test contrib/scalajs::
 }
 
