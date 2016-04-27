@@ -116,8 +116,8 @@ python_library(
   name='selectors',
   sources=['selectors.py'],
   dependencies=[
-    'src/python/pants/util:meta',
     'src/python/pants/util:memo',
+    'src/python/pants/util:meta',
     'src/python/pants/util:objects',
   ]
 )
