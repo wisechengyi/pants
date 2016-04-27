@@ -352,10 +352,10 @@ def identity(v):
   return v
 
 
-Files = Collection.of(File, ('dependencies',))
-Dirs = Collection.of(Dir, ('dependencies',))
-FilesContent = Collection.of(FileContent, ('dependencies',))
-Links = Collection.of(Link, ('dependencies',))
+Files = Collection.of(File)
+Dirs = Collection.of(Dir)
+FilesContent = Collection.of(FileContent)
+Links = Collection.of(Link)
 
 
 def create_fs_tasks():

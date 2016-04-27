@@ -79,7 +79,7 @@ class Collection(object):
 
   @classmethod
   @memoized
-  def of(cls, element_type, fields=()):
+  def of(cls, element_type, fields=('dependencies',)):
     type_name = b'{}({!r})'.format(cls.__name__, element_type)
 
     collection_of_type = type(type_name, (cls, datatype("{}s".format(element_type.__name__), fields)), {})
@@ -88,10 +88,3 @@ class Collection(object):
     setattr(sys.modules[cls.__module__], type_name, collection_of_type)
 
     return collection_of_type
-
-  @classmethod
-  def ext(cls):
-    raise NotImplementedError()
-
-  def __repr__(self):
-    return '{}(of={!r})'.format(self.__class__.__name__, self.ext)
