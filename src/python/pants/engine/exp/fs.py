@@ -15,10 +15,10 @@ import six
 from twitter.common.collections.orderedset import OrderedSet
 
 from pants.base.project_tree import PTSTAT_DIR, PTSTAT_FILE, PTSTAT_LINK
-from pants.engine.exp.selectors import Select, SelectDependencies, SelectProjection
+from pants.engine.exp.selectors import Collection, Select, SelectDependencies, SelectProjection
 from pants.source.wrapped_globs import Globs, RGlobs, ZGlobs
 from pants.util.meta import AbstractClass
-from pants.util.objects import Collection, datatype
+from pants.util.objects import datatype
 
 
 class Stat(AbstractClass):
@@ -352,10 +352,10 @@ def identity(v):
   return v
 
 
-Files = Collection.of(File)
-Dirs = Collection.of(Dir)
-FilesContent = Collection.of(FileContent)
-Links = Collection.of(Link)
+Files = Collection.of(File, ('dependencies',))
+Dirs = Collection.of(Dir, ('dependencies',))
+FilesContent = Collection.of(FileContent, ('dependencies',))
+Links = Collection.of(Link, ('dependencies',))
 
 
 def create_fs_tasks():
