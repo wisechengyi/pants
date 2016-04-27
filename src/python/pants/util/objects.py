@@ -27,7 +27,7 @@ def datatype(*args, **kwargs):
 
 class Collection(object):
   """
-  Single Collection Type.
+  Singleton Collection Type.
   """
 
   @classmethod
