@@ -16,6 +16,7 @@ python_library(
   name = 'project_tree',
   sources = ['project_tree.py'],
   dependencies = [
+    '3rdparty/python:pathspec',
     'src/python/pants/util:dirutil',
     'src/python/pants/util:meta',
     'src/python/pants/util:objects',
@@ -36,6 +37,7 @@ python_library(
   sources = ['scm_project_tree.py'],
   dependencies = [
     ':project_tree',
+    'src/python/pants/util:memo',
   ]
 )
 

@@ -54,7 +54,7 @@ class ExportTask(IvyTaskMixin, PythonTask):
   # Patch version x.x.1 : Increment this field when a minor format change that just adds information
   #   that an application can safely ignore.
   #
-  # Note format changes in src/python/pants/docs/export.md and update the Changelog section.
+  # Note format changes in src/docs/export.md and update the Changelog section.
   #
   DEFAULT_EXPORT_VERSION = '1.0.7'
 
@@ -288,7 +288,8 @@ class ExportTask(IvyTaskMixin, PythonTask):
     jvm_distributions = DistributionLocator.global_instance().all_jdk_paths()
     if jvm_distributions:
       deprecated_conditional(lambda: True, '0.0.89',
-                             'jvm_distributions is deprecated in favor of preferred_jvm_distributions.')
+                             'jvm_distributions is deprecated in favor of '
+                             'preferred_jvm_distributions.')
       graph_info['jvm_distributions'] = jvm_distributions
 
     # `jvm_distributions` are static distribution settings from config,

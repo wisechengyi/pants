@@ -1,3 +1,5 @@
+// Copyright 2016 Pants project contributors (see CONTRIBUTORS.md).
+// Licensed under the Apache License, Version 2.0 (see LICENSE).
 package org.pantsbuild.tools.junit.lib;
 
 import java.util.concurrent.CountDownLatch;
@@ -9,8 +11,8 @@ import static org.junit.Assert.assertTrue;
 /**
  * This test is intentionally under a java_library() BUILD target so it will not be run
  * on its own. It is run by the ConsoleRunnerTest suite to test ConsoleRunnerImpl.
- *
- * This test is designed to exercise the junit runner -parallel-methods argument
+ *<p>
+ * Exercises the junit runner -parallel-methods argument.
  * <p>
  * For all methods in ParallelMethodsDefaultParallelTest1 and ParallelMethodsDefaultParallelTest2
  * to succeed all of the test methods must be running at the same time. Intended to test the flags
@@ -25,7 +27,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class ParallelMethodsDefaultParallelTest1 {
   private static final int NUM_CONCURRENT_TESTS = 4;
-  private static final int RETRY_TIMEOUT_MS = 10000;
+  private static final int RETRY_TIMEOUT_MS = 3000;
   private static CountDownLatch latch = new CountDownLatch(NUM_CONCURRENT_TESTS);
 
   @Test
@@ -40,9 +42,7 @@ public class ParallelMethodsDefaultParallelTest1 {
 
   static void awaitLatch(String methodName) throws Exception {
     TestRegistry.registerTestCall(methodName);
-    System.out.println("start " + methodName);
     latch.countDown();
     assertTrue(latch.await(RETRY_TIMEOUT_MS, TimeUnit.MILLISECONDS));
-    System.out.println("end " + methodName);
   }
 }
