@@ -98,7 +98,7 @@ class PushDb(object):
 
     major = int(db_get('revision.major', '0'))
     minor = int(db_get('revision.minor', '0'))
-    patch = int(db_get('revision.patch', '1'))
+    patch = int(db_get('revision.patch', '0'))
     snapshot = str(db_get('revision.snapshot', 'false')).lower() == 'true'
     named_version = db_get('revision.named_version', None)
     named_is_latest = str(db_get('revision.named_is_latest', 'false')).lower() == 'true'
@@ -149,14 +149,9 @@ class PomWriter(object):
     self._tag = tag
 
   def write(self, target, path):
-    if 'idl-thrift-only-jar.science.src.thrift.com.twitter.expandodo.cards-scala' in target.id:
-      import pdb
-      pdb.set_trace()
-
     dependencies = OrderedDict()
     for internal_dep in target_internal_dependencies(target):
       jar = self._as_versioned_jar(internal_dep)
-
       key = (jar.org, jar.name)
       dependencies[key] = self._internaldep(jar, internal_dep)
 
@@ -173,9 +168,6 @@ class PomWriter(object):
     template_relpath = os.path.join(_TEMPLATES_RELPATH, 'pom.xml.mustache')
     template_text = pkgutil.get_data(__name__, template_relpath)
     generator = Generator(template_text, project=target_jar)
-
-
-
     with safe_open(path, 'w') as output:
       generator.write(output)
 
@@ -607,9 +599,6 @@ class JarPublish(ScmPublishMixin, JarTask):
       return entry.fingerprint or '0.0.0'
 
     def stage_artifacts(tgt, jar, version, tag, changelog):
-      if 'expandodo:cards-scala' in tgt.address.spec:
-        import pdb
-        pdb.set_trace()
       publications = OrderedSet()
 
       # TODO Remove this once we fix https://github.com/pantsbuild/pants/issues/1229
