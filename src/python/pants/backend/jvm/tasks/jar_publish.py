@@ -39,7 +39,6 @@ from pants.util.strutil import ensure_text
 
 _TEMPLATES_RELPATH = os.path.join('templates', 'jar_publish')
 
-
 class PushDb(object):
 
   @staticmethod
@@ -176,8 +175,8 @@ class PomWriter(object):
     jar, _ = internal_target.get_artifact_info()
     pushdb_entry = self._get_db(internal_target).get_entry(internal_target)
     classifier = jar.classifier
-    if 'idl-thrift-only-jar' in internal_target.identifier:
-      classifier = 'idl'
+    # if 'idl-thrift-only-jar' in internal_target.identifier:
+    #   classifier = 'idl'
     return jar.copy(rev=pushdb_entry.version().version(), classifier=classifier)
 
   def _internaldep(self, jar_dependency, target):
@@ -562,7 +561,8 @@ class JarPublish(ScmPublishMixin, JarTask):
 
   def execute(self):
     self.check_clean_master(commit=(not self.dryrun and self.commit))
-
+    # pydevd.settrace('localhost', port=5005, stdoutToServer=True, stderrToServer=True)
+    # pydevd.settrace('127.0.0.1', port=5005, stdoutToServer=True, stderrToServer=True)
     exported_targets = self.exported_targets()
     self.check_targets(exported_targets)
 
