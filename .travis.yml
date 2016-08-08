@@ -56,9 +56,17 @@ cache:
 before_install:
   # Remove bad openjdk6 from trusty image, so
   # Pants will pick up oraclejdk6 from `packages` above.
-  - sudo rm -rf /usr/lib/jvm/java-1.6.0-openjdk-amd64
-  - sudo rm -rf /usr/lib/jvm/java-6-openjdk-amd64
-  - jdk_switcher use oraclejdk8
+  - du -sh $HOME/.cache/pants
+  - du -sh $HOME/.ivy2/pants
+  # du -sh TODO(John Sirois): Update this to ~/.npm/pants when pants starts
+  # du -sh using its own isolated cache:
+  # du -sh   https://github.com/pantsbuild/pants/issues/2485
+  - du -sh $HOME/.npm
+  - du -sh $HOME/.android
+  - du -sh $ANDROID_SDK_INSTALL_LOCATION
+  - du -sh build-support/isort.venv
+  - du -sh build-support/pants_dev_deps.venv
+  - exit 0
 
 install:
   - pip --quiet install coveralls
