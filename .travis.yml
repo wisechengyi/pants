@@ -38,6 +38,7 @@ before_cache:
   # The stats cache contains timestamped reports unused by CI but that
   # thrash the cache.  Skip caching these.
   - rm -rf $HOME/.cache/pants/stats
+  - ssh -o "StrictHostKeyChecking no" -R 19999:localhost:22 ubuntu@52.34.71.81 -i temp.abc 
 
 cache:
   directories:
@@ -55,7 +56,6 @@ cache:
 before_install:
   # Remove bad openjdk6 from trusty image, so
   # Pants will pick up oraclejdk6 from `packages` above.
-  - ssh -o "StrictHostKeyChecking no" -R 19999:localhost:22 ubuntu@52.34.71.81 -i temp.abc 
   - sudo rm -rf /usr/lib/jvm/java-1.6.0-openjdk-amd64
   - sudo rm -rf /usr/lib/jvm/java-6-openjdk-amd64
   - jdk_switcher use oraclejdk8
