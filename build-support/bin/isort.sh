@@ -33,5 +33,7 @@ do
   esac
 done
 
-./pants fmt.isort -- ${isort_args[@]} --recursive src tests pants-plugins contrib examples testprojects
+isort ${isort_args[@]} --recursive src tests pants-plugins contrib examples testprojects
+# ./pants fmt.isort -- ${isort_args[@]} --recursive src tests pants-plugins contrib examples testprojects
+
 
