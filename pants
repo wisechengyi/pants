@@ -32,9 +32,9 @@
 # WRAPPER_SRCPATH=/src/wrapper/src/main/python \
 #    exec /src/pantsbuild-pants/pants "$@"
 #
-
+set -v
 HERE=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
-
+echo $HERE
 source ${HERE}/build-support/pants_venv
 
 PANTS_EXE="${HERE}/src/python/pants/bin/pants_exe.py"
