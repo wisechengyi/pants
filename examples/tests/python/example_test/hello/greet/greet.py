@@ -6,9 +6,13 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
                         unicode_literals, with_statement)
 
 import os
+import pdb
 import unittest
 
 from example.hello.greet.greet import greet
+
+
+pdb.set_trace()
 
 
 class GreetTest(unittest.TestCase):

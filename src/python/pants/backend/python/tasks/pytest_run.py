@@ -549,6 +549,8 @@ class PytestRun(TestRunnerTaskMixin, PythonTask):
     # scrubbing all `PEX_*` environment overrides and we use overrides when running pexes in this
     # task.
 
+    logger.debug(' '.join(pex.cmdline(args)))
+
     process = subprocess.Popen(pex.cmdline(args),
                                preexec_fn=os.setsid if setsid else None,
                                stdout=workunit.output('stdout'),
