@@ -443,7 +443,7 @@ class LocalScheduler(object):
       DescendantAddresses: select_dep_addrs,
     }
 
-    RulesetValidator(self._node_builder, goals, self._root_selector_fns.keys()).validate()
+    RulesetValidator(self._node_builder, goals, self._root_selector_fns).validate()
 
   def visualize_graph_to_file(self, roots, filename):
     """Visualize a graph walk by writing graphviz `dot` output to a file.
@@ -530,6 +530,18 @@ class LocalScheduler(object):
           yield self._node_builder.select_node(selector_fn(product), subject, None)
 
     return ExecutionRequest(tuple(roots()))
+
+  def selection_request(self, requests):
+    """Create and return an ExecutionRequest for the given (selector, subject) tuples.
+
+    This method allows users to specify their own selectors. It has the potential to replace
+    execution_request, which is a subset of this method, because it uses default selectors.
+    :param requests: A list of (selector, subject) tuples.
+    :return: An ExecutionRequest for the given selectors and subjects.
+    """
+    #TODO: Think about how to deprecate the existing execution_request API.
+    roots = (self._node_builder.select_node(selector, subject, None) for (selector, subject) in requests)
+    return ExecutionRequest(tuple(roots))
 
   @property
   def product_graph(self):
