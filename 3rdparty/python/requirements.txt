@@ -14,7 +14,6 @@ pathspec==0.3.4
 pep8==1.6.2
 pex==1.1.13
 psutil==4.3.0
-pydevd==0.0.6
 pyflakes==1.1.0
 Pygments==1.4
 pystache==0.5.3

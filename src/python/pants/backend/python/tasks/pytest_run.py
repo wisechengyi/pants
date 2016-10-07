@@ -548,34 +548,17 @@ class PytestRun(TestRunnerTaskMixin, PythonTask):
     # NB: We don't use pex.run(...) here since it makes a point of running in a clean environment,
     # scrubbing all `PEX_*` environment overrides and we use overrides when running pexes in this
     # task.
-    import pydevd
-    pydevd_exe = pydevd.__file__
-    pex_location = pex._pex
-
-    test_file = args[-1]
-
-    # /usr/bin/python /Users/yic/Desktop/IJ/2016.2.4-system/plugins-sandbox/plugins/python/helpers/pydev/pydevd.py --multiproc
-    # --qt-support --client 127.0.0.1 --port 64044 --file /Users/yic/Desktop/IJ/2016.2.4-system/plugins-sandbox/plugins/python/helpers/pycharm/utrunner.py
-    #  /Users/yic/workspace/pants/examples/tests/python/example_test/hello/greet/greet.py true
-    port = self.get_passthru_args()[0]
-    my_args = [
-      pex._interpreter.binary,
-      pydevd_exe,
-      '--multiproc',
-      '--qt-support',
-      '--client',
-      '127.0.0.1',
-      '--port',
-      port,
-      '--file',
-      '/Users/yic/Desktop/IJ/2016.2.4-system/plugins-sandbox/plugins/python/helpers/pycharm/utrunner.py',
-      test_file,
-    ]
-
+    chroot_path = pex._pex
     env = os.environ.copy()
-    env["PYTHONPATH"]= env["PYTHONPATH"] + pex_location + ':'
-    logger.debug(' '.join(my_args))
-    process = subprocess.Popen(my_args,
+
+    dep_dir =  os.path.join(chroot_path, '.deps')
+
+    env["PYTHONPATH"] += ':' + chroot_path
+    for dirname in os.listdir(dep_dir):
+      env["PYTHONPATH"] += ':' + os.path.join(dep_dir, dirname)
+
+    logger.info(' '.join(self.get_passthru_args()))
+    process = subprocess.Popen([pex._interpreter.binary, '-s'] + self.get_passthru_args(),
                                preexec_fn=os.setsid if setsid else None,
                                env=env,
                                stdout=workunit.output('stdout'),

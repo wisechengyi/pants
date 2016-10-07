@@ -9,7 +9,6 @@ python_library(
     '3rdparty/python/twitter/commons:twitter.common.dirutil',
     '3rdparty/python:coverage',
     '3rdparty/python:pex',
-    '3rdparty/python:pydevd',
     '3rdparty/python:pytest',
     '3rdparty/python:pytest-cov',
     '3rdparty/python:setuptools',
