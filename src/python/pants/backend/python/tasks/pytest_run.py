@@ -557,8 +557,14 @@ class PytestRun(TestRunnerTaskMixin, PythonTask):
     for dirname in os.listdir(dep_dir):
       env["PYTHONPATH"] += ':' + os.path.join(dep_dir, dirname)
 
-    logger.info(' '.join(self.get_passthru_args()))
-    process = subprocess.Popen([pex._interpreter.binary, '-s'] + self.get_passthru_args(),
+
+    my_args = [pex._interpreter.binary] + self.get_passthru_args()
+    # my_args.insert(1, chroot_path)
+    logger.info(' '.join(my_args))
+
+
+
+    process = subprocess.Popen(my_args,
                                preexec_fn=os.setsid if setsid else None,
                                env=env,
                                stdout=workunit.output('stdout'),
