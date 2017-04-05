@@ -8,7 +8,8 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
 import fnmatch
 import logging
 import os
-from types import NoneType
+# from types import NoneType
+NoneType = type(None)
 
 from pants.base.deprecated import deprecated
 from pants.base.project_tree import Dir, File, Link, ProjectTree

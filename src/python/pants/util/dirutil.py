@@ -92,7 +92,7 @@ def safe_file_dump(filename, payload):
   :param string payload: The string to write to the file.
   """
   with safe_open(filename, 'wb') as f:
-    f.write(payload)
+    f.write(payload.encode('utf-8'))
 
 
 def read_file(filename):

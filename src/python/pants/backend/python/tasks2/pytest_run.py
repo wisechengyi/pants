@@ -188,7 +188,7 @@ class PytestRun(TestRunnerTaskMixin, PythonExecutionTaskBase):
       args.append('--junitxml={}'.format(xml_path))
     yield args
 
-  DEFAULT_COVERAGE_CONFIG = dedent(b"""
+  DEFAULT_COVERAGE_CONFIG = dedent("""
     [run]
     branch = True
     timid = True

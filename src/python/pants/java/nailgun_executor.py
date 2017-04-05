@@ -70,9 +70,9 @@ class NailgunExecutor(Executor, ProcessManager):
   _NG_PORT_REGEX = re.compile(r'.*\s+port\s+(\d+)\.$')
 
   # Used to identify if we own a given nailgun server.
-  _PANTS_NG_ARG_PREFIX = b'-Dpants.buildroot'
-  _PANTS_FINGERPRINT_ARG_PREFIX = b'-Dpants.nailgun.fingerprint'
-  _PANTS_OWNER_ARG_PREFIX = b'-Dpants.nailgun.owner'
+  _PANTS_NG_ARG_PREFIX = '-Dpants.buildroot'
+  _PANTS_FINGERPRINT_ARG_PREFIX = '-Dpants.nailgun.fingerprint'
+  _PANTS_OWNER_ARG_PREFIX = '-Dpants.nailgun.owner'
   _PANTS_NG_BUILDROOT_ARG = '='.join((_PANTS_NG_ARG_PREFIX, get_buildroot()))
 
   _NAILGUN_SPAWN_LOCK = threading.Lock()

@@ -13,10 +13,10 @@ source ${REPO_ROOT}/build-support/common.sh
 
 
 if [[ -z "${PY}" ]]; then
-  if which python2.7 >/dev/null; then
-    PY=`which python2.7`
+  if which python3.6 >/dev/null; then
+    PY=`which python3.6`
   else
-    die 'No python2.7 interpreter found on the path.  Python will not work!'
+    die 'No python3.6 interpreter found on the path.  Python will not work!'
   fi
 fi
 

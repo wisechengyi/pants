@@ -383,8 +383,10 @@ class HtmlReporter(Reporter):
         element = [element]
 
       # Map assumes None for missing values, so this will pick the default for those.
-      (text, detail, detail_id, detail_initially_visible) = \
-        list(map(lambda x, y: x or y, element, ('', None, None, False)))
+      # (text, detail, detail_id, detail_initially_visible) = \
+      #   list(map(lambda x, y: x or y, element, ('', None, None, False)))
+
+      (text, detail, detail_id, detail_initially_visible) = ('', None, None, False)
 
       htmlified_text = self._htmlify_text(text)
 
@@ -454,7 +456,7 @@ class HtmlReporter(Reporter):
 
   def _htmlify_text(self, s):
     """Make text HTML-friendly."""
-    colored = self._handle_ansi_color_codes(cgi.escape(s.decode('utf-8', 'replace')))
+    colored = self._handle_ansi_color_codes(s)
     return linkify(self._buildroot, colored, self._linkify_memo).replace('\n', '</br>')
 
   _ANSI_COLOR_CODE_RE = re.compile(r'\033\[((?:\d|;)*)m')

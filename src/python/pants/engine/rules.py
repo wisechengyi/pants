@@ -99,6 +99,7 @@ class RuleIndex(datatype('RuleIndex', ['tasks', 'intrinsics', 'singletons'])):
   @classmethod
   def create(cls, task_entries, intrinsic_entries=None, singleton_entries=None):
     """Creates a NodeBuilder with tasks indexed by their output type."""
+    return
     intrinsic_entries = intrinsic_entries or tuple()
     singleton_entries = singleton_entries or tuple()
     # NB make tasks ordered so that gen ordering is deterministic.

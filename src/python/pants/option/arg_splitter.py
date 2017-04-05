@@ -260,7 +260,7 @@ class ArgSplitter(object):
 
   def _at_flag(self):
     return (self._unconsumed_args and
-            self._unconsumed_args[-1].startswith(b'-') and
+            self._unconsumed_args[-1].startswith('-') and
             not self._at_double_dash())
 
   def _at_scope(self):

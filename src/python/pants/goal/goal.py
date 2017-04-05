@@ -152,7 +152,7 @@ class _Goal(object):
     # a class method to an instance method, and instantiating the task much sooner in the
     # lifecycle.
     superclass = task_registrar.task_type
-    subclass_name = b'{0}_{1}'.format(superclass.__name__,
+    subclass_name = '{0}_{1}'.format(superclass.__name__,
                                       options_scope.replace('.', '_').replace('-', '_'))
     task_type = type(subclass_name, (superclass,), {
       '__doc__': superclass.__doc__,

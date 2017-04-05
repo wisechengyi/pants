@@ -22,7 +22,7 @@ from pants.goal.context import Context
 from pants.goal.goal import Goal
 from pants.goal.run_tracker import RunTracker
 from pants.help.help_printer import HelpPrinter
-from pants.init.pants_daemon_launcher import PantsDaemonLauncher
+# from pants.init.pants_daemon_launcher import PantsDaemonLauncher
 from pants.init.target_roots import TargetRoots
 from pants.java.nailgun_executor import NailgunProcessGroup
 from pants.reporting.reporting import Reporting
@@ -182,8 +182,9 @@ class GoalRunnerFactory(object):
       return goals, context
 
   def setup(self):
-    pantsd_launcher = PantsDaemonLauncher.Factory.global_instance().create(EngineInitializer)
-    self._maybe_launch_pantsd(pantsd_launcher)
+    # pantsd_launcher = PantsDaemonLauncher.Factory.global_instance().create(EngineInitializer)
+    # self._maybe_launch_pantsd(pantsd_launcher)
+    pantsd_launcher = None
     self._handle_help(self._help_request)
     goals, context = self._setup_context(pantsd_launcher)
     return GoalRunner(context=context,
@@ -222,7 +223,7 @@ class GoalRunner(object):
       RunTracker,
       Changed.Factory,
       Native.Factory,
-      PantsDaemonLauncher.Factory,
+      # PantsDaemonLauncher.Factory,
     }
 
   def _execute_engine(self):
