@@ -186,7 +186,7 @@ class ArgSplitter(object):
 
     while self._unconsumed_args and not self._at_double_dash():
       arg = self._unconsumed_args.pop()
-      if arg.startswith(b'-'):
+      if arg.startswith('-'):
         # We assume any args here are in global scope.
         if not self._check_for_help_request(arg):
           assign_flag_to_scope(arg, GLOBAL_SCOPE)
@@ -236,7 +236,7 @@ class ArgSplitter(object):
 
   def _descope_flag(self, flag, default_scope):
     """If the flag is prefixed by its scope, in the old style, extract the scope.
-
+DescendantAddresses
     Otherwise assume it belongs to default_scope.
 
     returns a pair (scope, flag).
@@ -267,4 +267,4 @@ class ArgSplitter(object):
     return self._unconsumed_args and self._unconsumed_args[-1] in self._known_scopes
 
   def _at_double_dash(self):
-    return self._unconsumed_args and self._unconsumed_args[-1] == b'--'
+    return self._unconsumed_args and self._unconsumed_args[-1] == '--'

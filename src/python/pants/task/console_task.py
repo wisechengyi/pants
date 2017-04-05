@@ -30,7 +30,7 @@ class ConsoleTask(QuietTaskMixin, Task):
 
   def __init__(self, *args, **kwargs):
     super(ConsoleTask, self).__init__(*args, **kwargs)
-    self._console_separator = self.get_options().sep.decode('string-escape')
+    self._console_separator = self.get_options().sep
     if self.get_options().output_file:
       try:
         self._outstream = safe_open(os.path.abspath(self.get_options().output_file), 'w')
@@ -55,7 +55,7 @@ class ConsoleTask(QuietTaskMixin, Task):
       try:
         targets = self.context.targets()
         for value in self.console_output(targets):
-          self._outstream.write(value.encode('utf-8'))
+          self._outstream.write(value)
           self._outstream.write(self._console_separator)
       finally:
         self._outstream.flush()
