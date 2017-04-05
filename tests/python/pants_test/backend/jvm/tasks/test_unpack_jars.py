@@ -130,19 +130,19 @@ class UnpackJarsTest(TaskTestBase):
       self._add_dummy_product(unpack_task, foo_target, jar_filename, rev1)
       unpacked_targets = unpack_task.execute()
 
-      self.assertEquals([foo_target], unpacked_targets)
+      self.assertEqual([foo_target], unpacked_targets)
       unpack_dir = unpack_task._unpack_dir(foo_target)
       files = []
       for _, dirname, filenames in safe_walk(unpack_dir):
         files += filenames
-      self.assertEquals(['foo.proto'], files)
+      self.assertEqual(['foo.proto'], files)
 
       # Calling the task a second time should not need to unpack any targets
       unpack_task = self.create_task(self.context(target_roots=[foo_target]))
       self._add_dummy_product(unpack_task, foo_target, jar_filename, rev1)
       unpacked_targets = unpack_task.execute()
 
-      self.assertEquals([], unpacked_targets)
+      self.assertEqual([], unpacked_targets)
 
       # Change the library version and the target should be unpacked again.
       self.reset_build_graph()  # Forget about the old definition of the unpack/jars:foo-jar target
@@ -153,7 +153,7 @@ class UnpackJarsTest(TaskTestBase):
       self._add_dummy_product(unpack_task, foo_target, jar_filename, rev2)
       unpacked_targets = unpack_task.execute()
 
-      self.assertEquals([foo_target], unpacked_targets)
+      self.assertEqual([foo_target], unpacked_targets)
 
       # Change the include pattern and the target should be unpacked again
       self.reset_build_graph()  # Forget about the old definition of the unpack/jars:foo-jar target
@@ -165,6 +165,6 @@ class UnpackJarsTest(TaskTestBase):
       self._add_dummy_product(unpack_task, foo_target, jar_filename, rev2)
       unpacked_targets = unpack_task.execute()
 
-      self.assertEquals([foo_target], unpacked_targets)
+      self.assertEqual([foo_target], unpacked_targets)
 
       # TODO(Eric Ayers) Check the 'unpacked_archives' product

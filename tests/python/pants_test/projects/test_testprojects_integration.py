@@ -90,8 +90,7 @@ class TestProjectsIntegrationTest(ProjectIntegrationTest):
 
     targets_to_exclude = (known_failing_targets + negative_test_targets + need_java_8 +
                           timeout_targets + deliberately_conflicting_targets)
-    exclude_opts = map(lambda target: '--exclude-target-regexp={}'.format(target),
-                       targets_to_exclude)
+    exclude_opts = ['--exclude-target-regexp={}'.format(target) for target in targets_to_exclude]
 
     # Run list with exclude options, then parse and sort output.
     pants_run = self.run_pants(['list', 'testprojects::', 'examples::'] + exclude_opts)
@@ -114,7 +113,7 @@ class TestProjectsIntegrationTest(ProjectIntegrationTest):
     self.assert_success(pants_run)
 
   def test_self(self):
-    self.assertEquals([t for s in range(0, self._SHARDS)
+    self.assertEqual([t for s in range(0, self._SHARDS)
                          for t in self.targets_for_shard(s)], 
                       self.targets)
 

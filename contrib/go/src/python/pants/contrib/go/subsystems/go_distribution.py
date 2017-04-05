@@ -118,7 +118,7 @@ class GoDistribution(object):
       return subprocess.check_output(self.cmdline, env=env, **kwargs)
 
     def __str__(self):
-      return (' '.join('{}={}'.format(k, v) for k, v in self.env.items()) +
+      return (' '.join('{}={}'.format(k, v) for k, v in list(self.env.items())) +
               ' ' +
               ' '.join(self.cmdline))
 

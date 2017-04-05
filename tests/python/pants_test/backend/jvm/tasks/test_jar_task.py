@@ -52,7 +52,7 @@ class BaseJarTaskTest(JarTaskTestBase):
       yield fd.name
 
   def assert_listing(self, jar, *expected_items):
-    self.assertEquals({'META-INF/', 'META-INF/MANIFEST.MF'} | set(expected_items),
+    self.assertEqual({'META-INF/', 'META-INF/MANIFEST.MF'} | set(expected_items),
                       set(jar.namelist()))
 
 
@@ -87,7 +87,7 @@ class JarTaskTest(BaseJarTaskTest):
 
         with open_zip(existing_jarfile) as jar:
           self.assert_listing(jar, 'f/', 'f/g/', 'f/g/h')
-          self.assertEquals('e', jar.read('f/g/h'))
+          self.assertEqual('e', jar.read('f/g/h'))
 
   def test_update_writestr(self):
     def assert_writestr(path, contents, *entries):
@@ -97,7 +97,7 @@ class JarTaskTest(BaseJarTaskTest):
 
         with open_zip(existing_jarfile) as jar:
           self.assert_listing(jar, *entries)
-          self.assertEquals(contents, jar.read(path))
+          self.assertEqual(contents, jar.read(path))
 
     assert_writestr('a.txt', b'b', 'a.txt')
     assert_writestr('a/b/c.txt', b'd', 'a/', 'a/b/', 'a/b/c.txt')
@@ -116,7 +116,7 @@ class JarTaskTest(BaseJarTaskTest):
 
         with open_zip(existing_jarfile) as jar:
           self.assert_listing(jar, 'f/', 'f/g/', 'f/g/h')
-          self.assertEquals('e', jar.read('f/g/h'))
+          self.assertEqual('e', jar.read('f/g/h'))
 
   def test_overwrite_writestr(self):
     with self.jarfile() as existing_jarfile:
@@ -125,7 +125,7 @@ class JarTaskTest(BaseJarTaskTest):
 
       with open_zip(existing_jarfile) as jar:
         self.assert_listing(jar, 'README')
-        self.assertEquals('42', jar.read('README'))
+        self.assertEqual('42', jar.read('README'))
 
   @contextmanager
   def _test_custom_manifest(self):
@@ -137,7 +137,7 @@ class JarTaskTest(BaseJarTaskTest):
 
       with open_zip(existing_jarfile) as jar:
         self.assert_listing(jar, 'README')
-        self.assertEquals('42', jar.read('README'))
+        self.assertEqual('42', jar.read('README'))
         self.assertNotEqual(manifest_contents, jar.read('META-INF/MANIFEST.MF'))
 
       with self.jar_task.open_jar(existing_jarfile, overwrite=False) as jar:
@@ -145,8 +145,8 @@ class JarTaskTest(BaseJarTaskTest):
 
       with open_zip(existing_jarfile) as jar:
         self.assert_listing(jar, 'README')
-        self.assertEquals('42', jar.read('README'))
-        self.assertEquals(manifest_contents, jar.read('META-INF/MANIFEST.MF'))
+        self.assertEqual('42', jar.read('README'))
+        self.assertEqual(manifest_contents, jar.read('META-INF/MANIFEST.MF'))
 
   def test_custom_manifest_str(self):
     with self._test_custom_manifest() as (jar, manifest_contents):
@@ -281,7 +281,7 @@ class JarBuilderTest(BaseJarTaskTest):
             'Can-Retransform-Classes': 'true',
             'Can-Set-Native-Method-Prefix': 'true',
         }
-        self.assertEquals(set(expected_entries.items()),
+        self.assertEqual(set(expected_entries.items()),
                           set(expected_entries.items()).intersection(set(all_entries.items())))
 
   def test_manifest_items(self):
@@ -313,5 +313,5 @@ class JarBuilderTest(BaseJarTaskTest):
           'Foo': 'foo-value',
           'Implementation-Version': '1.2.3',
           }
-        self.assertEquals(set(expected_entries.items()),
+        self.assertEqual(set(expected_entries.items()),
                           set(expected_entries.items()).intersection(set(all_entries.items())))

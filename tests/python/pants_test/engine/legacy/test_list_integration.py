@@ -55,7 +55,7 @@ class ListIntegrationTest(PantsRunIntegrationTest):
                                 'testprojects/tests/python/pants/build_parsing::',
                                 success=True,
                                 enable_v2_engine=True)
-    self.assertEquals(
+    self.assertEqual(
       pants_run.stdout_data.strip(),
       'testprojects/tests/python/pants/build_parsing:test-nested-variable-access-in-function-call'
     )
@@ -65,7 +65,7 @@ class ListIntegrationTest(PantsRunIntegrationTest):
                                 'testprojects/tests/java/org/pantsbuild/build_parsing::',
                                 success=True,
                                 enable_v2_engine=True)
-    self.assertRegexpMatches(
+    self.assertRegex(
       pants_run.stdout_data,
       r'testprojects/tests/java/org/pantsbuild/build_parsing:trailing_glob_doublestar'
     )

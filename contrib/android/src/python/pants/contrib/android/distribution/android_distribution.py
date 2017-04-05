@@ -55,7 +55,7 @@ class AndroidDistribution(object):
       yield sdk_path('ANDROID_SDK_HOME')
       yield sdk_path('ANDROID_SDK')
 
-    for path in filter(None, search_path(path)):
+    for path in [_f for _f in search_path(path) if _f]:
       dist = cls(sdk_path=path)
       return dist
     raise cls.DistributionError('Failed to locate Android SDK. Please install '

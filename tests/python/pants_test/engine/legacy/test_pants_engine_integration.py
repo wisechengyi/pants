@@ -12,8 +12,8 @@ class PantsEngineIntegrationTest(PantsRunIntegrationTest):
   def test_engine_list(self):
     pants_run = self.run_pants(['-ldebug', '--enable-v2-engine', 'list', '3rdparty::'])
     self.assert_success(pants_run)
-    self.assertRegexpMatches(pants_run.stderr_data, 'build_graph is: .*LegacyBuildGraph')
-    self.assertRegexpMatches(pants_run.stderr_data,
+    self.assertRegex(pants_run.stderr_data, 'build_graph is: .*LegacyBuildGraph')
+    self.assertRegex(pants_run.stderr_data,
                              'ran \d+ scheduling iterations and \d+ runnables in')
     self.assertNotRegexpMatches(pants_run.stderr_data, 'pantsd is running at pid \d+')
 

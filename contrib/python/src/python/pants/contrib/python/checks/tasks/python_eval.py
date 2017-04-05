@@ -49,7 +49,7 @@ class PythonEval(PythonTask):
       return
 
     targets = self.context.targets() if self.get_options().closure else self.context.target_roots
-    with self.invalidated(filter(self._is_evalable, targets),
+    with self.invalidated(list(filter(self._is_evalable, targets)),
                           topological_order=True) as invalidation_check:
       compiled = self._compile_targets(invalidation_check.invalid_vts)
       return compiled  # Collected and returned for tests

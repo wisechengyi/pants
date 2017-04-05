@@ -71,7 +71,7 @@ class IsortPythonTask(Task):
 
   def _calculate_isortable_python_sources(self, targets):
     """Generate a set of source files from the given targets."""
-    python_eval_targets = filter(self.is_non_synthetic_python_target, targets)
+    python_eval_targets = list(filter(self.is_non_synthetic_python_target, targets))
     sources = set()
     for target in python_eval_targets:
       sources.update(

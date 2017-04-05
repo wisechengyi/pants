@@ -36,9 +36,9 @@ def compare_config(config_paths):
   def get_keys(c, s):
     """Return all keys provided in section s of config c."""
     if s == 'DEFAULT':
-      return [k for k in c._defaults.keys()]
+      return [k for k in list(c._defaults.keys())]
     elif c.has_section(s):
-      return [k for k in c._sections[section].keys() if k != '__name__']
+      return [k for k in list(c._sections[section].keys()) if k != '__name__']
     else:
       return []
 
@@ -87,9 +87,9 @@ def compare_config(config_paths):
     """The value line, annotated with the path of the config which was the source of this value."""
     return '{}{}  # {}'.format(prefix, pretty(path_and_val[1]), path_and_val[0]).encode('utf8')
 
-  for section, section_dict in compared_config.items():
+  for section, section_dict in list(compared_config.items()):
     section_header = '\n[{}]'.format(section)
-    for key, vals in section_dict.items():
+    for key, vals in list(section_dict.items()):
       if len([v for v in vals if v[1] is not None]) > 1:
         if section_header:
           # Only print section_header if we actually have anything to say about that section.

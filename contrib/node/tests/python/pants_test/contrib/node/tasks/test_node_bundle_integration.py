@@ -54,7 +54,7 @@ class NodeBundleIntegrationTest(PantsRunIntegrationTest):
     self.assert_success(pants_run)
 
     with self._extract_archive(self.WEB_COMPONENT_BUTTON_ARTIFACT) as temp_dir:
-      self.assertEquals(
+      self.assertEqual(
         set(os.listdir(temp_dir)),
         set(['src', 'test', 'node_modules', 'package.json', 'webpack.config.js'])
       )
@@ -70,7 +70,7 @@ class NodeBundleIntegrationTest(PantsRunIntegrationTest):
     self.assert_success(pants_run)
 
     with self._extract_archive(self.WEB_COMPONENT_BUTTON_PROCESSED_ARTIFACT) as temp_dir:
-      self.assertEquals(
+      self.assertEqual(
         set(os.listdir(temp_dir)),
         set(['Button.js'])
       )
@@ -85,7 +85,7 @@ class NodeBundleIntegrationTest(PantsRunIntegrationTest):
     self.assert_success(pants_run)
 
     with self._extract_archive(self.JVM_PROJECT_ARTIFACT) as temp_dir:
-      self.assertEquals(
+      self.assertEqual(
         set(os.listdir(os.path.join(temp_dir, self.WEB_COMPONENT_BUTTON_PROCESSED_PROJECT))),
         set(['Button.js'])
       )
@@ -105,7 +105,7 @@ class NodeBundleIntegrationTest(PantsRunIntegrationTest):
 
     with self._extract_archive(self.JVM_WITH_ARTIFACTS_ARTIFACT) as temp_dir:
       print (os.listdir(temp_dir))
-      self.assertEquals(
+      self.assertEqual(
         set(os.listdir(os.path.join(temp_dir, self.WITH_DEPENDENCY_ARTIFACTS_PROJECT))),
         set(['Button.js'])
       )
@@ -121,7 +121,7 @@ class NodeBundleIntegrationTest(PantsRunIntegrationTest):
     self.assert_success(self.run_pants(command=command))
 
     with self._extract_archive(self.PREINSTALLED_ARTIFACT) as temp_dir:
-      self.assertEquals(
+      self.assertEqual(
         set(os.listdir(temp_dir)),
         set(['src', 'test', 'node_modules', 'package.json'])
       )

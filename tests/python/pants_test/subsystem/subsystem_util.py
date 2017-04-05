@@ -55,7 +55,7 @@ def subsystem_instance(subsystem_type, scope=None, **options):
                     .format(subsystem_type))
 
   optionables = Subsystem.closure([subsystem_type])
-  updated_options = dict(Subsystem._options.items()) if Subsystem._options else {}
+  updated_options = dict(list(Subsystem._options.items())) if Subsystem._options else {}
   if options:
     updated_options.update(options)
 
@@ -112,13 +112,13 @@ def init_subsystems(subsystem_types, options=None):
   optionables = Subsystem.closure(subsystem_types)
   if options:
     allowed_scopes = {o.options_scope for o in optionables}
-    for scope in options.keys():
+    for scope in list(options.keys()):
       if scope not in allowed_scopes:
         raise ValueError('`{}` is not the scope of any of these subsystems: {}'.format(
             scope, optionables))
   # Don't trample existing subsystem options, in case a test has set up some
   # other subsystems in some other way.
-  updated_options = dict(Subsystem._options.items()) if Subsystem._options else {}
+  updated_options = dict(list(Subsystem._options.items())) if Subsystem._options else {}
   if options:
     updated_options.update(options)
   Subsystem.set_options(create_options_for_optionables(optionables, options=updated_options))

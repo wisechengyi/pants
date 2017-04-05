@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
                         unicode_literals, with_statement)
 
 import logging
-import Queue
+import queue
 
 from pants.pantsd.service.pants_service import PantsService
 
@@ -33,7 +33,7 @@ class SchedulerService(PantsService):
     self._engine = legacy_graph_helper.engine
 
     self._logger = logging.getLogger(__name__)
-    self._event_queue = Queue.Queue(maxsize=64)
+    self._event_queue = queue.Queue(maxsize=64)
 
   @property
   def locked(self):
@@ -70,7 +70,7 @@ class SchedulerService(PantsService):
     """File event notification queue processor."""
     try:
       event = self._event_queue.get(timeout=1)
-    except Queue.Empty:
+    except queue.Empty:
       return
 
     try:

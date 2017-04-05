@@ -151,7 +151,7 @@ class PythonInterpreterCache(object):
     setup_paths = paths or os.getenv('PATH').split(os.pathsep)
     self._setup_cached(filters)
     def unsatisfied_filters():
-      return filter(lambda f: len(list(self._matching(self.interpreters, [f]))) == 0, filters)
+      return [f for f in filters if len(list(self._matching(self.interpreters, [f]))) == 0]
     if force or len(unsatisfied_filters()) > 0:
       self._setup_paths(setup_paths, filters)
     for filt in unsatisfied_filters():

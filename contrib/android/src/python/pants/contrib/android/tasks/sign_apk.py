@@ -141,7 +141,7 @@ class SignApkTask(Task):
           unsigned_apks = self.context.products.get('apk')
           packages = unsigned_apks.get(target)
           if packages:
-            for tgts, products in packages.items():
+            for tgts, products in list(packages.items()):
               for prod in products:
                 yield os.path.join(tgts, prod)
 

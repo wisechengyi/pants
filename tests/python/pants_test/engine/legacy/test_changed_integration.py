@@ -228,8 +228,8 @@ class ChangedIntegrationTest(PantsRunIntegrationTest, TestGenerator):
     def safe_filename(f):
       return f.replace('/', '_').replace('.', '_')
 
-    for filename, dependee_mapping in cls.TEST_MAPPING.items():
-      for dependee_type in dependee_mapping.keys():
+    for filename, dependee_mapping in list(cls.TEST_MAPPING.items()):
+      for dependee_type in list(dependee_mapping.keys()):
         # N.B. The parameters here are used purely to close over the respective loop variables.
         def inner_integration_coverage_test(self, filename=filename, dependee_type=dependee_type):
           with create_isolated_git_repo() as worktree:

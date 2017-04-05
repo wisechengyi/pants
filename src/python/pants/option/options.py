@@ -122,7 +122,7 @@ class Options(object):
       if target_spec_files:
         for spec in target_spec_files:
           with open(spec) as f:
-            target_specs.extend(filter(None, [line.strip() for line in f]))
+            target_specs.extend([_f for _f in [line.strip() for line in f] if _f])
 
     help_request = splitter.help_request
 

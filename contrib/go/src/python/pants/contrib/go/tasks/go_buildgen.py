@@ -62,7 +62,7 @@ class GoTargetGenerator(object):
       for local_go_target in local_go_targets:
         deps = self._list_deps(gopath, local_go_target.address)
         self._generate_missing(gopath, local_go_target.address, deps, visited)
-    return visited.items()
+    return list(visited.items())
 
   def _generate_missing(self, gopath, local_address, import_listing, visited):
     target_type = GoBinary if import_listing.pkg_name == 'main' else GoLibrary
@@ -410,7 +410,7 @@ class GoBuildgen(GoTask):
     for target in targets:
       targets_by_spec_path[target.address.spec_path].add(target)
 
-    for spec_path, targets in targets_by_spec_path.items():
+    for spec_path, targets in list(targets_by_spec_path.items()):
       rel_path = os.path.join(spec_path, build_file_basename)
       result = self._create_template_data(rel_path, list(targets))
       if result:

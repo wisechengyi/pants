@@ -115,7 +115,7 @@ class JvmPlatformAnalysisMixin(object):
     :return: the dict mapping JvmTarget -> set of JvmTargets.
     """
     jvm_deps = self._unfiltered_jvm_dependency_map()
-    return {target: deps for target, deps in jvm_deps.items()
+    return {target: deps for target, deps in list(jvm_deps.items())
             if deps and self._is_jvm_target(target)}
 
 
@@ -230,7 +230,7 @@ class JvmPlatformValidate(JvmPlatformAnalysisMixin, Task):
       for target, deps in invalids:
         for dep in deps:
           dependency_to_dependees[dep].add(target)
-      invalids = dependency_to_dependees.items()
+      invalids = list(dependency_to_dependees.items())
 
     invalids = sorted(invalids)
     individual_errors = '\n'.join(self._create_individual_error_message(target, deps)
@@ -312,7 +312,7 @@ class JvmPlatformExplain(JvmPlatformAnalysisMixin, ConsoleTask):
     if not self.transitive:
       return self.jvm_dependency_map
     full_map = self._unfiltered_jvm_dependency_map(fully_transitive=True)
-    return {target: deps for target, deps in full_map.items()
+    return {target: deps for target, deps in list(full_map.items())
             if self._is_jvm_target(target) and deps}
 
   @memoized_property
@@ -321,7 +321,7 @@ class JvmPlatformExplain(JvmPlatformAnalysisMixin, ConsoleTask):
     target_dependencies.update(self.dependency_map)
 
     target_dependees = defaultdict(set)
-    for target, deps in target_dependencies.items():
+    for target, deps in list(target_dependencies.items()):
       for dependency in deps:
         target_dependees[dependency].add(target)
 
@@ -329,7 +329,7 @@ class JvmPlatformExplain(JvmPlatformAnalysisMixin, ConsoleTask):
     min_allowed_version = {}
 
     def get_versions(targets):
-      return map(self.jvm_version, targets)
+      return list(map(self.jvm_version, targets))
 
     for target in self.jvm_targets:
       if target_dependencies[target]:

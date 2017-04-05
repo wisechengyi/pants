@@ -8,7 +8,7 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
 import os
 import subprocess
 from contextlib import closing
-from StringIO import StringIO
+from io import StringIO
 
 from pants.goal.goal import Goal
 from pants.ivy.bootstrapper import Bootstrapper

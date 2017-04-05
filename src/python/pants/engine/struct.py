@@ -17,10 +17,10 @@ from pants.util.meta import AbstractClass
 
 def _normalize_utf8_keys(kwargs):
   """When kwargs are passed literally in a source file, their keys are ascii: normalize."""
-  if any(type(key) is six.binary_type for key in kwargs.keys()):
+  if any(type(key) is six.binary_type for key in list(kwargs.keys())):
     # This is to preserve the original dict type for kwargs.
     dict_type = type(kwargs)
-    return dict_type([(six.text_type(k), v) for k, v in kwargs.items()])
+    return dict_type([(six.text_type(k), v) for k, v in list(kwargs.items())])
   return kwargs
 
 
@@ -101,7 +101,7 @@ class Struct(Serializable, SerializableFactory, Validatable):
     This excludes fields like `extends`, `merges`, and `abstract`, which are consumed by
     SerializableFactory.create and Validatable.validate.
     """
-    return {k: v for k, v in self._kwargs.items() if k not in self._INTERNAL_FIELDS}
+    return {k: v for k, v in list(self._kwargs.items()) if k not in self._INTERNAL_FIELDS}
 
   @property
   def name(self):
@@ -202,16 +202,16 @@ class Struct(Serializable, SerializableFactory, Validatable):
       return self
 
     # Filter out the attributes that we will consume below for inheritance.
-    attributes = {k: v for k, v in self._asdict().items()
+    attributes = {k: v for k, v in list(self._asdict().items())
                   if k not in self._INHERITANCE_FIELDS and v is not None}
 
     if self.extends:
-      for k, v in self._extract_inheritable_attributes(self.extends).items():
+      for k, v in list(self._extract_inheritable_attributes(self.extends).items()):
         attributes.setdefault(k, v)
 
     if self.merges:
       def merge(attrs):
-        for k, v in attrs.items():
+        for k, v in list(attrs.items()):
           if isinstance(v, MutableMapping):
             mapping = attributes.get(k, {})
             mapping.update(v)
@@ -264,12 +264,12 @@ class Struct(Serializable, SerializableFactory, Validatable):
     else:
       def hashable(value):
         if isinstance(value, dict):
-          return tuple(sorted((k, hashable(v)) for k, v in value.items()))
+          return tuple(sorted((k, hashable(v)) for k, v in list(value.items())))
         elif isinstance(value, list):
           return tuple(hashable(v) for v in value)
         else:
           return value
-      return tuple(sorted((k, hashable(v)) for k, v in self._kwargs.items()
+      return tuple(sorted((k, hashable(v)) for k, v in list(self._kwargs.items())
                           if k not in self._INHERITANCE_FIELDS))
 
   def __hash__(self):
@@ -289,7 +289,7 @@ class Struct(Serializable, SerializableFactory, Validatable):
     else:
       return '{classname}({args})'.format(classname=classname,
                                           args=', '.join(sorted('{}={!r}'.format(k, v)
-                                                                for k, v in self._kwargs.items()
+                                                                for k, v in list(self._kwargs.items())
                                                                 if v)))
 
 

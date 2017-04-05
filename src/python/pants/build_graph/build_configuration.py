@@ -57,16 +57,16 @@ class BuildConfiguration(object):
     if not isinstance(aliases, BuildFileAliases):
       raise TypeError('The aliases must be a BuildFileAliases, given {}'.format(aliases))
 
-    for alias, target_type in aliases.target_types.items():
+    for alias, target_type in list(aliases.target_types.items()):
       self._register_target_alias(alias, target_type)
 
-    for alias, target_macro_factory in aliases.target_macro_factories.items():
+    for alias, target_macro_factory in list(aliases.target_macro_factories.items()):
       self._register_target_macro_factory_alias(alias, target_macro_factory)
 
-    for alias, obj in aliases.objects.items():
+    for alias, obj in list(aliases.objects.items()):
       self._register_exposed_object(alias, obj)
 
-    for alias, context_aware_object_factory in aliases.context_aware_object_factories.items():
+    for alias, context_aware_object_factory in list(aliases.context_aware_object_factories.items()):
       self._register_exposed_context_aware_object_factory(alias, context_aware_object_factory)
 
   # TODO(John Sirois): Warn on alias override across all aliases since they share a global
@@ -156,7 +156,7 @@ class BuildConfiguration(object):
                                   registration_callback=registration_callback)
 
     # Expose all aliased Target types.
-    for alias, target_type in self._target_by_alias.items():
+    for alias, target_type in list(self._target_by_alias.items()):
       proxy = create_call_proxy(target_type, alias)
       type_aliases[alias] = proxy
 
@@ -166,21 +166,21 @@ class BuildConfiguration(object):
     # Now its safe to add mappings from both the directly exposed and macro-created target types to
     # their call proxies for context awares and macros to use to manufacture targets by type
     # instead of by alias.
-    for alias, target_type in self._target_by_alias.items():
+    for alias, target_type in list(self._target_by_alias.items()):
       proxy = type_aliases[alias]
       type_aliases[target_type] = proxy
 
-    for target_macro_factory in self._target_macro_factory_by_alias.values():
+    for target_macro_factory in list(self._target_macro_factory_by_alias.values()):
       for target_type in target_macro_factory.target_types:
         proxy = create_call_proxy(target_type)
         type_aliases[target_type] = proxy
 
     parse_context = ParseContext(rel_path=build_file.spec_path, type_aliases=type_aliases)
 
-    for alias, object_factory in self._exposed_context_aware_object_factory_by_alias.items():
+    for alias, object_factory in list(self._exposed_context_aware_object_factory_by_alias.items()):
       parse_globals[alias] = object_factory(parse_context)
 
-    for alias, target_macro_factory in self._target_macro_factory_by_alias.items():
+    for alias, target_macro_factory in list(self._target_macro_factory_by_alias.items()):
       parse_globals[alias] = target_macro_factory.target_macro(parse_context)
 
     return self.ParseState(registered_addressable_instances, parse_globals)

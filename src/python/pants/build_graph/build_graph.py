@@ -283,7 +283,7 @@ class BuildGraph(AbstractClass):
 
     :param predicate: A target predicate that will be used to filter the targets returned.
     """
-    return filter(predicate, self._target_by_address.values())
+    return list(filter(predicate, list(self._target_by_address.values())))
 
   def sorted_targets(self):
     """

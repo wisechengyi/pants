@@ -29,7 +29,7 @@ class EngineTestBase(BaseTest):
 
     :API: public
     """
-    return map(cls.as_goal, goal_names)
+    return list(map(cls.as_goal, goal_names))
 
   @classmethod
   def install_task(cls, name, action=None, dependencies=None, goal=None):

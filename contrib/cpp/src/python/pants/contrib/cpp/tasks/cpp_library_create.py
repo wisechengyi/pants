@@ -43,7 +43,7 @@ class CppLibraryCreate(CppTask):
 
   def _create_library(self, target, results_dir):
     objects = []
-    for basedir, objs in self.context.products.get('objs').get(target).items():
+    for basedir, objs in list(self.context.products.get('objs').get(target).items()):
       objects = [os.path.join(basedir, obj) for obj in objs]
     # TODO: copy public headers to work dir.
     output = self._link_library(target, results_dir, objects)

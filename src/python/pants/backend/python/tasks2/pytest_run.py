@@ -229,7 +229,7 @@ class PytestRun(TestRunnerTaskMixin, PythonExecutionTaskBase):
     # coverage data files into canonical form.
     # See the "[paths]" entry here: http://nedbatchelder.com/code/coverage/config.html for details.
     cp.add_section('paths')
-    for canonical, alternates in source_mappings.items():
+    for canonical, alternates in list(source_mappings.items()):
       key = canonical.replace(os.sep, '.')
       realpaths = set()
       add_realpath(canonical)

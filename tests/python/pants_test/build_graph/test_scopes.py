@@ -15,8 +15,8 @@ from pants_test.base_test import BaseTest
 class ScopesTest(BaseTest):
 
   def test_mixed_case(self):
-    self.assertEquals(Scope('RUNTIME'), Scope('runtime'))
-    self.assertNotEquals(Scope('RUNTIME'), Scope('COMPILE'))
+    self.assertEqual(Scope('RUNTIME'), Scope('runtime'))
+    self.assertNotEqual(Scope('RUNTIME'), Scope('COMPILE'))
 
   def test_default_parsing(self):
     equivalent_defaults = [
@@ -26,7 +26,7 @@ class ScopesTest(BaseTest):
     expected = Scope(Scopes.DEFAULT)
     for i, scope in enumerate(equivalent_defaults):
       received = Scope(scope)
-      self.assertEquals(expected, received, 'Expected scope {i}. {received} == {expected}'.format(
+      self.assertEqual(expected, received, 'Expected scope {i}. {received} == {expected}'.format(
         i=i,
         received=received,
         expected=expected,
@@ -51,7 +51,7 @@ class ScopesTest(BaseTest):
                                              exclude_scopes=Scopes.RUNTIME))
 
   def test_scope_equality(self):
-    self.assertEquals(Scope('a b'), Scope('b') + Scope('a'))
+    self.assertEqual(Scope('a b'), Scope('b') + Scope('a'))
 
   def test_invalid_in_scope_params(self):
     bad_values = ['', (), [], {}, set(), OrderedSet(), 'default', 'runtime', ('compile',)]
@@ -83,7 +83,7 @@ class ScopedClosureTest(BaseTest):
       respect_intransitive=respect_intransitive,
       bfs=True
     ))
-    self.assertEquals(set_type(expected_targets), bfs_result)
+    self.assertEqual(set_type(expected_targets), bfs_result)
 
   def assert_closure_dfs(self, expected_targets, roots, include_scopes=None, exclude_scopes=None,
                      respect_intransitive=True, ordered=False, postorder=None):
@@ -95,7 +95,7 @@ class ScopedClosureTest(BaseTest):
       respect_intransitive=respect_intransitive,
       postorder=postorder
     ))
-    self.assertEquals(set_type(expected_targets), result)
+    self.assertEqual(set_type(expected_targets), result)
 
   def test_find_normal_dependencies(self):
     a = self.make_target('a')

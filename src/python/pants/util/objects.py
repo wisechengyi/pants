@@ -35,13 +35,13 @@ def datatype(*args, **kwargs):
 
     def _asdict(self):
       '''Return a new OrderedDict which maps field names to their values'''
-      return OrderedDict(zip(self._fields, super(DataType, self).__iter__()))
+      return OrderedDict(list(zip(self._fields, super(DataType, self).__iter__())))
 
     def _replace(_self, **kwds):
       '''Return a new datatype object replacing specified fields with new values'''
-      result = _self._make(map(kwds.pop, _self._fields, super(DataType, _self).__iter__()))
+      result = _self._make(list(map(kwds.pop, _self._fields, super(DataType, _self).__iter__())))
       if kwds:
-        raise ValueError('Got unexpected field names: %r' % kwds.keys())
+        raise ValueError('Got unexpected field names: %r' % list(kwds.keys()))
       return result
 
     def __getnewargs__(self):

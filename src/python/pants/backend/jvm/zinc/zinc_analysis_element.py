@@ -74,7 +74,7 @@ class ZincAnalysisElement(object):
       self.args = []
       for arg in args:
         sorted_arg = defaultdict(list)
-        for k, vs in arg.items():
+        for k, vs in list(arg.items()):
           sorted_arg[k] = sorted(vs)
         self.args.append(sorted_arg)
     else:

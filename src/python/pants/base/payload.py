@@ -30,7 +30,7 @@ class Payload(object):
 
   @property
   def fields(self):
-    return self._fields.items()
+    return list(self._fields.items())
 
   def freeze(self):
     """Permanently make this Payload instance immutable.
@@ -66,7 +66,7 @@ class Payload(object):
 
     :API: public
     """
-    for key, field in field_dict.items():
+    for key, field in list(field_dict.items()):
       self.add_field(key, field)
 
   def add_field(self, key, field):
@@ -101,7 +101,7 @@ class Payload(object):
     :param iterable<string> field_keys: A subset of fields to use for the fingerprint.  Defaults
                                         to all fields.
     """
-    field_keys = frozenset(field_keys or self._fields.keys())
+    field_keys = frozenset(field_keys or list(self._fields.keys()))
     if field_keys not in self._fingerprint_memo_map:
       self._fingerprint_memo_map[field_keys] = self._compute_fingerprint(field_keys)
     return self._fingerprint_memo_map[field_keys]
@@ -130,7 +130,7 @@ class Payload(object):
     :API: public
     """
     self._fingerprint_memo_map = {}
-    for field in self._fields.values():
+    for field in list(self._fields.values()):
       field.mark_dirty()
 
   def __getattr__(self, attr):

@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
                         unicode_literals, with_statement)
 
 import unittest
-import urlparse
+import urllib.parse
 
 from requests import RequestException
 
@@ -88,7 +88,7 @@ class TestBestUrlSelector(BaseTest):
   def call_url(self, expected_url, with_error=False):
     try:
       with self.best_url_selector.select_best_url() as url:
-        self.assertEquals(urlparse.urlparse(expected_url), url)
+        self.assertEqual(urllib.parse.urlparse(expected_url), url)
 
         if with_error:
           raise RequestException('error connecting to {}'.format(url))

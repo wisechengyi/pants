@@ -84,12 +84,12 @@ class DuplicateDetector(JvmBinaryTask):
 
     # Extract external dependencies on libraries (jars)
     external_deps = self._get_external_dependencies(binary_target)
-    for (file_name, jar_names) in external_deps.items():
+    for (file_name, jar_names) in list(external_deps.items()):
       artifacts_by_file_name[file_name].update(jar_names)
 
     # Extract internal dependencies on classes and resources
     internal_deps = self._get_internal_dependencies(binary_target)
-    for (file_name, target_specs) in internal_deps.items():
+    for (file_name, target_specs) in list(internal_deps.items()):
       artifacts_by_file_name[file_name].update(target_specs)
 
     return self._check_conflicts(artifacts_by_file_name, binary_target)
@@ -138,7 +138,7 @@ class DuplicateDetector(JvmBinaryTask):
 
   def _get_conflicts_by_artifacts(self, artifacts_by_file_name):
     conflicts_by_artifacts = defaultdict(set)
-    for (file_name, artifacts) in artifacts_by_file_name.items():
+    for (file_name, artifacts) in list(artifacts_by_file_name.items()):
       if (not artifacts) or len(artifacts) < 2:
         continue
       if self._is_excluded(file_name):
@@ -148,7 +148,7 @@ class DuplicateDetector(JvmBinaryTask):
 
   def _log_conflicts(self, conflicts_by_artifacts, target):
     self.context.log.warn('\n ===== For target {}:'.format(target))
-    for artifacts, duplicate_files in conflicts_by_artifacts.items():
+    for artifacts, duplicate_files in list(conflicts_by_artifacts.items()):
       if len(artifacts) < 2:
         continue
       self.context.log.warn(

@@ -55,20 +55,20 @@ class SchedulerTest(unittest.TestCase):
     """Execute the given request and return roots as a list of ((subject, product), value) tuples."""
     result = self.engine.execute(build_request)
     self.assertIsNone(result.error)
-    return self.scheduler.root_entries(build_request).items()
+    return list(self.scheduler.root_entries(build_request).items())
 
   def request(self, goals, *subjects):
     return self.scheduler.build_request(goals=goals, subjects=subjects)
 
   def assert_root(self, root, subject, return_value):
     """Asserts that the given root has the given result."""
-    self.assertEquals(subject, root[0][0])
-    self.assertEquals(Return(return_value), root[1])
+    self.assertEqual(subject, root[0][0])
+    self.assertEqual(Return(return_value), root[1])
 
   def assert_root_failed(self, root, subject, msg_str):
     """Asserts that the root was a Throw result containing the given msg string."""
-    self.assertEquals(subject, root[0][0])
-    self.assertEquals(Throw, type(root[1]))
+    self.assertEqual(subject, root[0][0])
+    self.assertEqual(Throw, type(root[1]))
     self.assertIn(msg_str, str(root[1].exc))
 
   def test_compile_only_3rdparty(self):
@@ -155,7 +155,7 @@ class SchedulerTest(unittest.TestCase):
                                     variants={'resolve': 'latest-hadoop'})
 
     # Confirm that the produced jars had the appropriate versions.
-    self.assertEquals({Jar('org.apache.hadoop', 'hadoop-common', '2.7.0'),
+    self.assertEqual({Jar('org.apache.hadoop', 'hadoop-common', '2.7.0'),
                        Jar('com.google.guava', 'guava', '18.0')},
                       {ret.value for node, ret in walk
                        if node.product == Jar})

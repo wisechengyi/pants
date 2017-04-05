@@ -56,13 +56,13 @@ class SignApkTest(TestAndroidBase):
   def test_setting_location(self):
     with temporary_dir() as temp:
       task = self.create_task(self._get_context(location=temp))
-      self.assertEquals(temp, task.config_file)
+      self.assertEqual(temp, task.config_file)
 
   def test_package_name(self):
     with self.android_binary() as android_binary:
       key = self.FakeKeystore()
       target = android_binary
-      self.assertEquals(SignApkTask.signed_package_name(target, key.build_type),
+      self.assertEqual(SignApkTask.signed_package_name(target, key.build_type),
                         'org.pantsbuild.example.hello.debug.signed.apk')
 
   def test_setup_default_config(self):
@@ -93,5 +93,5 @@ class SignApkTest(TestAndroidBase):
         expected_args.extend(['{0}/{1}.{2}.signed.apk'.format(temp, target.manifest.package_name,
                                                               fake_key.build_type)])
         expected_args.extend(['unsigned_apk_product', 'key_alias'])
-        self.assertEquals(expected_args, task._render_args(target, fake_key, 'unsigned_apk_product',
+        self.assertEqual(expected_args, task._render_args(target, fake_key, 'unsigned_apk_product',
                                                            temp))

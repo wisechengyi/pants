@@ -54,7 +54,7 @@ class AnalysisParser(object):
     with open(path, 'rb') as infile:
       with raise_on_eof(infile):
         # The first line of the file should contain the expected header.
-        firstline = infile.next()
+        firstline = next(infile)
         if firstline != self.current_test_header:
           raise ParseError("The '{}' analysis file mismatches the current analysis format."
                            " Got:\n  {}\nExpected:\n  {}".format(path,

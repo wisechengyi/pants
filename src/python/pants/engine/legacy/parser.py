@@ -78,7 +78,7 @@ class LegacyPythonCallbacksParser(Parser):
         else:
           return self._object_type(*args, **kwargs)
 
-    for alias, symbol in symbol_table.items():
+    for alias, symbol in list(symbol_table.items()):
       registrar = Registrar(alias, symbol)
       symbols[alias] = registrar
       symbols[symbol] = registrar
@@ -86,10 +86,10 @@ class LegacyPythonCallbacksParser(Parser):
     if aliases.objects:
       symbols.update(aliases.objects)
 
-    for alias, object_factory in aliases.context_aware_object_factories.items():
+    for alias, object_factory in list(aliases.context_aware_object_factories.items()):
       symbols[alias] = object_factory(parse_context)
 
-    for alias, target_macro_factory in aliases.target_macro_factories.items():
+    for alias, target_macro_factory in list(aliases.target_macro_factories.items()):
       underlying_symbol = symbols.get(alias, TargetAdaptor)
       symbols[alias] = target_macro_factory.target_macro(parse_context)
       for target_type in target_macro_factory.target_types:

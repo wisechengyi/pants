@@ -96,7 +96,7 @@ class OptionsBootstrapper(object):
       # Take just the bootstrap args, so we don't choke on other global-scope args on the cmd line.
       # Stop before '--' since args after that are pass-through and may have duplicate names to our
       # bootstrap options.
-      bargs = filter(is_bootstrap_option, itertools.takewhile(lambda arg: arg != '--', self._args))
+      bargs = list(filter(is_bootstrap_option, itertools.takewhile(lambda arg: arg != '--', self._args)))
 
       configpaths = self.get_config_file_paths(env=self._env, args=self._args)
       pre_bootstrap_config = Config.load(configpaths)
@@ -122,7 +122,7 @@ class OptionsBootstrapper(object):
 
       if bootstrap_option_values.pantsrc:
         rcfiles = [os.path.expanduser(rcfile) for rcfile in bootstrap_option_values.pantsrc_files]
-        existing_rcfiles = filter(os.path.exists, rcfiles)
+        existing_rcfiles = list(filter(os.path.exists, rcfiles))
         full_configpaths.extend(existing_rcfiles)
 
       self._post_bootstrap_config = Config.load(full_configpaths,

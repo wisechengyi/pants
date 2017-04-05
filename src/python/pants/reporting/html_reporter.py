@@ -84,8 +84,8 @@ class HtmlReporter(Reporter):
     """Implementation of Reporter callback."""
     self._report_file.close()
     # Make sure everything's closed.
-    for files in self._output_files.values():
-      for f in files.values():
+    for files in list(self._output_files.values()):
+      for f in list(files.values()):
         f.close()
 
   # Creates a collapsible div in which to nest the reporting for a workunit.
@@ -284,7 +284,7 @@ class HtmlReporter(Reporter):
         return e if isinstance(e, string_types) else e + (_id, )
 
       msg_elements = []
-      for cache_name, stat in artifact_cache_stats.stats_per_cache.items():
+      for cache_name, stat in list(artifact_cache_stats.stats_per_cache.items()):
         # TODO consider display causes for hit/miss targets
         hit_targets = [tgt for tgt, cause in stat.hit_targets]
         miss_targets = [tgt for tgt, cause in stat.miss_targets]
@@ -304,7 +304,7 @@ class HtmlReporter(Reporter):
                     lambda: render_cache_stats(self.run_tracker.artifact_cache_stats),
                     force=force_overwrite)
 
-    for f in self._output_files[workunit.id].values():
+    for f in list(self._output_files[workunit.id].values()):
       f.close()
 
   def handle_output(self, workunit, label, s):
@@ -384,7 +384,7 @@ class HtmlReporter(Reporter):
 
       # Map assumes None for missing values, so this will pick the default for those.
       (text, detail, detail_id, detail_initially_visible) = \
-        map(lambda x, y: x or y, element, ('', None, None, False))
+        list(map(lambda x, y: x or y, element, ('', None, None, False)))
 
       htmlified_text = self._htmlify_text(text)
 

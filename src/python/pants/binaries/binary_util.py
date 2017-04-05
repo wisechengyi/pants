@@ -131,7 +131,7 @@ class BinaryUtil(object):
     self._pants_bootstrapdir = bootstrapdir
     self._path_by_id = _DEFAULT_PATH_BY_ID.copy()
     if path_by_id:
-      self._path_by_id.update((tuple(k), tuple(v)) for k, v in path_by_id.items())
+      self._path_by_id.update((tuple(k), tuple(v)) for k, v in list(path_by_id.items()))
 
   @contextmanager
   def _select_binary_stream(self, name, binary_path, fetcher=None):

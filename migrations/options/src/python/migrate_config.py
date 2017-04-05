@@ -76,7 +76,7 @@ def check_config_file(path):
   def section(s):
     return cyan('[{}]'.format(s))
 
-  for src, dst in migrations.items():
+  for src, dst in list(migrations.items()):
     check_option(cp, src, dst)
 
   # Special-case handling of per-task subsystem options, so we can sweep them up in all
@@ -86,7 +86,7 @@ def check_config_file(path):
     sections = sections or cp.sections()
     for src_sec in ['DEFAULT'] + sections:
       dst_sec = subsystem_sec if src_sec == 'DEFAULT' else '{}.{}'.format(subsystem_sec, src_sec)
-      for src_key, dst_key in options_map.items():
+      for src_key, dst_key in list(options_map.items()):
         check_option(cp, (src_sec, src_key), (dst_sec, dst_key))
 
   artifact_cache_options_map = {

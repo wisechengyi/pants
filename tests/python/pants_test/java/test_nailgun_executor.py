@@ -17,7 +17,7 @@ PATCH_OPTS = dict(autospec=True, spec_set=True)
 
 def fake_process(**kwargs):
   proc = mock.create_autospec(psutil.Process, spec_set=True)
-  [setattr(getattr(proc, k), 'return_value', v) for k, v in kwargs.items()]
+  [setattr(getattr(proc, k), 'return_value', v) for k, v in list(kwargs.items())]
   return proc
 
 

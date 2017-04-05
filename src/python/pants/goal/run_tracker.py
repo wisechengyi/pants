@@ -258,7 +258,7 @@ class RunTracker(Subsystem):
     # values.  Probably better for there to be one top-level JSON value, namely json.dumps(stats).
     # But this will first require changing the upload receiver at every shop that uses this
     # (probably only Foursquare at present).
-    params = {k: json.dumps(v) for (k, v) in stats.items()}
+    params = {k: json.dumps(v) for (k, v) in list(stats.items())}
     try:
       r = requests.post(url, data=params, timeout=timeout)
       if r.status_code != requests.codes.ok:

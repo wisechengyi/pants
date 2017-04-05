@@ -257,7 +257,7 @@ class SourceRootConfig(Subsystem):
       for pattern in options.get('{}_root_patterns'.format(category), []):
         trie.add_pattern(pattern, category)
       # Add fixed source roots.
-      for path, langs in options.get('{}_roots'.format(category), {}).items():
+      for path, langs in list(options.get('{}_roots'.format(category), {}).items()):
         trie.add_fixed(path, langs, category)
 
     return trie
@@ -320,7 +320,7 @@ class SourceRootTrie(object):
 
     def subpatterns(self):
       if self.children:
-        for key, child in self.children.items():
+        for key, child in list(self.children.items()):
           for sp, langs, category in child.subpatterns():
             if sp:
               yield os.path.join(key, sp), langs, category
@@ -346,7 +346,7 @@ class SourceRootTrie(object):
 
   def fixed(self):
     """Returns a list of just the fixed source roots in the trie."""
-    for key, child in self._root.children.items():
+    for key, child in list(self._root.children.items()):
       if key == '^':
         return list(child.subpatterns())
     return []

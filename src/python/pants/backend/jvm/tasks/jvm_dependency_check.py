@@ -226,5 +226,5 @@ class JvmDependencyCheck(Task):
                 (src, actual_dep))
 
     return (list(missing_file_deps),
-            missing_tgt_deps_map.items(),
-            missing_direct_tgt_deps_map.items())
+            list(missing_tgt_deps_map.items()),
+            list(missing_direct_tgt_deps_map.items()))

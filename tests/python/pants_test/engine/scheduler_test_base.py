@@ -72,7 +72,7 @@ class SchedulerTestBase(object):
   def execute(self, scheduler, product, *subjects):
     """Runs an ExecutionRequest for the given product and subjects, and returns the result value."""
     request = self.execute_request(scheduler, product, *subjects)
-    states = scheduler.root_entries(request).values()
+    states = list(scheduler.root_entries(request).values())
     if any(type(state) is not Return for state in states):
       with temporary_file_path(cleanup=False, suffix='.dot') as dot_file:
         scheduler.visualize_graph_to_file(dot_file)

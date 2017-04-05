@@ -100,7 +100,7 @@ class RuleIndexTest(unittest.TestCase):
   def test_creation_fails_with_bad_declaration_type(self):
     with self.assertRaises(TypeError) as cm:
       RuleIndex.create([A()], tuple())
-    self.assertEquals("Unexpected rule type: <class 'pants_test.engine.test_rules.A'>."
+    self.assertEqual("Unexpected rule type: <class 'pants_test.engine.test_rules.A'>."
                       " Rules either extend Rule, or are 3 elem tuples.",
       str(cm.exception))
 
@@ -356,8 +356,8 @@ class RuleGraphMakerTest(unittest.TestCase):
       else:
         pass
 
-    self.assertEquals(31, len(all_rules))
-    self.assertEquals(56, len(root_rule_lines)) # 2 lines per entry
+    self.assertEqual(31, len(all_rules))
+    self.assertEqual(56, len(root_rule_lines)) # 2 lines per entry
 
   def test_smallest_full_test_multiple_root_subject_types(self):
     rules = [

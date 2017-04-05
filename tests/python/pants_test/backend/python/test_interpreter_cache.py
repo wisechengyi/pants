@@ -76,7 +76,7 @@ class TestInterpreterCache(BaseTest):
       self.assertEqual(1, len(distributions))
       dist_location = distributions[0].location
 
-      self.assertRegexpMatches(dist_location, r'\.egg$')
+      self.assertRegex(dist_location, r'\.egg$')
       os.symlink(dist_location, os.path.join(repo_root, os.path.basename(dist_location)))
 
       return Package.from_href(dist_location).raw_version

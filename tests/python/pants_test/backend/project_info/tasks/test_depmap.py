@@ -38,7 +38,7 @@ class DepmapTest(BaseDepmapTest):
         type=type,
         name=name,
         deps=','.join("'{0}'".format(dep) for dep in list(deps)),
-        extra=('' if not kwargs else ', '.join('{0}={1}'.format(k, v) for k, v in kwargs.items()))
+        extra=('' if not kwargs else ', '.join('{0}={1}'.format(k, v) for k, v in list(kwargs.items())))
       )))
 
     def create_python_binary_target(path, name, entry_point, type, deps=()):

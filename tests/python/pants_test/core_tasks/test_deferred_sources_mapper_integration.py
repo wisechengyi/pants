@@ -92,7 +92,7 @@ class DeferredSourcesMapperIntegration(PantsRunIntegrationTest):
       export_data = json.loads(pants_run.stdout_data)
 
       synthetic_proto_libraries = []
-      for target in export_data['targets'].values():
+      for target in list(export_data['targets'].values()):
         if target['is_synthetic'] and target['pants_target_type'] == 'java_protobuf_library':
           synthetic_proto_libraries.append(target)
 

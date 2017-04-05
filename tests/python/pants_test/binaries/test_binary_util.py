@@ -35,10 +35,10 @@ class BinaryUtilTest(BaseTest):
       return path_or_fd
 
     def keys(self):
-      return self._map.keys()
+      return list(self._map.keys())
 
     def values(self):
-      return self._map.values()
+      return list(self._map.values())
 
     def __getitem__(self, key):
       return self._map[key]  # Vanilla internal map access (without lambda shenanigans).
@@ -124,8 +124,8 @@ class BinaryUtilTest(BaseTest):
       fake_url(binaries, bases[2], 'ivy'): 'UNSEEN IVY 2',
     })
 
-    unseen = [item for item in fetcher.values() if item.startswith('SEEN ')]
-    for supportdir, version, name in binaries.values():
+    unseen = [item for item in list(fetcher.values()) if item.startswith('SEEN ')]
+    for supportdir, version, name in list(binaries.values()):
       binary_path = binary_util._select_binary_base_path(supportdir=supportdir,
                                                          version=version,
                                                          name=name)
@@ -143,7 +143,7 @@ class BinaryUtilTest(BaseTest):
     def uname_func():
       return "linux", "dontcare1", "dontcare2", "dontcare3", "amd64"
 
-    self.assertEquals("supportdir/linux/x86_64/name/version",
+    self.assertEqual("supportdir/linux/x86_64/name/version",
                       binary_util._select_binary_base_path("supportdir", "name", "version",
                                                            uname_func=uname_func))
 
@@ -153,7 +153,7 @@ class BinaryUtilTest(BaseTest):
     def uname_func():
       return "darwin", "dontcare1", "14.9", "dontcare2", "dontcare3",
 
-    self.assertEquals("supportdir/mac/10.10/name/version",
+    self.assertEqual("supportdir/mac/10.10/name/version",
                       binary_util._select_binary_base_path("supportdir", "name", "version",
                                                            uname_func=uname_func))
 
@@ -163,7 +163,7 @@ class BinaryUtilTest(BaseTest):
     def uname_func():
       return "vms", "dontcare1", "999.9", "dontcare2", "VAX9"
 
-    with self.assertRaisesRegexp(BinaryUtil.MissingMachineInfo,
+    with self.assertRaisesRegex(BinaryUtil.MissingMachineInfo,
                                  r'Pants has no binaries for vms'):
       binary_util._select_binary_base_path("supportdir", "name", "version", uname_func=uname_func)
 
@@ -174,7 +174,7 @@ class BinaryUtilTest(BaseTest):
       return "darwin", "dontcare1", "999.9", "dontcare2", "x86_64"
 
     os_id = ('darwin', '999')
-    with self.assertRaisesRegexp(BinaryUtil.MissingMachineInfo,
+    with self.assertRaisesRegex(BinaryUtil.MissingMachineInfo,
                                  r'Update --binaries-path-by-id to find binaries for '
                                  r'{}'.format(re.escape(repr(os_id)))):
       binary_util._select_binary_base_path("supportdir", "name", "version", uname_func=uname_func)
@@ -186,6 +186,6 @@ class BinaryUtilTest(BaseTest):
     def uname_func():
       return "darwin", "dontcare1", "100.99", "dontcare2", "t1000"
 
-    self.assertEquals("supportdir/skynet/42/name/version",
+    self.assertEqual("supportdir/skynet/42/name/version",
                       binary_util._select_binary_base_path("supportdir", "name", "version",
                                                            uname_func=uname_func))

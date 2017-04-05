@@ -35,7 +35,7 @@ class TestAaptGen(TestAndroidBase):
           task = self.create_task(self.context())
           targets = [binary1, binary2]
           task.create_sdk_jar_deps(targets)
-          self.assertNotEquals(task._jar_library_by_sdk['19'], task._jar_library_by_sdk['18'])
+          self.assertNotEqual(task._jar_library_by_sdk['19'], task._jar_library_by_sdk['18'])
 
   def test_create_sdk_dependency_injection(self):
     with distribution() as dist:
@@ -59,7 +59,7 @@ class TestAaptGen(TestAndroidBase):
     with self.android_binary(target_name='binary1', target_sdk='19') as binary1:
       with self.android_binary(target_name='binary2', target_sdk='19') as binary2:
         task = self.create_task(self.context())
-        self.assertEquals(task.aapt_out(binary1), task.aapt_out(binary2))
+        self.assertEqual(task.aapt_out(binary1), task.aapt_out(binary2))
 
   def test_aapt_tool(self):
     with distribution() as dist:
@@ -67,8 +67,8 @@ class TestAaptGen(TestAndroidBase):
         self.set_options(sdk_path=dist, build_tools_version='20.0.0')
         task = self.create_task(self.context())
         aapt_tool = task.aapt_tool(android_binary)
-        self.assertEquals(os.path.basename(os.path.dirname(aapt_tool)), '20.0.0')
-        self.assertEquals(os.path.basename(aapt_tool), 'aapt')
+        self.assertEqual(os.path.basename(os.path.dirname(aapt_tool)), '20.0.0')
+        self.assertEqual(os.path.basename(aapt_tool), 'aapt')
 
   def test_android_tool(self):
     with distribution() as dist:
@@ -76,8 +76,8 @@ class TestAaptGen(TestAndroidBase):
         self.set_options(sdk_path=dist, target_sdk='18')
         task = self.create_task(self.context())
         android_jar = task.android_jar(android_binary)
-        self.assertEquals(os.path.basename(os.path.dirname(android_jar)), 'android-18')
-        self.assertEquals(os.path.basename(android_jar), 'android.jar')
+        self.assertEqual(os.path.basename(os.path.dirname(android_jar)), 'android-18')
+        self.assertEqual(os.path.basename(android_jar), 'android.jar')
 
   def test_render_args(self):
     with distribution() as dist:
@@ -86,7 +86,7 @@ class TestAaptGen(TestAndroidBase):
           self.set_options(sdk_path=dist)
           task = self.create_task(self.context())
           rendered_args = task._render_args(binary, binary.manifest, [resources.resource_dir])
-        self.assertEquals(os.path.basename(rendered_args[0]), 'aapt')
+        self.assertEqual(os.path.basename(rendered_args[0]), 'aapt')
 
   def test_priority_order_in_render_args(self):
     with distribution() as dist:

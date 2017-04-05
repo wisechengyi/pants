@@ -76,7 +76,7 @@ testprojects/
 @contextmanager
 def harness():
   try:
-    for name, content in BUILD_FILES.items():
+    for name, content in list(BUILD_FILES.items()):
       safe_file_dump(name, dedent(content))
     yield
   finally:

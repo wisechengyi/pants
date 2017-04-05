@@ -39,7 +39,7 @@ class NodeTaskTest(TaskTestBase):
       NodeTest: False,
       Target: False,
     }
-    self.assertEqual(expected, self._type_check(expected.keys(), NodeTask.is_node_package))
+    self.assertEqual(expected, self._type_check(list(expected.keys()), NodeTask.is_node_package))
 
   def test_is_node_module(self):
     expected = {
@@ -48,7 +48,7 @@ class NodeTaskTest(TaskTestBase):
       NodeTest: False,
       Target: False,
     }
-    self.assertEqual(expected, self._type_check(expected.keys(), NodeTask.is_node_module))
+    self.assertEqual(expected, self._type_check(list(expected.keys()), NodeTask.is_node_module))
 
   def test_is_node_remote_module(self):
     expected = {
@@ -57,7 +57,7 @@ class NodeTaskTest(TaskTestBase):
       NodeTest: False,
       Target: False,
     }
-    self.assertEqual(expected, self._type_check(expected.keys(), NodeTask.is_node_remote_module))
+    self.assertEqual(expected, self._type_check(list(expected.keys()), NodeTask.is_node_remote_module))
 
   def test_is_node_test(self):
     expected = {
@@ -66,7 +66,7 @@ class NodeTaskTest(TaskTestBase):
       NodeTest: True,
       Target: False,
     }
-    self.assertEqual(expected, self._type_check(expected.keys(), NodeTask.is_node_test))
+    self.assertEqual(expected, self._type_check(list(expected.keys()), NodeTask.is_node_test))
 
   def _type_check(self, types, type_check_function):
     # Make sure the diff display length is long enough for the test_is_* tests.
@@ -75,7 +75,7 @@ class NodeTaskTest(TaskTestBase):
     self.maxDiff = None
 
     target_names = [':' + letter for letter in list(string.ascii_lowercase)]
-    types_with_target_names = zip(types, target_names)
+    types_with_target_names = list(zip(types, target_names))
 
     type_check_results = [(type, type_check_function(self.make_target(target_name, type)))
                           for (type, target_name) in types_with_target_names]

@@ -265,7 +265,7 @@ class ManifestEntries(FingerprintedMixin):
     if entries:
       if not isinstance(entries, dict):
         raise self.ExpectedDictionaryError("entries must be a dictionary of strings.")
-      for key in entries.keys():
+      for key in list(entries.keys()):
         if not isinstance(key, string_types):
           raise self.ExpectedDictionaryError(
             "entries must be dictionary of strings, got key {} type {}"

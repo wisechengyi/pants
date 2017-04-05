@@ -51,7 +51,7 @@ class ReverseDepmap(ConsoleTask):
           deps[root.address.spec].append(root.address.spec)
         for dependent in self.get_dependents(dependees_by_target, [root]):
           deps[root.address.spec].append(dependent.address.spec)
-      for address in deps.keys():
+      for address in list(deps.keys()):
         deps[address].sort()
       yield json.dumps(deps, indent=4, separators=(',', ': '), sort_keys=True)
     else:

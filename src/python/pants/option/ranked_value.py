@@ -72,7 +72,7 @@ class RankedValue(object):
     :returns: the integer constant value of the rank.
     :rtype: int
     """
-    if name in cls._RANK_NAMES.values():
+    if name in list(cls._RANK_NAMES.values()):
       return getattr(cls, name, None)
     return None
 
@@ -83,7 +83,7 @@ class RankedValue(object):
     :returns: the rank names as a list (I.e., ['NONE', 'HARDCODED', 'CONFIG', ...])
     :rtype: list
     """
-    return sorted(cls._RANK_NAMES.values(), key=cls.get_rank_value)
+    return sorted(list(cls._RANK_NAMES.values()), key=cls.get_rank_value)
 
   @classmethod
   def prioritized_iter(cls, flag_val, env_val, config_val, hardcoded_val, default):

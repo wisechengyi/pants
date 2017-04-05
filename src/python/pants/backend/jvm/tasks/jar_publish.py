@@ -163,7 +163,7 @@ class PomWriter(object):
 
     target_jar = self._internaldep(self._as_versioned_jar(target), target)
     if target_jar:
-      target_jar = target_jar.extend(dependencies=dependencies.values())
+      target_jar = target_jar.extend(dependencies=list(dependencies.values()))
 
     template_relpath = os.path.join(_TEMPLATES_RELPATH, 'pom.xml.mustache')
     template_text = pkgutil.get_data(__name__, template_relpath)
@@ -387,7 +387,7 @@ class JarPublish(ScmPublishMixin, JarTask):
           "This repo is not configured to publish externally! Please configure per\n"
           "http://pantsbuild.org/publish.html#authenticating-to-the-artifact-repository,\n"
           "by setting --publish-jar-repos=<dict> or re-run with '--publish-jar-local=<dir>'.")
-      for repo, data in self.repos.items():
+      for repo, data in list(self.repos.items()):
         auth = data.get('auth')
         if auth:
           credentials = next(iter(self.context.resolve(auth)))
@@ -469,7 +469,7 @@ class JarPublish(ScmPublishMixin, JarTask):
       isatty = False
     if not isatty:
       return True
-    push = raw_input('\nPublish {} with revision {} ? [y|N] '.format(
+    push = input('\nPublish {} with revision {} ? [y|N] '.format(
       coord, version
     ))
     print('\n')
@@ -483,7 +483,7 @@ class JarPublish(ScmPublishMixin, JarTask):
     if product_mapping is None:
       raise ValueError("No product mapping in {} for {}. "
                        "You may need to run some other task first".format(typename, tgt))
-    for basedir, jars in product_mapping.items():
+    for basedir, jars in list(product_mapping.items()):
       for artifact in jars:
         path = self.artifact_path(jar, version, name=override_name, suffix=suffix,
                                   extension=extension, artifact_ext=artifact_ext)
@@ -628,7 +628,7 @@ class JarPublish(ScmPublishMixin, JarTask):
 
       # Process any extra jars that might have been previously generated for this target, or a
       # target that it was derived from.
-      for extra_product, extra_config in (self.get_options().publish_extras or {}).items():
+      for extra_product, extra_config in list((self.get_options().publish_extras or {}).items()):
         override_name = jar.name
         if 'override_name' in extra_config:
           # If the supplied string has a '{target_provides_name}' in it, replace it with the
@@ -671,7 +671,7 @@ class JarPublish(ScmPublishMixin, JarTask):
 
     if self.overrides:
       print('\nPublishing with revision overrides:')
-      for (org, name), rev in self.overrides.items():
+      for (org, name), rev in list(self.overrides.items()):
         print('{0}={1}'.format(coordinate(org, name), rev))
 
     head_sha = self.scm.commit_id
@@ -835,9 +835,9 @@ class JarPublish(ScmPublishMixin, JarTask):
         first, _ = pair
         return str(first.address)
 
-      for publish_target, invalid_targets in sorted(invalid.items(), key=first_address):
+      for publish_target, invalid_targets in sorted(list(invalid.items()), key=first_address):
         msg.append('\n  Cannot publish {} due to:'.format(publish_target.address))
-        for invalid_target, reasons in sorted(invalid_targets.items(), key=first_address):
+        for invalid_target, reasons in sorted(list(invalid_targets.items()), key=first_address):
           for reason in sorted(reasons):
             msg.append('\n    {} - {}'.format(invalid_target.address, reason))
 
@@ -853,7 +853,7 @@ class JarPublish(ScmPublishMixin, JarTask):
       def get_synthetic(lang, target):
         mappings = self.context.products.get(lang).get(target)
         if mappings:
-          for key, generated in mappings.items():
+          for key, generated in list(mappings.items()):
             for synthetic in generated:
               yield synthetic
 
@@ -866,8 +866,8 @@ class JarPublish(ScmPublishMixin, JarTask):
     def exportable(tgt):
       return tgt in candidates and tgt.is_exported
 
-    return OrderedSet(filter(exportable,
-                             reversed(sort_targets(filter(exportable, candidates)))))
+    return OrderedSet(list(filter(exportable,
+                             reversed(sort_targets(list(filter(exportable, candidates)))))))
 
   def entry_fingerprint(self, target, fingerprint_internal):
     sha = hashlib.sha1()
@@ -893,7 +893,7 @@ class JarPublish(ScmPublishMixin, JarTask):
 
   def changelog(self, target, sha):
     # Filter synthetic files.
-    files = filter(lambda filename: not filename.startswith(os.pardir), target.sources_relative_to_buildroot())
+    files = [filename for filename in target.sources_relative_to_buildroot() if not filename.startswith(os.pardir)]
     return ensure_text(self.scm.changelog(from_commit=sha, files=files))
 
   def fetch_ivysettings(self, ivy):
@@ -984,7 +984,7 @@ class JarPublish(ScmPublishMixin, JarTask):
       with self.open_jar(jar_path, overwrite=True, compressed=True) as open_jar:
         def add_docs(docs):
           if docs:
-            for basedir, doc_files in docs.items():
+            for basedir, doc_files in list(docs.items()):
               for doc_file in doc_files:
                 open_jar.write(os.path.join(basedir, doc_file), doc_file)
 

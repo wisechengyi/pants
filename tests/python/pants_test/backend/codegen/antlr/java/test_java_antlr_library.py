@@ -19,7 +19,7 @@ class JavaAntlrLibraryTest(BaseTest):
     return BuildFileAliases(targets={'java_antlr_library': JavaAntlrLibrary})
 
   def test_empty(self):
-    with self.assertRaisesRegexp(ValueError, "Missing required 'sources' parameter"):
+    with self.assertRaisesRegex(ValueError, "Missing required 'sources' parameter"):
       self.add_to_build_file('BUILD', dedent('''
         java_antlr_library(name='foo',
           sources=[],
@@ -35,7 +35,7 @@ class JavaAntlrLibraryTest(BaseTest):
     self.assertIsInstance(self.foo, JavaAntlrLibrary)
 
   def test_invalid_compiler(self):
-    with self.assertRaisesRegexp(ValueError, "Illegal value for 'compiler'"):
+    with self.assertRaisesRegex(ValueError, "Illegal value for 'compiler'"):
       self.add_to_build_file('BUILD', dedent('''
         java_antlr_library(name='foo',
           sources=['foo'],

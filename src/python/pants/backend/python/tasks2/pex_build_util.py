@@ -99,7 +99,7 @@ def dump_requirements(builder, interpreter, req_libs, log, platforms=None):
   distributions = _resolve_multi(interpreter, reqs_to_build, platforms, find_links)
 
   locations = set()
-  for platform, dists in distributions.items():
+  for platform, dists in list(distributions.items()):
     for dist in dists:
       if dist.location not in locations:
         log.debug('  Dumping distribution: .../{}'.format(os.path.basename(dist.location)))

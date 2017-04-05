@@ -69,7 +69,7 @@ class InvalidationCacheManagerTest(BaseTest):
     symlink = os.path.join(parent, 'current')
     self.assertTrue(os.path.islink(symlink))
     self.assertTrue(unstable_dir_name, os.readlink(symlink))
-    self.assertEquals(symlink, vt.results_dir)
+    self.assertEqual(symlink, vt.results_dir)
 
   def test_creates_stable_results_dir_prefix_symlink(self):
     parent, unstable_dir_name = os.path.split(self.cache_manager._results_dir_prefix)
@@ -92,10 +92,10 @@ class InvalidationCacheManagerTest(BaseTest):
     all_vts = ic.all_vts
     invalid_vts = ic.invalid_vts
 
-    self.assertEquals(5, len(invalid_vts))
-    self.assertEquals(5, len(all_vts))
+    self.assertEqual(5, len(invalid_vts))
+    self.assertEqual(5, len(all_vts))
     vts_targets = [vt.targets[0] for vt in all_vts]
-    self.assertEquals(set(targets), set(vts_targets))
+    self.assertEqual(set(targets), set(vts_targets))
 
   def test_force_invalidate(self):
     vt = self.make_vt()
@@ -162,28 +162,28 @@ class InvalidationCacheManagerTest(BaseTest):
 
     # This only is caught here if the VT is still invalid for some reason, otherwise it's caught by the update() method.
     vt.force_invalidate()
-    with self.assertRaisesRegexp(ValueError, r'Path for link.*overwrite an existing directory*'):
+    with self.assertRaisesRegex(ValueError, r'Path for link.*overwrite an existing directory*'):
       vt.create_results_dir()
 
   def test_raises_for_clobbered_symlink(self):
     vt = self.make_vt()
     self.clobber_symlink(vt)
-    with self.assertRaisesRegexp(VersionedTargetSet.IllegalResultsDir, r'The.*symlink*'):
+    with self.assertRaisesRegex(VersionedTargetSet.IllegalResultsDir, r'The.*symlink*'):
       vt.ensure_legal()
 
   def test_raises_missing_current_results_dir(self):
     vt = self.make_vt()
     safe_rmtree(vt.current_results_dir)
-    with self.assertRaisesRegexp(VersionedTargetSet.IllegalResultsDir, r'The.*current_results_dir*'):
+    with self.assertRaisesRegex(VersionedTargetSet.IllegalResultsDir, r'The.*current_results_dir*'):
       vt.ensure_legal()
 
   def test_raises_both_clobbered_symlink_and_missing_current_results_dir(self):
     vt = self.make_vt()
     self.clobber_symlink(vt)
     safe_rmtree(vt.current_results_dir)
-    with self.assertRaisesRegexp(VersionedTargetSet.IllegalResultsDir, r'The.*symlink*'):
+    with self.assertRaisesRegex(VersionedTargetSet.IllegalResultsDir, r'The.*symlink*'):
       vt.ensure_legal()
-    with self.assertRaisesRegexp(VersionedTargetSet.IllegalResultsDir, r'The.*current_results_dir*'):
+    with self.assertRaisesRegex(VersionedTargetSet.IllegalResultsDir, r'The.*current_results_dir*'):
       vt.ensure_legal()
 
   def test_for_illegal_vts(self):

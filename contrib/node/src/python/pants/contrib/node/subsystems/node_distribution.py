@@ -41,9 +41,9 @@ class NodeDistribution(object):
                help='Node distribution version.  Used as part of the path to lookup the '
                     'distribution with --binary-util-baseurls and --pants-bootstrapdir')
       register('--package-manager', advanced=True, default='npm', fingerprint=True,
-               choices=NodeDistribution.VALID_PACKAGE_MANAGER_LIST.keys(),
+               choices=list(NodeDistribution.VALID_PACKAGE_MANAGER_LIST.keys()),
                help='Default package manager config for repo. Should be one of {}'.format(
-                 NodeDistribution.VALID_PACKAGE_MANAGER_LIST.keys()))
+                 list(NodeDistribution.VALID_PACKAGE_MANAGER_LIST.keys())))
       register('--yarnpkg-version', advanced=True, default='v0.19.1', fingerprint=True,
                help='Yarnpkg version. Used for binary utils')
 
@@ -67,7 +67,7 @@ class NodeDistribution(object):
 
   @classmethod
   def validate_package_manager(cls, package_manager):
-    if package_manager not in cls.VALID_PACKAGE_MANAGER_LIST.keys():
+    if package_manager not in list(cls.VALID_PACKAGE_MANAGER_LIST.keys()):
       raise TaskError('Unknown package manager: %s' % package_manager)
     package_manager = cls.VALID_PACKAGE_MANAGER_LIST[package_manager]
     return package_manager

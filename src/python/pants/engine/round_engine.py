@@ -36,7 +36,7 @@ class GoalExecutor(object):
     goal_workdir = os.path.join(self._context.options.for_global_scope().pants_workdir,
                                 self._goal.name)
     with self._context.new_workunit(name=self._goal.name, labels=[WorkUnitLabel.GOAL]):
-      for name, task_type in reversed(self._tasktypes_by_name.items()):
+      for name, task_type in reversed(list(self._tasktypes_by_name.items())):
         task_workdir = os.path.join(goal_workdir, name)
         task = task_type(self._context, task_workdir)
         log_config = WorkUnit.LogConfig(level=task.get_options().level, colors=task.get_options().colors)
@@ -47,7 +47,7 @@ class GoalExecutor(object):
             task.execute()
 
       if explain:
-        reversed_tasktypes_by_name = reversed(self._tasktypes_by_name.items())
+        reversed_tasktypes_by_name = reversed(list(self._tasktypes_by_name.items()))
         goal_to_task = ', '.join(
             '{}->{}'.format(name, task_type.__name__) for name, task_type in reversed_tasktypes_by_name)
         print('{goal} [{goal_to_task}]'.format(goal=self._goal.name, goal_to_task=goal_to_task))
@@ -84,7 +84,7 @@ class RoundEngine(Engine):
       if dependee:
         dependees.add(dependee)
 
-    for goal, goal_info in goal_info_by_goal.items():
+    for goal, goal_info in list(goal_info_by_goal.items()):
       add_dependee(goal)
       for dependency in goal_info.goal_dependencies:
         add_dependee(dependency, goal)
@@ -92,7 +92,7 @@ class RoundEngine(Engine):
     satisfied = set()
     while dependees_by_goal:
       count = len(dependees_by_goal)
-      for goal, dependees in dependees_by_goal.items():
+      for goal, dependees in list(dependees_by_goal.items()):
         unsatisfied = len(dependees - satisfied)
         if unsatisfied == 0:
           satisfied.add(goal)
@@ -100,14 +100,14 @@ class RoundEngine(Engine):
           yield goal_info_by_goal[goal]
           break
       if len(dependees_by_goal) == count:
-        for dependees in dependees_by_goal.values():
+        for dependees in list(dependees_by_goal.values()):
           dependees.difference_update(satisfied)
         # TODO(John Sirois): Do a better job here and actually collect and print cycle paths
         # between Goals/Tasks.  The developer can most directly address that data.
         raise self.GoalCycleError('Cycle detected in goal dependencies:\n\t{0}'
                                   .format('\n\t'.join('{0} <- {1}'.format(goal, list(dependees))
                                                       for goal, dependees
-                                                      in dependees_by_goal.items())))
+                                                      in list(dependees_by_goal.items()))))
 
   class TargetRootsReplacement(object):
 

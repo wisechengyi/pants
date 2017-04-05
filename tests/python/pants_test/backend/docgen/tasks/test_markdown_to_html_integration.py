@@ -37,13 +37,13 @@ class MarkdownIntegrationTest(PantsRunIntegrationTest):
     with safe_open(out_path) as outfile:
       page_html = outfile.read()
       # should get Sense and Sensibility in title (or TITLE, sheesh):
-      self.assertRegexpMatches(page_html,
+      self.assertRegex(page_html,
                                r'(?i).*<title[^>]*>\s*Sense\s+and\s+Sensibility\s*</title')
       # should get formatted with h1:
-      self.assertRegexpMatches(page_html,
+      self.assertRegex(page_html,
                                r'(?i).*<h1[^>]*>\s*They\s+Heard\s+Her\s+With\s+Surprise\s*</h1>')
       # should get formatted with _something_
-      self.assertRegexpMatches(page_html, r'.*>\s*inhabiting\s*</')
-      self.assertRegexpMatches(page_html, r'.*>\s*civilly\s*</')
+      self.assertRegex(page_html, r'.*>\s*inhabiting\s*</')
+      self.assertRegex(page_html, r'.*>\s*civilly\s*</')
       # there should be a link that has href="http://www.calderdale.gov.uk/"
-      self.assertRegexpMatches(page_html, r'.*<a [^>]*href\s*=\s*[\'"]http://www.calderdale')
+      self.assertRegex(page_html, r'.*<a [^>]*href\s*=\s*[\'"]http://www.calderdale')

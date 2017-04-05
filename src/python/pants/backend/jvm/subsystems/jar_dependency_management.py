@@ -249,12 +249,12 @@ class PinnedJarArtifactSet(object):
     return artifact
 
   def __iter__(self):
-    return iter(self._artifacts_to_versions.values())
+    return iter(list(self._artifacts_to_versions.values()))
 
   def __len__(self):
     return len(self._artifacts_to_versions)
 
-  def __nonzero__(self):
+  def __bool__(self):
     return len(self) > 0
 
   def __contains__(self, artifact):

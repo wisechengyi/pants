@@ -32,7 +32,7 @@ class EngineTest(unittest.TestCase):
 
   def assert_engine(self, engine):
     result = engine.execute(self.request(['compile'], self.java))
-    self.assertEqual([Return(Classpath(creator='javac'))], result.root_products.values())
+    self.assertEqual([Return(Classpath(creator='javac'))], list(result.root_products.values()))
     self.assertIsNone(result.error)
 
   @contextmanager

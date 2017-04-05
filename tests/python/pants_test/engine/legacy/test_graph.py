@@ -94,7 +94,7 @@ class GraphInvalidationTest(unittest.TestCase):
     with self.open_scheduler([spec]) as (graph, _, _):
       target = graph.get_target(Address.parse(spec))
       sources = [os.path.basename(s) for s in target.sources_relative_to_buildroot()]
-      self.assertEquals(['p', 'a', 'n', 't', 's', 'b', 'u', 'i', 'l', 'd'],
+      self.assertEqual(['p', 'a', 'n', 't', 's', 'b', 'u', 'i', 'l', 'd'],
                         sources)
 
   def test_implicit_sources(self):
@@ -105,11 +105,11 @@ class GraphInvalidationTest(unittest.TestCase):
         ['test_a.py']
     }
 
-    for spec, exp_sources in expected_sources.items():
+    for spec, exp_sources in list(expected_sources.items()):
       with self.open_scheduler([spec]) as (graph, _, _):
         target = graph.get_target(Address.parse(spec))
         sources = sorted([os.path.basename(s) for s in target.sources_relative_to_buildroot()])
-        self.assertEquals(exp_sources, sources)
+        self.assertEqual(exp_sources, sources)
 
   def test_target_macro_override(self):
     """Tests that we can "wrap" an existing target type with additional functionality.

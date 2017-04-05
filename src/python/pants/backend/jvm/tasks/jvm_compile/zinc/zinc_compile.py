@@ -79,11 +79,11 @@ class BaseZincCompile(JvmCompile):
   @staticmethod
   def validate_arguments(log, whitelisted_args, args):
     """Validate that all arguments match whitelisted regexes."""
-    valid_patterns = {re.compile(p): v for p, v in whitelisted_args.items()}
+    valid_patterns = {re.compile(p): v for p, v in list(whitelisted_args.items())}
 
     def validate(idx):
       arg = args[idx]
-      for pattern, has_argument in valid_patterns.items():
+      for pattern, has_argument in list(valid_patterns.items()):
         if pattern.match(arg):
           return 2 if has_argument else 1
       log.warn("Zinc argument '{}' is not supported, and is subject to change/removal!".format(arg))
@@ -309,7 +309,7 @@ class BaseZincCompile(JvmCompile):
               log_file, settings, fatal_warnings, zinc_file_manager,
               javac_plugin_map, scalac_plugin_map):
     self._verify_zinc_classpath(classpath)
-    self._verify_zinc_classpath(upstream_analysis.keys())
+    self._verify_zinc_classpath(list(upstream_analysis.keys()))
 
     zinc_args = []
 
@@ -340,7 +340,7 @@ class BaseZincCompile(JvmCompile):
     zinc_args.extend(self._scalac_plugin_args(scalac_plugin_map, classpath))
     if upstream_analysis:
       zinc_args.extend(['-analysis-map',
-                        ','.join('{}:{}'.format(*kv) for kv in upstream_analysis.items())])
+                        ','.join('{}:{}'.format(*kv) for kv in list(upstream_analysis.items()))])
 
     zinc_args.extend(args)
     zinc_args.extend(self._get_zinc_arguments(settings))
@@ -404,7 +404,7 @@ class BaseZincCompile(JvmCompile):
   @classmethod
   def _javac_plugin_args(cls, javac_plugin_map):
     ret = []
-    for plugin, args in javac_plugin_map.items():
+    for plugin, args in list(javac_plugin_map.items()):
       for arg in args:
         if ' ' in arg:
           # Note: Args are separated by spaces, and there is no way to escape embedded spaces, as
@@ -419,9 +419,9 @@ class BaseZincCompile(JvmCompile):
     if not scalac_plugin_map:
       return []
 
-    plugin_jar_map = cls._find_scalac_plugins(scalac_plugin_map.keys(), classpath)
+    plugin_jar_map = cls._find_scalac_plugins(list(scalac_plugin_map.keys()), classpath)
     ret = []
-    for name, jar in plugin_jar_map.items():
+    for name, jar in list(plugin_jar_map.items()):
       ret.append('-S-Xplugin:{}'.format(jar))
       for arg in scalac_plugin_map[name]:
         ret.append('-S-P:{}:{}'.format(name, arg))

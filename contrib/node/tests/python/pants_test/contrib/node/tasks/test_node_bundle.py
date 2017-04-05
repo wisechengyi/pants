@@ -58,8 +58,8 @@ class TestNodeBundle(TaskTestBase):
 
       product_data = product.get(target)
       self.assertIsNotNone(product_data)
-      product_basedir = product_data.keys()[0]
-      self.assertEquals(product_data[product_basedir], ['{}.tar.gz'.format(self.target_name)])
+      product_basedir = list(product_data.keys())[0]
+      self.assertEqual(product_data[product_basedir], ['{}.tar.gz'.format(self.target_name)])
 
   def test_no_dependencies_for_node_bundle(self):
     with temporary_dir() as tmp_dir:
@@ -83,9 +83,9 @@ class TestNodeBundle(TaskTestBase):
         self.assertRaises(TargetDefinitionException, task.execute)
 
   def test_no_zip_for_archive(self):
-    with self.assertRaisesRegexp(TargetDefinitionException, 'zip'):
+    with self.assertRaisesRegex(TargetDefinitionException, 'zip'):
       NodeBundle(node_module=self.node_module_target_name_full, archive='zip')
 
   def test_require_node_module_for_bundle(self):
-    with self.assertRaisesRegexp(TargetDefinitionException, 'node_module'):
+    with self.assertRaisesRegex(TargetDefinitionException, 'node_module'):
       NodeBundle()

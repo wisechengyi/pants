@@ -50,21 +50,21 @@ class FSTest(unittest.TestCase, SchedulerTestBase, AbstractClass):
     with self.mk_project_tree(ignore_patterns=ignore_patterns) as project_tree:
       scheduler = self.mk_scheduler(project_tree=project_tree)
       result = self.execute(scheduler, Snapshot, self.specs('', *filespecs))[0]
-      self.assertEquals(sorted([p.path for p in getattr(result, field)]), sorted(paths))
+      self.assertEqual(sorted([p.path for p in getattr(result, field)]), sorted(paths))
 
   def assert_content(self, filespecs, expected_content):
     with self.mk_project_tree() as project_tree:
       scheduler = self.mk_scheduler(project_tree=project_tree)
       result = self.execute(scheduler, FilesContent, self.specs('', *filespecs))[0]
       actual_content = {f.path: f.content for f in result.dependencies}
-      self.assertEquals(expected_content, actual_content)
+      self.assertEqual(expected_content, actual_content)
 
   def assert_digest(self, filespecs, expected_files):
     with self.mk_project_tree() as project_tree:
       scheduler = self.mk_scheduler(project_tree=project_tree)
       result = self.execute(scheduler, Snapshot, self.specs('', *filespecs))[0]
       # Confirm all expected files were digested.
-      self.assertEquals(set(expected_files), set(f.path for f in result.files))
+      self.assertEqual(set(expected_files), set(f.path for f in result.files))
       self.assertTrue(result.fingerprint is not None)
 
   def assert_fsnodes(self, filespecs, subject_product_pairs):
@@ -76,7 +76,7 @@ class FSTest(unittest.TestCase, SchedulerTestBase, AbstractClass):
       # request.
       fs_nodes = [n for n, _ in scheduler.product_graph.walk(roots=request.roots)
                   if type(n) is "TODO: need a new way to filter for FS intrinsics"]
-      self.assertEquals(set((n.subject, n.product) for n in fs_nodes), set(subject_product_pairs))
+      self.assertEqual(set((n.subject, n.product) for n in fs_nodes), set(subject_product_pairs))
 
   def test_walk_literal(self):
     self.assert_walk_files(['4.txt'], ['4.txt'])

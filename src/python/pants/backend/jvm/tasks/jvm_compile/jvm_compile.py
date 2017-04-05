@@ -459,7 +459,7 @@ class JvmCompile(NailgunTaskBase):
       # Initialize the classpath for all targets.
       compile_contexts = {vt.target: self._compile_context(vt.target, vt.results_dir)
                           for vt in invalidation_check.all_vts}
-      for cc in compile_contexts.values():
+      for cc in list(compile_contexts.values()):
         classpath_product.add_for_target(cc.target, [(conf, classpath_for_context(cc))
                                                      for conf in self._confs])
 
@@ -478,7 +478,7 @@ class JvmCompile(NailgunTaskBase):
       if not self.get_options().use_classpath_jars:
         # Once compilation has completed, replace the classpath entry for each target with
         # its jar'd representation.
-        for cc in compile_contexts.values():
+        for cc in list(compile_contexts.values()):
           for conf in self._confs:
             classpath_product.remove_for_target(cc.target, [(conf, cc.classes_dir)])
             classpath_product.add_for_target(cc.target, [(conf, cc.jar_file)])
@@ -650,7 +650,7 @@ class JvmCompile(NailgunTaskBase):
     """One of the compile child workunits actually calls compiler, this is to locate its stdout."""
     logs = []
     for workunit in compile_workunit.children:
-      for output_name, outpath in workunit.output_paths().items():
+      for output_name, outpath in list(workunit.output_paths().items()):
         # Workunit that runs compiler is id-ed by the task name.
         if (workunit.name == self.name() and output_name in ('stdout', 'stderr')
             and workunit.outcome() == WorkUnit.FAILURE):
@@ -701,7 +701,7 @@ class JvmCompile(NailgunTaskBase):
       if os.path.exists(compile_context.analysis_file):
         products = self._analysis_parser.parse_products_from_path(compile_context.analysis_file,
                                                                   compile_context.classes_dir)
-        for src, classes in products.items():
+        for src, classes in list(products.items()):
           relsrc = os.path.relpath(src, buildroot)
           classes_by_src[relsrc] = classes
           unclaimed_classes.difference_update(classes)
@@ -716,7 +716,7 @@ class JvmCompile(NailgunTaskBase):
 
     # Register a mapping between sources and classfiles (if requested).
     if classes_by_source is not None:
-      ccbsbc = self.compute_classes_by_source(compile_contexts).items()
+      ccbsbc = list(self.compute_classes_by_source(compile_contexts).items())
       for compile_context, computed_classes_by_source in ccbsbc:
         classes_dir = compile_context.classes_dir
 
@@ -742,7 +742,7 @@ class JvmCompile(NailgunTaskBase):
       # Warn or error for unused.
       def joined_dep_msg(deps):
         return '\n  '.join('\'{}\','.format(dep.address.spec) for dep in sorted(deps))
-      flat_replacements = set(r for replacements in replacement_deps.values() for r in replacements)
+      flat_replacements = set(r for replacements in list(replacement_deps.values()) for r in replacements)
       replacements_msg = ''
       if flat_replacements:
         replacements_msg = 'Suggested replacements:\n  {}\n'.format(joined_dep_msg(flat_replacements))
@@ -750,7 +750,7 @@ class JvmCompile(NailgunTaskBase):
           'unused dependencies:\n  {}\n{}'
           '(If you\'re seeing this message in error, you might need to '
           'change the `scope` of the dependencies.)'.format(
-            joined_dep_msg(replacement_deps.keys()),
+            joined_dep_msg(list(replacement_deps.keys())),
             replacements_msg,
           )
         )
@@ -769,7 +769,7 @@ class JvmCompile(NailgunTaskBase):
         self.context.log.info('Found the following deps from target\'s transitive '
                               'dependencies that provide the missing classes:')
         suggested_deps = set()
-        for classname, candidates in missing_dep_suggestions.items():
+        for classname, candidates in list(missing_dep_suggestions.items()):
           suggested_deps.add(list(candidates)[0])
           self.context.log.info('  {}: {}'.format(classname, ', '.join(candidates)))
         suggestion_msg = (
@@ -789,7 +789,7 @@ class JvmCompile(NailgunTaskBase):
     """Returns tuples of classes_dir->analysis_file for the closure of the target."""
     # Reorganize the compile_contexts by class directory.
     compile_contexts_by_directory = {}
-    for compile_context in compile_contexts.values():
+    for compile_context in list(compile_contexts.values()):
       compile_contexts_by_directory[compile_context.classes_dir] = compile_context
     # If we have a compile context for the target, include it.
     for entry in classpath_entries:

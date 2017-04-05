@@ -169,7 +169,7 @@ class JvmdocGen(JvmTask):
         futures = []
         self.context.log.debug("Begin multiprocessing section; output may be misordered or garbled")
         try:
-          for gendir, (target, command) in jobs.items():
+          for gendir, (target, command) in list(jobs.items()):
             self.context.log.debug("Running create_jvmdoc in {} with {}"
                                    .format(gendir, " ".join(command)))
             futures.append(pool.apply_async(create_jvmdoc, args=(command, gendir)))

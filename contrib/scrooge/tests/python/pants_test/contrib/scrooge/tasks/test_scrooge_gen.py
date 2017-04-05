@@ -135,14 +135,14 @@ class ScroogeGenTest(TaskTestBase):
       Context.add_new_target = mock
       task.execute()
 
-      self.assertEquals(1, mock.call_count)
+      self.assertEqual(1, mock.call_count)
       _, call_kwargs = mock.call_args
-      self.assertEquals(call_kwargs['target_type'], library_type)
-      self.assertEquals(call_kwargs['dependencies'], OrderedSet())
-      self.assertEquals(call_kwargs['provides'], None)
-      self.assertEquals(call_kwargs['sources'], [])
-      self.assertEquals(call_kwargs['derived_from'], target)
-      self.assertEquals(call_kwargs['strict_deps'], True)
+      self.assertEqual(call_kwargs['target_type'], library_type)
+      self.assertEqual(call_kwargs['dependencies'], OrderedSet())
+      self.assertEqual(call_kwargs['provides'], None)
+      self.assertEqual(call_kwargs['sources'], [])
+      self.assertEqual(call_kwargs['derived_from'], target)
+      self.assertEqual(call_kwargs['strict_deps'], True)
 
     finally:
       Context.add_new_target = saved_add_new_target

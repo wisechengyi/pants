@@ -114,7 +114,7 @@ def create_options(options, passthru_args=None):
       return passthru_args or []
 
     def items(self):
-      return options.items()
+      return list(options.items())
 
     @property
     def scope_to_flags(self):
@@ -191,7 +191,7 @@ def create_options_for_optionables(optionables, extra_scopes=None, options=None)
 
   # We need to update options before completing them based on inner/outer relation.
   if options:
-    for scope, opts in options.items():
+    for scope, opts in list(options.items()):
       all_options[scope].update(opts)
 
   # Iterating in sorted order guarantees that we see outer scopes before inner scopes,
@@ -200,7 +200,7 @@ def create_options_for_optionables(optionables, extra_scopes=None, options=None)
     if s != GLOBAL_SCOPE:
       scope = enclosing_scope(s)
       opts = all_options[s]
-      for key, val in all_options.get(scope, {}).items():
+      for key, val in list(all_options.get(scope, {}).items()):
         if key not in opts:  # Inner scope values override the inherited ones.
           opts[key] = val
 

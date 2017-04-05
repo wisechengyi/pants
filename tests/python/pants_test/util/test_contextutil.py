@@ -36,14 +36,14 @@ class ContextutilTest(unittest.TestCase):
         subprocess.Popen([sys.executable, '-c', 'import os; print(os.environ["HORK"])'],
                          stdout=output).wait()
         output.seek(0)
-        self.assertEquals('BORK\n', output.read())
+        self.assertEqual('BORK\n', output.read())
 
       # test that the variable is cleared
       with temporary_file() as new_output:
         subprocess.Popen([sys.executable, '-c', 'import os; print("HORK" in os.environ)'],
                          stdout=new_output).wait()
         new_output.seek(0)
-        self.assertEquals('False\n', new_output.read())
+        self.assertEqual('False\n', new_output.read())
 
   def test_environment_negation(self):
     with temporary_file() as output:
@@ -53,29 +53,29 @@ class ContextutilTest(unittest.TestCase):
           subprocess.Popen([sys.executable, '-c', 'import os; print("HORK" in os.environ)'],
                            stdout=output).wait()
           output.seek(0)
-          self.assertEquals('False\n', output.read())
+          self.assertEqual('False\n', output.read())
 
   def test_simple_pushd(self):
     pre_cwd = os.getcwd()
     with temporary_dir() as tempdir:
       with pushd(tempdir) as path:
-        self.assertEquals(tempdir, path)
-        self.assertEquals(os.path.realpath(tempdir), os.getcwd())
-      self.assertEquals(pre_cwd, os.getcwd())
-    self.assertEquals(pre_cwd, os.getcwd())
+        self.assertEqual(tempdir, path)
+        self.assertEqual(os.path.realpath(tempdir), os.getcwd())
+      self.assertEqual(pre_cwd, os.getcwd())
+    self.assertEqual(pre_cwd, os.getcwd())
 
   def test_nested_pushd(self):
     pre_cwd = os.getcwd()
     with temporary_dir() as tempdir1:
       with pushd(tempdir1):
-        self.assertEquals(os.path.realpath(tempdir1), os.getcwd())
+        self.assertEqual(os.path.realpath(tempdir1), os.getcwd())
         with temporary_dir(root_dir=tempdir1) as tempdir2:
           with pushd(tempdir2):
-            self.assertEquals(os.path.realpath(tempdir2), os.getcwd())
-          self.assertEquals(os.path.realpath(tempdir1), os.getcwd())
-        self.assertEquals(os.path.realpath(tempdir1), os.getcwd())
-      self.assertEquals(pre_cwd, os.getcwd())
-    self.assertEquals(pre_cwd, os.getcwd())
+            self.assertEqual(os.path.realpath(tempdir2), os.getcwd())
+          self.assertEqual(os.path.realpath(tempdir1), os.getcwd())
+        self.assertEqual(os.path.realpath(tempdir1), os.getcwd())
+      self.assertEqual(pre_cwd, os.getcwd())
+    self.assertEqual(pre_cwd, os.getcwd())
 
   def test_temporary_file_no_args(self):
     with temporary_file() as fp:
@@ -165,7 +165,7 @@ class ContextutilTest(unittest.TestCase):
     falsey = (None, '', False)
     for invalid in falsey:
       with self.assertRaises(InvalidZipPath):
-        open_zip(invalid).gen.next()
+        next(open_zip(invalid).gen)
 
   def test_open_zip_returns_realpath_on_badzipfile(self):
     # In case of file corruption, deleting a Pants-constructed symlink would not resolve the error.
@@ -173,39 +173,39 @@ class ContextutilTest(unittest.TestCase):
       with temporary_dir() as tempdir:
         file_symlink = os.path.join(tempdir, 'foo')
         os.symlink(not_zip.name, file_symlink)
-        self.assertEquals(os.path.realpath(file_symlink), os.path.realpath(not_zip.name))
-        with self.assertRaisesRegexp(zipfile.BadZipfile, r'{}'.format(not_zip.name)):
-          open_zip(file_symlink).gen.next()
+        self.assertEqual(os.path.realpath(file_symlink), os.path.realpath(not_zip.name))
+        with self.assertRaisesRegex(zipfile.BadZipfile, r'{}'.format(not_zip.name)):
+          next(open_zip(file_symlink).gen)
 
   def test_stdio_as(self):
     old_stdout, old_stderr, old_stdin = sys.stdout, sys.stderr, sys.stdin
 
     with stdio_as(stdout=1, stderr=2, stdin=3):
-      self.assertEquals(sys.stdout, 1)
-      self.assertEquals(sys.stderr, 2)
-      self.assertEquals(sys.stdin, 3)
+      self.assertEqual(sys.stdout, 1)
+      self.assertEqual(sys.stderr, 2)
+      self.assertEqual(sys.stdin, 3)
 
-    self.assertEquals(sys.stdout, old_stdout)
-    self.assertEquals(sys.stderr, old_stderr)
-    self.assertEquals(sys.stdin, old_stdin)
+    self.assertEqual(sys.stdout, old_stdout)
+    self.assertEqual(sys.stderr, old_stderr)
+    self.assertEqual(sys.stdin, old_stdin)
 
   def test_stdio_as_stdin_default(self):
     old_stdout, old_stderr, old_stdin = sys.stdout, sys.stderr, sys.stdin
 
     with stdio_as(stdout=1, stderr=2):
-      self.assertEquals(sys.stdout, 1)
-      self.assertEquals(sys.stderr, 2)
-      self.assertEquals(sys.stdin, old_stdin)
+      self.assertEqual(sys.stdout, 1)
+      self.assertEqual(sys.stderr, 2)
+      self.assertEqual(sys.stdin, old_stdin)
 
-    self.assertEquals(sys.stdout, old_stdout)
-    self.assertEquals(sys.stderr, old_stderr)
+    self.assertEqual(sys.stdout, old_stdout)
+    self.assertEqual(sys.stderr, old_stderr)
 
   def test_permissions(self):
-    with temporary_file(permissions=0700) as f:
-      self.assertEquals(0700, os.stat(f.name)[0] & 0777)
+    with temporary_file(permissions=0o700) as f:
+      self.assertEqual(0o700, os.stat(f.name)[0] & 0o777)
 
-    with temporary_dir(permissions=0644) as path:
-      self.assertEquals(0644, os.stat(path)[0] & 0777)
+    with temporary_dir(permissions=0o644) as path:
+      self.assertEqual(0o644, os.stat(path)[0] & 0o777)
 
   def test_exception_logging(self):
     fake_logger = mock.Mock()

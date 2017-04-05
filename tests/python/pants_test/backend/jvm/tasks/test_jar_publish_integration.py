@@ -79,7 +79,7 @@ class JarPublishIntegrationTest(PantsRunIntegrationTest):
                          'welcome_2.11-0.0.1-SNAPSHOT-sources.jar']}
     self.publish_test('testprojects/src/scala/org/pantsbuild/testproject/publish'
                       ':jvm-run-example-lib',
-                      dict(unique_artifacts.items() + shared_artifacts('0.0.1-SNAPSHOT').items()),
+                      dict(list(unique_artifacts.items()) + list(shared_artifacts('0.0.1-SNAPSHOT').items())),
                       ['org.pantsbuild.testproject.publish/hello-greet/publish.properties',
                        'org.pantsbuild.testproject.publish/jvm-example-lib_2.11/publish.properties',
                        'org.pantsbuild.testproject.publish.hello/welcome_2.11/publish.properties'],
@@ -261,7 +261,7 @@ class JarPublishIntegrationTest(PantsRunIntegrationTest):
       for pushdb_file in pushdb_files:
         self.assertFalse(os.path.exists(os.path.join(self.pushdb_root, pushdb_file)))
 
-      for directory, artifact_list in artifacts.items():
+      for directory, artifact_list in list(artifacts.items()):
         for artifact in artifact_list:
           artifact_path = os.path.join(publish_dir, directory, artifact)
           self.assertTrue(os.path.exists(artifact_path))

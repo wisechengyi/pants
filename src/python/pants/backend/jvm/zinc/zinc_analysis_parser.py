@@ -62,7 +62,7 @@ class ZincAnalysisParser(object):
       ext_deps.append(self._find_repeated_at_header(infile, ext_dep_header))
 
     classname_to_sources = {}
-    for src, classnames in self._find_repeated_at_header(infile, b'class names').items():
+    for src, classnames in list(self._find_repeated_at_header(infile, b'class names').items()):
       for classname in classnames:
         classname_to_sources[classname] = src
 
@@ -70,20 +70,20 @@ class ZincAnalysisParser(object):
     scalalib_re = re.compile(r'scala-library-\d+\.\d+\.\d+\.jar$')
     filtered_bin_deps = defaultdict(list)
     for src, deps in six.iteritems(bin_deps):
-      filtered_bin_deps[src] = filter(lambda x: scalalib_re.search(x) is None, deps)
+      filtered_bin_deps[src] = [x for x in deps if scalalib_re.search(x) is None]
 
     transformed_ext_deps = defaultdict(list)
     def fqcn_to_path(fqcn):
       return os.path.join(classes_dir, fqcn.replace(b'.', os.sep) + b'.class')
     for ext_deps_dict in ext_deps:
-      for clz, fqcns in ext_deps_dict.items():
+      for clz, fqcns in list(ext_deps_dict.items()):
         transformed_ext_deps[classname_to_sources[clz]].extend(fqcn_to_path(fqcn) for fqcn in fqcns)
 
     # TODO: We skip converting the source classname to a target-internal sourcefile, although it
     # looks like we could do that by parsing the `class names` header from this section.
     ret = defaultdict(list)
     for d in [filtered_bin_deps, transformed_ext_deps]:
-      for src, deps in d.items():
+      for src, deps in list(d.items()):
         ret[src].extend(deps)
     return ret
 

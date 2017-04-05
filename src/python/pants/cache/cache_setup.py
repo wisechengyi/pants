@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
 
 import os
 import threading
-import urlparse
+import urllib.parse
 from collections import namedtuple
 
 from six.moves import range
@@ -223,13 +223,13 @@ class CacheFactory(object):
     return string_spec.startswith('http://') or string_spec.startswith('https://')
 
   def _baseurl(self, url):
-    parsed_url = urlparse.urlparse(url)
+    parsed_url = urllib.parse.urlparse(url)
     return '{scheme}://{netloc}'.format(scheme=parsed_url.scheme, netloc=parsed_url.netloc)
 
   def get_available_urls(self, urls):
     """Return reachable urls sorted by their ping times."""
     baseurl_to_urls = {self._baseurl(url): url for url in urls}
-    pingtimes = self._pinger.pings(baseurl_to_urls.keys())  # List of pairs (host, time in ms).
+    pingtimes = self._pinger.pings(list(baseurl_to_urls.keys()))  # List of pairs (host, time in ms).
     self._log.debug('Artifact cache server ping times: {}'
                     .format(', '.join(['{}: {:.6f} secs'.format(*p) for p in pingtimes])))
 
@@ -250,7 +250,7 @@ class CacheFactory(object):
       - A list or tuple of two specs, local, then remote, each as described above
     """
     compression = self._options.compression_level
-    if compression not in range(10):
+    if compression not in list(range(10)):
       raise ValueError('compression_level must be an integer 0-9: {}'.format(compression))
 
     deprecated_conditional(

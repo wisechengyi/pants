@@ -14,6 +14,7 @@ import six
 from pants.base.build_file_target_factory import BuildFileTargetFactory
 from pants.build_graph.target import Target
 from pants.util.memo import memoized_property
+import collections
 
 
 class TargetMacro(object):
@@ -134,7 +135,7 @@ class BuildFileAliases(object):
 
     target_types = {}
     target_macro_factories = {}
-    for alias, obj in targets.items():
+    for alias, obj in list(targets.items()):
       cls._validate_alias('targets', alias, obj)
       if cls._is_target_type(obj):
         target_types[alias] = obj
@@ -152,7 +153,7 @@ class BuildFileAliases(object):
     if not objects:
       return {}
 
-    for alias, obj in objects.items():
+    for alias, obj in list(objects.items()):
       cls._validate_alias('objects', alias, obj)
       cls._validate_not_targets('objects', alias, obj)
     return objects.copy()
@@ -162,10 +163,10 @@ class BuildFileAliases(object):
     if not context_aware_object_factories:
       return {}
 
-    for alias, obj in context_aware_object_factories.items():
+    for alias, obj in list(context_aware_object_factories.items()):
       cls._validate_alias('context_aware_object_factories', alias, obj)
       cls._validate_not_targets('context_aware_object_factories', alias, obj)
-      if not callable(obj):
+      if not isinstance(obj, collections.Callable):
         raise TypeError('The given context aware object factory {alias!r} must be a callable.'
                         .format(alias=alias))
 
@@ -238,9 +239,9 @@ class BuildFileAliases(object):
     :rtype: dict
     """
     target_types_by_alias = defaultdict(set)
-    for alias, target_type in self.target_types.items():
+    for alias, target_type in list(self.target_types.items()):
       target_types_by_alias[alias].add(target_type)
-    for alias, target_macro_factory in self.target_macro_factories.items():
+    for alias, target_macro_factory in list(self.target_macro_factories.items()):
       target_types_by_alias[alias].update(target_macro_factory.target_types)
     return dict(target_types_by_alias)
 

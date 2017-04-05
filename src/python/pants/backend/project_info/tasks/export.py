@@ -263,10 +263,10 @@ class ExportTask(IvyTaskMixin, PythonTask):
         if hasattr(current_target, 'test_platform'):
           info['test_platform'] = current_target.test_platform.name
 
-      info['roots'] = map(lambda (source_root, package_prefix): {
-        'source_root': source_root,
-        'package_prefix': package_prefix
-      }, self._source_roots_for_target(current_target))
+      info['roots'] = [{
+        'source_root': source_root_package_prefix[0],
+        'package_prefix': source_root_package_prefix[1]
+      } for source_root_package_prefix in self._source_roots_for_target(current_target)]
 
       if classpath_products:
         info['libraries'] = [self._jar_id(lib) for lib in target_libraries]
@@ -282,7 +282,7 @@ class ExportTask(IvyTaskMixin, PythonTask):
           'target_level' : str(platform.target_level),
           'source_level' : str(platform.source_level),
           'args' : platform.args,
-        } for platform_name, platform in JvmPlatform.global_instance().platforms_by_name.items() },
+        } for platform_name, platform in list(JvmPlatform.global_instance().platforms_by_name.items()) },
     }
 
     graph_info = {
@@ -302,7 +302,7 @@ class ExportTask(IvyTaskMixin, PythonTask):
       except DistributionLocator.Error:
         return None
 
-    for platform_name, platform in JvmPlatform.global_instance().platforms_by_name.items():
+    for platform_name, platform in list(JvmPlatform.global_instance().platforms_by_name.items()):
       preferred_distributions = {}
       for strict, strict_key in [(True, 'strict'), (False, 'non_strict')]:
         dist = get_preferred_distribution(platform, strict=strict)
@@ -317,7 +317,7 @@ class ExportTask(IvyTaskMixin, PythonTask):
 
     if python_interpreter_targets_mapping:
       interpreters = self.interpreter_cache.select_interpreter(
-        python_interpreter_targets_mapping.keys())
+        list(python_interpreter_targets_mapping.keys()))
       default_interpreter = interpreters[0]
 
       interpreters_info = {}
@@ -360,7 +360,7 @@ class ExportTask(IvyTaskMixin, PythonTask):
   def target_aliases_map(self):
     registered_aliases = self.context.build_file_parser.registered_aliases()
     map = {}
-    for alias, target_types in registered_aliases.target_types_by_alias.items():
+    for alias, target_types in list(registered_aliases.target_types_by_alias.items()):
       # If a target class is registered under multiple aliases returns the last one.
       for target_type in target_types:
         map[target_type] = alias

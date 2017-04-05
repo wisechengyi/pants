@@ -26,7 +26,7 @@ class FindBugsTest(PantsRunIntegrationTest):
       }
     }
     if config:
-      for scope, scoped_cfgs in config.items():
+      for scope, scoped_cfgs in list(config.items()):
         updated = full_config.get(scope, {})
         updated.update(scoped_cfgs)
         full_config[scope] = updated

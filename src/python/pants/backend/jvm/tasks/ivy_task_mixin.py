@@ -135,7 +135,7 @@ class IvyTaskMixin(TaskBase):
     confs = confs or ('default',)
     targets_by_sets = JarDependencyManagement.global_instance().targets_by_artifact_set(targets)
     results = []
-    for artifact_set, target_subset in targets_by_sets.items():
+    for artifact_set, target_subset in list(targets_by_sets.items()):
       results.append(self._resolve_subset(executor,
                                                      target_subset,
                                                      classpath_products,

@@ -53,13 +53,13 @@ class TestSetupPy(PythonTaskTestBase):
 
   def create_dependencies(self, depmap):
     target_map = {}
-    for name, deps in depmap.items():
+    for name, deps in list(depmap.items()):
       target_map[name] = self.create_python_library(
         relpath=name,
         name=name,
         provides='setup_py(name="{name}", version="0.0.0")'.format(name=name)
       )
-    for name, deps in depmap.items():
+    for name, deps in list(depmap.items()):
       target = target_map[name]
       dep_targets = [target_map[name] for name in deps]
       for dep in dep_targets:
@@ -95,7 +95,7 @@ class TestSetupPy(PythonTaskTestBase):
     dep_map = OrderedDict(foo=['bar'], bar=['baz'], baz=[])
     target_map = self.create_dependencies(dep_map)
     with self.run_execute(target_map['foo'], recursive=False) as created:
-      self.assertEqual([target_map['foo']], created.keys())
+      self.assertEqual([target_map['foo']], list(created.keys()))
     with self.run_execute(target_map['foo'], recursive=True) as created:
       self.assertEqual({target_map['baz'], target_map['bar'], target_map['foo']},
                        set(created.keys()))
@@ -161,10 +161,10 @@ class TestSetupPy(PythonTaskTestBase):
     self.assertEqual(entry_points, {'foo_binary': 'foo.bin:foo'})
 
     with self.run_execute(foo, recursive=False) as created:
-      self.assertEqual([foo], created.keys())
+      self.assertEqual([foo], list(created.keys()))
 
     with self.run_execute(foo, recursive=True) as created:
-      self.assertEqual([foo], created.keys())
+      self.assertEqual([foo], list(created.keys()))
 
   def test_binary_target_injected_into_reduced_dependencies_with_provider(self):
     bar_bin_dep = self.create_python_library(
@@ -207,7 +207,7 @@ class TestSetupPy(PythonTaskTestBase):
     self.assertEqual(entry_points, {'bar_binary': 'bar.bin:bar'})
 
     with self.run_execute(bar, recursive=False) as created:
-      self.assertEqual([bar], created.keys())
+      self.assertEqual([bar], list(created.keys()))
 
     with self.run_execute(bar, recursive=True) as created:
       self.assertEqual({bar_bin_dep, bar}, set(created.keys()))
@@ -392,7 +392,7 @@ class TestSetupPy(PythonTaskTestBase):
     conway = self.target('src/python/monster:conway')
 
     with self.run_execute(conway) as created:
-      self.assertEqual([conway], created.keys())
+      self.assertEqual([conway], list(created.keys()))
 
       with self.extracted_sdist(sdist=created[conway],
                                 expected_prefix='monstrous.moonshine-0.0.0',
@@ -434,7 +434,7 @@ class TestSetupPy(PythonTaskTestBase):
     conway = self.target('src/python/monster:conway')
 
     with self.run_execute(conway) as created:
-      self.assertEqual([conway], created.keys())
+      self.assertEqual([conway], list(created.keys()))
 
       # Now that we've created the sdist tarball, delete the symlink destination to ensure the
       # unpacked sdist can't get away with unpacking a symlink that happens to have local
@@ -481,7 +481,7 @@ class TestSetupPy(PythonTaskTestBase):
     # Remove this once proper Subsystem dependency chains are re-established.
     init_subsystem(JVM)
     with self.run_execute(target) as created:
-      self.assertEqual([target], created.keys())
+      self.assertEqual([target], list(created.keys()))
 
   def test_exported_thrift(self):
     self.create_file(relpath='src/thrift/exported/exported.thrift', contents=dedent("""
@@ -494,7 +494,7 @@ class TestSetupPy(PythonTaskTestBase):
                               sources=['exported.thrift'],
                               provides=PythonArtifact(name='test.exported', version='0.0.0'))
     with self.run_execute(target) as created:
-      self.assertEqual([target], created.keys())
+      self.assertEqual([target], list(created.keys()))
 
   def test_exported_thrift_issues_2005(self):
     # Issue #2005 highlighted the fact the PythonThriftBuilder was building both a given
@@ -603,7 +603,7 @@ class TestSetupPy(PythonTaskTestBase):
       ]
     )
     with self.run_execute(pants) as created:
-      self.assertEqual([pants], created.keys())
+      self.assertEqual([pants], list(created.keys()))
 
 
 def test_detect_namespace_packages():
@@ -636,7 +636,7 @@ def yield_chroot(packages, namespace_packages, resources):
       write(package, '__init__.py', '')
     for package in namespace_packages:
       write(package, '__init__.py', '__import__("pkg_resources").declare_namespace(__name__)')
-    for package, resource_list in resources.items():
+    for package, resource_list in list(resources.items()):
       for resource in resource_list:
         write(package, resource, 'asdfasdf')
 
@@ -651,7 +651,7 @@ def test_find_packages():
       p, n_p, r = SetupPy.find_packages(chroot)
       assert p == set(packages + namespace_packages)
       assert n_p == set(namespace_packages)
-      assert r == dict((k, set(v)) for (k, v) in resources.items())
+      assert r == dict((k, set(v)) for (k, v) in list(resources.items()))
 
   # assert both packages and namespace packages work
   assert_single_chroot(['foo'], [], {})

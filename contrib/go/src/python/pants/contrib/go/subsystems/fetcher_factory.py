@@ -88,7 +88,7 @@ class FetcherFactory(Subsystem):
   @memoized_property
   def _matchers(self):
     matchers = []
-    for regex, info in self.get_options().matchers.items():
+    for regex, info in list(self.get_options().matchers.items()):
       matcher = re.compile(regex)
       unexpanded_url_info = ArchiveFetcher.UrlInfo(*info)
       matchers.append((matcher, unexpanded_url_info))

@@ -33,4 +33,4 @@ class BundleIntegrationTest(PantsRunIntegrationTest):
                      .format(name=name))
       bundle_jar_name = 'example{proj}'.format(proj=name)
       stdout = self.bundle_and_run(target, bundle_name, bundle_jar_name=bundle_jar_name)
-      self.assertEquals(stdout, 'Hello world!: resource from example {name}\n'.format(name=name))
+      self.assertEqual(stdout, 'Hello world!: resource from example {name}\n'.format(name=name))

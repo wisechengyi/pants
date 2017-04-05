@@ -24,7 +24,7 @@ class IdeGenTest(BaseTest):
     })
     source_roots = SourceRootConfig.global_instance().get_source_roots()
     source_set_list = []
-    self.assertEquals([], Project._collapse_by_source_root(source_roots, source_set_list))
+    self.assertEqual([], Project._collapse_by_source_root(source_roots, source_set_list))
 
     source_sets = [
       SourceSet('/repo-root', 'src/java', 'org/pantsbuild/app', False),
@@ -34,31 +34,31 @@ class IdeGenTest(BaseTest):
 
     results = Project._collapse_by_source_root(source_roots, source_sets)
 
-    self.assertEquals(SourceSet('/repo-root', 'src/java', '', False), results[0])
+    self.assertEqual(SourceSet('/repo-root', 'src/java', '', False), results[0])
     self.assertFalse(results[0].is_test)
-    self.assertEquals(SourceSet('/repo-root', 'tests/java', '', True), results[1])
+    self.assertEqual(SourceSet('/repo-root', 'tests/java', '', True), results[1])
     self.assertTrue(results[1].is_test)
     # If there is no registered source root, the SourceSet should be returned unmodified
-    self.assertEquals(source_sets[2], results[2])
+    self.assertEqual(source_sets[2], results[2])
     self.assertFalse(results[2].is_test)
 
   def test_source_set(self):
     source_set1 = SourceSet('repo-root', 'path/to/build', 'org/pantsbuild/project', False)
     # only the first 3 parameters are considered keys
-    self.assertEquals(('repo-root', 'path/to/build', 'org/pantsbuild/project'),
+    self.assertEqual(('repo-root', 'path/to/build', 'org/pantsbuild/project'),
                       source_set1._key_tuple)
     source_set2 = SourceSet('repo-root', 'path/to/build', 'org/pantsbuild/project', True)
     # Don't consider the test flag
-    self.assertEquals(source_set1, source_set2)
+    self.assertEqual(source_set1, source_set2)
 
   def assert_dedup(self, expected, actual):
-    self.assertEquals([expected], actual)
+    self.assertEqual([expected], actual)
     # that test is not good enough, 'resources_only' and 'is_test' aren't considered keys for the set
-    self.assertEquals(expected.resources_only, actual[0].resources_only)
-    self.assertEquals(expected.is_test, actual[0].is_test)
+    self.assertEqual(expected.resources_only, actual[0].resources_only)
+    self.assertEqual(expected.is_test, actual[0].is_test)
 
   def test_dedup_sources_simple(self):
-    self.assertEquals([
+    self.assertEqual([
       SourceSet('foo', 'bar', ''),
       SourceSet('foo', 'bar', 'baz'),
       SourceSet('foo', 'bar', 'foobar')

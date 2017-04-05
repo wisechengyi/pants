@@ -19,7 +19,7 @@ class ListRootsTest(ConsoleTaskTestBase):
 
   def _create_source_roots(self, source_root_dict):
     self.set_options_for_scope('source', source_roots=source_root_dict)
-    for dir in source_root_dict.keys():
+    for dir in list(source_root_dict.keys()):
       os.makedirs(os.path.join(get_buildroot(), dir))
 
   def test_no_langs(self):

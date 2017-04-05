@@ -26,6 +26,7 @@ from pants.source.payload_fields import SourcesField
 from pants.source.wrapped_globs import Files, FilesetWithSpec, Globs
 from pants.subsystem.subsystem import Subsystem
 from pants.util.memo import memoized_property
+import collections
 
 
 logger = logging.getLogger(__name__)
@@ -176,18 +177,18 @@ class Target(AbstractTarget):
       :API: public
       """
       ignore_params = set((self.get_options().ignored or {}).get(target.type_alias, ()))
-      unknown_args = {arg: value for arg, value in kwargs.items() if arg not in ignore_params}
-      ignored_args = {arg: value for arg, value in kwargs.items() if arg in ignore_params}
+      unknown_args = {arg: value for arg, value in list(kwargs.items()) if arg not in ignore_params}
+      ignored_args = {arg: value for arg, value in list(kwargs.items()) if arg in ignore_params}
       if ignored_args:
         logger.debug('{target} ignoring the unimplemented arguments: {args}'
                      .format(target=target.address.spec,
                              args=', '.join('{} = {}'.format(key, val)
-                                            for key, val in ignored_args.items())))
+                                            for key, val in list(ignored_args.items()))))
       if unknown_args:
         error_message = '{target_type} received unknown arguments: {args}'
         raise self.UnknownArgumentError(target.address.spec, error_message.format(
           target_type=type(target).__name__,
-          args=''.join('\n  {} = {}'.format(key, value) for key, value in unknown_args.items())
+          args=''.join('\n  {} = {}'.format(key, value) for key, value in list(unknown_args.items()))
         ))
 
   @classmethod
@@ -705,9 +706,9 @@ class Target(AbstractTarget):
     :param predicate: Callable that takes a :py:class:`pants.build_graph.target.Target`
       as its single argument and returns True if the target should passed to ``work``.
     """
-    if not callable(work):
+    if not isinstance(work, collections.Callable):
       raise ValueError('work must be callable but was {}'.format(work))
-    if predicate and not callable(predicate):
+    if predicate and not isinstance(predicate, collections.Callable):
       raise ValueError('predicate must be callable but was {}'.format(predicate))
     self._build_graph.walk_transitive_dependency_graph([self.address], work, predicate)
 

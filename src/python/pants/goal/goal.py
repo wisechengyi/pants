@@ -226,10 +226,10 @@ class _Goal(object):
 
   def task_types(self):
     """Returns the task types in this goal, unordered."""
-    return self._task_type_by_name.values()
+    return list(self._task_type_by_name.values())
 
   def task_items(self):
-    for name, task_type in self._task_type_by_name.items():
+    for name, task_type in list(self._task_type_by_name.items()):
       yield name, task_type
 
   def has_task_of_type(self, typ):

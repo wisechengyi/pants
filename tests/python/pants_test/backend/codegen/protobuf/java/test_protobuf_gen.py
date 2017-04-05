@@ -52,8 +52,8 @@ class ProtobufGenTest(TaskTestBase):
     context = self.context(target_roots=[self.target('test_proto:proto')])
     task = self.create_task(context)
     javadeps = task.javadeps
-    self.assertEquals(len(javadeps), 1)
-    self.assertEquals('protobuf-java', javadeps.pop().name)
+    self.assertEqual(len(javadeps), 1)
+    self.assertEqual('protobuf-java', javadeps.pop().name)
 
   def test_calculate_sources(self):
     self.add_to_build_file('proto-lib', dedent("""
@@ -65,8 +65,8 @@ class ProtobufGenTest(TaskTestBase):
     context = self.context(target_roots=[target])
     task = self.create_task(context)
     result = task._calculate_sources(target)
-    self.assertEquals(1, len(result.keys()))
-    self.assertEquals(OrderedSet(['proto-lib/foo.proto']), result['proto-lib'])
+    self.assertEqual(1, len(list(result.keys())))
+    self.assertEqual(OrderedSet(['proto-lib/foo.proto']), result['proto-lib'])
 
   def test_calculate_sources_with_source_root(self):
     self.add_to_build_file('project/src/main/proto/proto-lib', dedent("""
@@ -78,6 +78,6 @@ class ProtobufGenTest(TaskTestBase):
     context = self.context(target_roots=[target])
     task = self.create_task(context)
     result = task._calculate_sources(target)
-    self.assertEquals(1, len(result.keys()))
-    self.assertEquals(OrderedSet(['project/src/main/proto/proto-lib/foo.proto']),
+    self.assertEqual(1, len(list(result.keys())))
+    self.assertEqual(OrderedSet(['project/src/main/proto/proto-lib/foo.proto']),
                       result['project/src/main/proto'])

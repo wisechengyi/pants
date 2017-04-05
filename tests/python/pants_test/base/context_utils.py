@@ -84,7 +84,7 @@ class TestContext(Context):
     :API: public
     """
     # Just execute in-process.
-    return map(f, items)
+    return list(map(f, items))
 
 
 # TODO: Make Console and Workspace into subsystems, and simplify this signature.

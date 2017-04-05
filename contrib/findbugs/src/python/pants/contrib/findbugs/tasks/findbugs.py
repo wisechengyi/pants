@@ -104,7 +104,7 @@ class FindBugs(NailgunTask):
     if self.get_options().transitive:
       targets = self.context.targets(self._is_findbugs_target)
     else:
-      targets = filter(self._is_findbugs_target, self.context.target_roots)
+      targets = list(filter(self._is_findbugs_target, self.context.target_roots))
 
     bug_counts = { 'error': 0, 'high': 0, 'normal': 0, 'low': 0 }
     target_count = 0
@@ -120,7 +120,7 @@ class FindBugs(NailgunTask):
         target_bug_counts = self.findbugs(vt.target)
         if not self.get_options().fail_on_error or sum(target_bug_counts.values()) == 0:
           vt.update()
-        bug_counts = {k: bug_counts.get(k, 0) + target_bug_counts.get(k, 0) for k in bug_counts.keys()}
+        bug_counts = {k: bug_counts.get(k, 0) + target_bug_counts.get(k, 0) for k in list(bug_counts.keys())}
 
       error_count = bug_counts.pop('error', 0)
       bug_counts['total'] = sum(bug_counts.values())

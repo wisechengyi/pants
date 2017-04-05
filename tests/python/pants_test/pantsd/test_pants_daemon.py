@@ -65,7 +65,7 @@ class PantsDaemonTest(BaseTest):
     with stdio_as(mock_fd, mock_fd, mock_fd):
       self.pantsd._close_fds()
 
-    self.assertEquals(mock_fd.close.call_count, 3)
+    self.assertEqual(mock_fd.close.call_count, 3)
     mock_close.assert_has_calls(mock.call(x) for x in [0, 1, 2])
 
   def test_shutdown(self):

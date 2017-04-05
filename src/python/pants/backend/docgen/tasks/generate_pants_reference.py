@@ -60,7 +60,7 @@ class GeneratePantsReference(Task):
     global_scope_data = all_global_data[0:1]
     global_subsystem_data = all_global_data[1:]
 
-    goal_scopes = sorted([si.scope for si in self.context.options.known_scope_to_info.values()
+    goal_scopes = sorted([si.scope for si in list(self.context.options.known_scope_to_info.values())
     if si.scope and '.' not in si.scope and si.category != ScopeInfo.SUBSYSTEM])
     # TODO: Make goals Optionable and get their description via their ScopeInfo?
     goal_data = []

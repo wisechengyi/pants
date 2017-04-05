@@ -161,7 +161,7 @@ class CacheCompileIntegrationTest(BaseCompileIT):
         return sorted(os.listdir(cd))
 
       # One workdir should contain NotMain, and the other should contain Main.
-      self.assertEquals(sorted(classfiles(w) for w in target_workdirs if w != 'current'),
+      self.assertEqual(sorted(classfiles(w) for w in target_workdirs if w != 'current'),
                         sorted([['A.class', 'Main.class'], ['A.class', 'NotMain.class']]))
 
   def test_incremental_caching(self):
@@ -198,7 +198,7 @@ class CacheCompileIntegrationTest(BaseCompileIT):
       def complete_config(config):
         # Clone the input config and add cache settings.
         cache_settings = {'write_to': [cache_dir], 'read_from': [cache_dir]}
-        return dict(config.items() + [('cache.compile.zinc', cache_settings)])
+        return dict(list(config.items()) + [('cache.compile.zinc', cache_settings)])
 
       buildfile = os.path.join(src_dir, 'BUILD')
       spec = os.path.join(src_dir, ':cachetest')
@@ -211,12 +211,12 @@ class CacheCompileIntegrationTest(BaseCompileIT):
         safe_mkdir(src_dir, clean=True)
         self.create_file(buildfile,
                         """java_library(name='cachetest', sources=rglobs('*.java', '*.scala'))""")
-        for name, content in c.srcfiles.items():
+        for name, content in list(c.srcfiles.items()):
           self.create_file(os.path.join(src_dir, name), content)
 
         # Compile, and confirm that we have the right count of artifacts.
         self.run_compile(spec, complete_config(c.config), workdir)
-        self.assertEquals(c.artifact_count, len(os.listdir(artifact_dir)))
+        self.assertEqual(c.artifact_count, len(os.listdir(artifact_dir)))
 
 
 class CacheCompileIntegrationWithZjarsTest(CacheCompileIntegrationTest):

@@ -442,7 +442,7 @@ class _Locator(object):
     :rtype: :class:`pants.java.distribution.Distribution`
     """
 
-    for dist in self._cache.values():
+    for dist in list(self._cache.values()):
       if minimum_version and dist.version < minimum_version:
         continue
       if maximum_version and dist.version > maximum_version:
@@ -581,7 +581,7 @@ class DistributionLocator(Subsystem):
   def register_options(cls, register):
     super(DistributionLocator, cls).register_options(register)
     human_readable_os_aliases = ', '.join('{}: [{}]'.format(str(key), ', '.join(sorted(val)))
-                                          for key, val in OS_ALIASES.items())
+                                          for key, val in list(OS_ALIASES.items()))
     register('--paths', advanced=True, type=dict,
              help='Map of os names to lists of paths to jdks. These paths will be searched before '
                   'everything else (before the JDK_HOME, JAVA_HOME, PATH environment variables) '

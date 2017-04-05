@@ -5,7 +5,7 @@
 from __future__ import (absolute_import, division, generators, nested_scopes, print_function,
                         unicode_literals, with_statement)
 
-import Queue as queue
+import queue as queue
 import threading
 import traceback
 from collections import defaultdict, deque
@@ -73,10 +73,10 @@ class StatusTable(object):
 
   def unfinished_items(self):
     """Returns a list of (name, status) tuples, only including entries marked as unfinished."""
-    return [(key, stat) for key, stat in self._statuses.items() if stat not in self.DONE_STATES]
+    return [(key, stat) for key, stat in list(self._statuses.items()) if stat not in self.DONE_STATES]
 
   def failed_keys(self):
-    return [key for key, stat in self._statuses.items() if stat == FAILED]
+    return [key for key, stat in list(self._statuses.items()) if stat == FAILED]
 
   def is_unstarted(self, key):
     return self._statuses.get(key) is UNSTARTED
@@ -88,10 +88,10 @@ class StatusTable(object):
     return self.is_unstarted(key) and self._pending_dependencies_count[key] == 0
 
   def are_all_done(self):
-    return all(s in self.DONE_STATES for s in self._statuses.values())
+    return all(s in self.DONE_STATES for s in list(self._statuses.values()))
 
   def has_failures(self):
-    return any(stat is FAILED for stat in self._statuses.values())
+    return any(stat is FAILED for stat in list(self._statuses.values()))
 
 
 class ExecutionFailure(Exception):

@@ -132,7 +132,7 @@ class IvyFetchStep(IvyResolutionStep):
   """Resolves ivy artifacts using the coordinates from a previous resolve."""
 
   def required_load_files_exist(self):
-    return (all(os.path.isfile(report) for report in self.workdir_reports_by_conf.values()) and
+    return (all(os.path.isfile(report) for report in list(self.workdir_reports_by_conf.values())) and
                 os.path.isfile(self.ivy_cache_classpath_filename) and
                 os.path.isfile(self.frozen_resolve_file))
 
@@ -212,7 +212,7 @@ class IvyResolveStep(IvyResolutionStep):
   """Resolves ivy artifacts and produces a cacheable file containing the resulting coordinates."""
 
   def required_load_files_exist(self):
-    return (all(os.path.isfile(report) for report in self.workdir_reports_by_conf.values()) and
+    return (all(os.path.isfile(report) for report in list(self.workdir_reports_by_conf.values())) and
                 os.path.isfile(self.ivy_cache_classpath_filename))
 
   def resolve_report_path(self, conf):
@@ -309,14 +309,14 @@ class FrozenResolution(object):
 
   def target_spec_to_coordinate_strings(self):
     return {t.address.spec: [str(c) for c in coordinates]
-            for t, coordinates in self.target_to_resolved_coordinates.items()}
+            for t, coordinates in list(self.target_to_resolved_coordinates.items())}
 
   def __repr__(self):
     return 'FrozenResolution(\n  target_to_resolved_coordinates\n    {}\n  all\n    {}'.format(
       '\n    '.join(':  '.join([t.address.spec,
                                 '\n      '.join(str(c) for c in cs)])
-                    for t,cs in self.target_to_resolved_coordinates.items()),
-      '\n    '.join(str(c) for c in self.coordinate_to_attributes.keys())
+                    for t,cs in list(self.target_to_resolved_coordinates.items())),
+      '\n    '.join(str(c) for c in list(self.coordinate_to_attributes.keys()))
     )
 
   def __eq__(self, other):
@@ -337,17 +337,17 @@ class FrozenResolution(object):
       from_file = json.load(f, object_pairs_hook=OrderedDict)
     result = {}
     target_lookup = {t.address.spec: t for t in targets}
-    for conf, serialized_resolution in from_file.items():
+    for conf, serialized_resolution in list(from_file.items()):
       resolution = FrozenResolution()
 
       def m2_for(c):
         return M2Coordinate.from_string(c)
 
-      for coord, attr_dict in serialized_resolution['coord_to_attrs'].items():
+      for coord, attr_dict in list(serialized_resolution['coord_to_attrs'].items()):
         m2 = m2_for(coord)
         resolution.coordinate_to_attributes[m2] = attr_dict
 
-      for spec, coord_strs in serialized_resolution['target_to_coords'].items():
+      for spec, coord_strs in list(serialized_resolution['target_to_coords'].items()):
         t = target_lookup.get(spec, None)
         if t is None:
           raise cls.MissingTarget('Cannot find target for address {} in frozen resolution'
@@ -360,11 +360,11 @@ class FrozenResolution(object):
   @classmethod
   def dump_to_file(cls, filename, resolutions_by_conf):
     res = {}
-    for conf, resolution in resolutions_by_conf.items():
+    for conf, resolution in list(resolutions_by_conf.items()):
       res[conf] = OrderedDict([
         ['target_to_coords',resolution.target_spec_to_coordinate_strings()],
         ['coord_to_attrs', OrderedDict([str(c), attrs]
-                                       for c, attrs in resolution.coordinate_to_attributes.items())]
+                                       for c, attrs in list(resolution.coordinate_to_attributes.items()))]
       ])
 
     with safe_concurrent_creation(filename) as tmp_filename:
@@ -680,7 +680,7 @@ class IvyInfo(object):
     return resolved_jars
 
   def __repr__(self):
-    return 'IvyInfo(conf={}, refs={})'.format(self._conf, self.modules_by_ref.keys())
+    return 'IvyInfo(conf={}, refs={})'.format(self._conf, list(self.modules_by_ref.keys()))
 
 
 class IvyUtils(object):
@@ -723,7 +723,7 @@ class IvyUtils(object):
       return []
     else:
       with safe_open(path, 'r') as cp:
-        return filter(None, (path.strip() for path in cp.read().split(os.pathsep)))
+        return [_f for _f in (path.strip() for path in cp.read().split(os.pathsep)) if _f]
 
   @classmethod
   def do_resolve(cls, executor, extra_args, ivyxml, jvm_options, workdir_report_paths_by_conf,
@@ -866,7 +866,7 @@ class IvyUtils(object):
 
     # (re)create the classpath with all of the paths
     with safe_open(outpath, 'w') as outfile:
-      outfile.write(':'.join(OrderedSet(symlink_map.values())))
+      outfile.write(':'.join(OrderedSet(list(symlink_map.values()))))
 
     return dict(symlink_map)
 
@@ -951,7 +951,7 @@ class IvyUtils(object):
 
     manager = jar_dep_manager or JarDependencyManagement.global_instance()
     artifact_set = PinnedJarArtifactSet(pinned_artifacts) # Copy, because we're modifying it.
-    for jars in jars_by_key.values():
+    for jars in list(jars_by_key.values()):
       for i, dep in enumerate(jars):
         direct_coord = M2Coordinate.create(dep)
         managed_coord = artifact_set[direct_coord]
@@ -966,7 +966,7 @@ class IvyUtils(object):
           # pants behavior for 'force'.
           artifact_set.put(direct_coord)
 
-    dependencies = [cls._generate_jar_template(jars) for jars in jars_by_key.values()]
+    dependencies = [cls._generate_jar_template(jars) for jars in list(jars_by_key.values())]
 
     # As it turns out force is not transitive - it only works for dependencies pants knows about
     # directly (declared in BUILD files - present in generated ivy.xml). The user-level ivy docs
@@ -1008,7 +1008,7 @@ class IvyUtils(object):
       jars_by_key.setdefault((jar.org, jar.name, jar.rev), []).append(jar)
 
 
-    dependencies = [cls._generate_fetch_jar_template(_jars) for _jars in jars_by_key.values()]
+    dependencies = [cls._generate_fetch_jar_template(_jars) for _jars in list(jars_by_key.values())]
 
     template_data = TemplateData(org=org,
                                  module=name,
@@ -1092,11 +1092,11 @@ class IvyUtils(object):
     if provide_excludes:
       additional_excludes = tuple(provide_excludes)
       new_jars = OrderedDict()
-      for coordinate, jar in jars.items():
+      for coordinate, jar in list(jars.items()):
         new_jars[coordinate] = jar.copy(excludes=jar.excludes + additional_excludes)
       jars = new_jars
 
-    return jars.values(), global_excludes
+    return list(jars.values()), global_excludes
 
   @classmethod
   def _resolve_conflict(cls, existing, proposed):
@@ -1177,7 +1177,7 @@ class IvyUtils(object):
         mutable=jar_attributes.mutable,
         force=jar_attributes.force,
         transitive=jar_attributes.transitive,
-        artifacts=artifacts.values(),
+        artifacts=list(artifacts.values()),
         any_have_url=any_have_url,
         excludes=[cls._generate_exclude_template(exclude) for exclude in excludes])
 
@@ -1221,7 +1221,7 @@ class IvyUtils(object):
         module=jar_attributes.name,
         version=jar_attributes.rev,
         mutable=jar_attributes.mutable,
-        artifacts=artifacts.values(),
+        artifacts=list(artifacts.values()),
         any_have_url=any_have_url,
         excludes=[])
 

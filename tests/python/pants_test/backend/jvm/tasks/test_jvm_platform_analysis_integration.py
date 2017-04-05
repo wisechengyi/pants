@@ -42,7 +42,7 @@ class JvmPlatformAnalysisIntegrationTest(PantsRunIntegrationTest):
 
     def jvm_platform_validate(self, *targets):
       return self.test.run_pants_with_workdir(['jvm-platform-validate', '--check=fatal']
-                                              + map(self.spec, targets),
+                                              + list(map(self.spec, targets)),
                                               workdir=self.workdir)
 
   @contextmanager

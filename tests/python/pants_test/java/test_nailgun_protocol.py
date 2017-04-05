@@ -31,7 +31,7 @@ class TestNailgunProtocol(unittest.TestCase):
   EMPTY_PAYLOAD = ''
   TEST_COMMAND = 'test'
   TEST_OUTPUT = 't e s t'
-  TEST_UNICODE_PAYLOAD = u'([\d０-９]{1,4}\s?[年月日])'.encode('utf-8')
+  TEST_UNICODE_PAYLOAD = '([\d０-９]{1,4}\s?[年月日])'.encode('utf-8')
   TEST_WORKING_DIR = '/path/to/a/repo'
   TEST_ARGUMENTS = ['t', 'e', 's', 't']
   TEST_ENVIRON = dict(TEST_VAR='success')
@@ -185,10 +185,10 @@ class TestNailgunProtocol(unittest.TestCase):
     )
 
   def test_isatty_from_empty_env(self):
-    self.assertEquals(NailgunProtocol.isatty_from_env({}), (False, False, False))
+    self.assertEqual(NailgunProtocol.isatty_from_env({}), (False, False, False))
 
   def test_isatty_from_env(self):
-    self.assertEquals(
+    self.assertEqual(
       NailgunProtocol.isatty_from_env({
         'NAILGUN_TTY_0': '1',
         'NAILGUN_TTY_1': '0',
@@ -198,7 +198,7 @@ class TestNailgunProtocol(unittest.TestCase):
     )
 
   def test_isatty_from_env_mixed(self):
-    self.assertEquals(
+    self.assertEqual(
       NailgunProtocol.isatty_from_env({
         'NAILGUN_TTY_0': '0',
         'NAILGUN_TTY_1': '1'
@@ -211,7 +211,7 @@ class TestNailgunProtocol(unittest.TestCase):
       NailgunProtocol.construct_chunk(ChunkType.STDOUT, 1111)
 
   def test_construct_chunk_unicode(self):
-    NailgunProtocol.construct_chunk(ChunkType.STDOUT, u'Ø')
+    NailgunProtocol.construct_chunk(ChunkType.STDOUT, 'Ø')
 
   def test_construct_chunk_bytes(self):
     NailgunProtocol.construct_chunk(ChunkType.STDOUT, b'yes')

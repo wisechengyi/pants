@@ -33,10 +33,10 @@ class ClocTest(ConsoleTaskTestBase):
         fields = line.split()
         if len(fields) >= 5:
           if fields[0] == lang:
-            self.assertEquals(files, int(fields[1]))
-            self.assertEquals(blank, int(fields[2]))
-            self.assertEquals(comment, int(fields[3]))
-            self.assertEquals(code, int(fields[4]))
+            self.assertEqual(files, int(fields[1]))
+            self.assertEqual(blank, int(fields[2]))
+            self.assertEqual(comment, int(fields[3]))
+            self.assertEqual(code, int(fields[4]))
             return
       self.fail('Found no output line for {}'.format(lang))
 
@@ -54,6 +54,6 @@ class ClocTest(ConsoleTaskTestBase):
     self.create_file('src/py/foo/empty.py', '')
 
     res = self.execute_console_task(targets=[py_tgt], options={'ignored': True})
-    self.assertEquals(['Ignored the following files:',
+    self.assertEqual(['Ignored the following files:',
                        '{}/src/py/foo/empty.py: zero sized file'.format(get_buildroot())],
                       filter(None, res)[-2:])

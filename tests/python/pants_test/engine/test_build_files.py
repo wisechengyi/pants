@@ -111,8 +111,8 @@ class GraphTestBase(unittest.TestCase, SchedulerTestBase):
     """Perform an ExecutionRequest to parse the given Address into a Struct."""
     request = scheduler.execution_request([TestTable.constraint()], [address])
     LocalSerialEngine(scheduler).reduce(request)
-    root_entries = scheduler.root_entries(request).items()
-    self.assertEquals(1, len(root_entries))
+    root_entries = list(scheduler.root_entries(request).items())
+    self.assertEqual(1, len(root_entries))
     return root_entries[0]
 
   def walk(self, scheduler, address):
@@ -122,12 +122,12 @@ class GraphTestBase(unittest.TestCase, SchedulerTestBase):
 
   def resolve_failure(self, scheduler, address):
     root, state = self._populate(scheduler, address)
-    self.assertEquals(type(state), Throw, '{} is not a Throw.'.format(state))
+    self.assertEqual(type(state), Throw, '{} is not a Throw.'.format(state))
     return state.exc
 
   def resolve(self, scheduler, address):
     root, state = self._populate(scheduler, address)
-    self.assertEquals(type(state), Return, '{} is not a Return.'.format(state))
+    self.assertEqual(type(state), Return, '{} is not a Return.'.format(state))
     return state.value
 
 
@@ -183,14 +183,14 @@ class InlinedGraphTest(GraphTestBase):
 
     nonstrict_address = Address.parse('graph_test:nonstrict')
     nonstrict = self.resolve(scheduler, nonstrict_address)
-    self.assertEquals(nonstrict, self.resolve(scheduler, nonstrict_address))
+    self.assertEqual(nonstrict, self.resolve(scheduler, nonstrict_address))
 
     # The already resolved `nonstrict` interior node should be re-used by `java1`.
     java1_address = Address.parse('graph_test:java1')
     java1 = self.resolve(scheduler, java1_address)
-    self.assertEquals(nonstrict, java1.configurations[1])
+    self.assertEqual(nonstrict, java1.configurations[1])
 
-    self.assertEquals(java1, self.resolve(scheduler, java1_address))
+    self.assertEqual(java1, self.resolve(scheduler, java1_address))
 
   def do_test_trace_message(self, scheduler, parsed_address, expected_string=None):
     # Confirm that the root failed, and that a cycle occurred deeper in the graph.
@@ -257,7 +257,7 @@ class InlinedGraphTest(GraphTestBase):
   def assert_resolve_failure_type(self, expected_type, mismatch, scheduler):
 
     failure = self.resolve_failure(scheduler, mismatch)
-    self.assertEquals(type(failure),
+    self.assertEqual(type(failure),
                       expected_type,
                       'type was not {}. Instead was {}, {!r}'.format(expected_type.__name__, type(failure).__name__, failure))
 
@@ -306,14 +306,14 @@ class LazyResolvingGraphTest(GraphTestBase):
     resolved_nonstrict = self.resolve(scheduler, nonstrict_address)
     self.assertEqual(expected_nonstrict, resolved_nonstrict)
     self.assertEqual(expected_nonstrict, expected_java1.configurations[1])
-    self.assertEquals(resolved_java1.configurations[1], resolved_nonstrict)
+    self.assertEqual(resolved_java1.configurations[1], resolved_nonstrict)
 
     resolved_public = self.resolve(scheduler, public_address)
     self.assertEqual(expected_public, resolved_public)
     self.assertEqual(expected_public, expected_java1.configurations[0].default_repo)
     self.assertEqual(expected_public, expected_java1.configurations[0].repos['jane'])
-    self.assertEquals(resolved_java1.configurations[0].default_repo, resolved_public)
-    self.assertEquals(resolved_java1.configurations[0].repos['jane'], resolved_public)
+    self.assertEqual(resolved_java1.configurations[0].default_repo, resolved_public)
+    self.assertEqual(resolved_java1.configurations[0].repos['jane'], resolved_public)
 
     # NB: `dependencies` lists must be explicitly requested by tasks, so we expect an Address.
     thrift1_address = address('thrift1')

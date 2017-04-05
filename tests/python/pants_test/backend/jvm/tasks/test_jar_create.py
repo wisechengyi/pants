@@ -121,7 +121,7 @@ class JarCreateExecuteTest(JarCreateTestBase):
     """
     jar_mapping = context.products.get(product_type).get(target)
     self.assertEqual(1, len(jar_mapping))
-    for basedir, jars in jar_mapping.items():
+    for basedir, jars in list(jar_mapping.items()):
       self.assertEqual(1, len(jars))
       with open_zip(os.path.join(basedir, jars[0])) as jar:
         actual_iter = iter(jar.namelist())

@@ -81,7 +81,7 @@ class AntlrJavaGenTest(NailgunTaskTestBase):
 
     actual_sources = [s for s in Fileset.rglobs('*.java', root=target_workdir)]
     expected_sources = syn_target.sources_relative_to_source_root()
-    self.assertEquals(set(expected_sources), set(actual_sources))
+    self.assertEqual(set(expected_sources), set(actual_sources))
 
     # Check that the synthetic target has a valid source root and the generated sources have the
     # expected java package
@@ -164,7 +164,7 @@ class AntlrJavaGenTest(NailgunTaskTestBase):
       )
     """.format(**self.PARTS)))
 
-    with self.assertRaisesRegexp(TaskError, r'.*Antlr sources in multiple directories.*'):
+    with self.assertRaisesRegex(TaskError, r'.*Antlr sources in multiple directories.*'):
       self.execute(self.create_context())
 
   def test_generated_target_fingerprint_stable_v3(self):

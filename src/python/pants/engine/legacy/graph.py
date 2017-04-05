@@ -72,7 +72,7 @@ class LegacyBuildGraph(BuildGraph):
   def _get_target_types(symbol_table_cls):
     aliases = symbol_table_cls.aliases()
     target_types = dict(aliases.target_types)
-    for alias, factory in aliases.target_macro_factories.items():
+    for alias, factory in list(aliases.target_macro_factories.items()):
       target_type, = factory.target_types
       target_types[alias] = target_type
     return target_types
@@ -86,7 +86,7 @@ class LegacyBuildGraph(BuildGraph):
     new_targets = list()
 
     # Index the ProductGraph.
-    for node, state in roots.items():
+    for node, state in list(roots.items()):
       if type(state) is not Return:
         trace = '\n'.join(self._scheduler.trace())
         raise AddressLookupError(
@@ -232,12 +232,12 @@ class LegacyBuildGraph(BuildGraph):
       raise result.error
     # Update the base class indexes for this request.
     root_entries = self._scheduler.root_entries(request)
-    address_entries = {k: v for k, v in root_entries.items() if k[1].product is Addresses}
-    target_entries = {k: v for k, v in root_entries.items() if k[1].product is HydratedTargets}
+    address_entries = {k: v for k, v in list(root_entries.items()) if k[1].product is Addresses}
+    target_entries = {k: v for k, v in list(root_entries.items()) if k[1].product is HydratedTargets}
     self._index(target_entries)
 
     yielded_addresses = set()
-    for (subject, _), state in address_entries.items():
+    for (subject, _), state in list(address_entries.items()):
       if not state.value.dependencies:
         raise self.InvalidCommandLineSpecError(
           'Spec {} does not match any targets.'.format(subject))
@@ -289,7 +289,7 @@ def _eager_fileset_with_spec(spec_path, filespec, snapshot):
   files = tuple(fast_relpath(fd.path, spec_path) for fd in snapshot.files)
 
   relpath_adjusted_filespec = FilesetRelPathWrapper.to_filespec(filespec['globs'], spec_path)
-  if filespec.has_key('exclude'):
+  if 'exclude' in filespec:
     relpath_adjusted_filespec['exclude'] = [FilesetRelPathWrapper.to_filespec(e['globs'], spec_path)
                                             for e in filespec['exclude']]
 
@@ -312,9 +312,9 @@ def hydrate_sources(sources_field, snapshot):
 def hydrate_bundles(bundles_field, snapshot_list):
   """Given a BundlesField and a Snapshot for each of its filesets create a list of BundleAdaptors."""
   bundles = []
-  zipped = zip(bundles_field.bundles,
+  zipped = list(zip(bundles_field.bundles,
                bundles_field.filespecs_list,
-               snapshot_list)
+               snapshot_list))
   for bundle, filespecs, snapshot in zipped:
     spec_path = bundles_field.address.spec_path
     kwargs = bundle.kwargs()

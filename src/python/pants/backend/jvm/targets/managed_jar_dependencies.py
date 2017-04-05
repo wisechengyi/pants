@@ -128,7 +128,7 @@ class ManagedJarLibraries(object):
                                                    artifacts=artifacts,
                                                    **kwargs)
     jars, _ = ManagedJarDependencies._split_jars_and_specs(artifacts)
-    for library_name, dep in self._jars_by_name(management, jars).items():
+    for library_name, dep in list(self._jars_by_name(management, jars).items()):
       self._parse_context.create_object('jar_library',
                                         name=library_name,
                                         jars=[copy.deepcopy(dep)],

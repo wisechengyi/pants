@@ -71,7 +71,7 @@ class Report(object):
 
   def open(self):
     with self._lock:
-      for reporter in self._reporters.values():
+      for reporter in list(self._reporters.values()):
         reporter.open()
     self._emitter_thread.start()
 
@@ -91,7 +91,7 @@ class Report(object):
   def start_workunit(self, workunit):
     with self._lock:
       self._workunits[workunit.id] = workunit
-      for reporter in self._reporters.values():
+      for reporter in list(self._reporters.values()):
         reporter.start_workunit(workunit)
 
   def log(self, workunit, level, *msg_elements):
@@ -100,13 +100,13 @@ class Report(object):
     Each element of msg_elements is either a message string or a (message, detail) pair.
     """
     with self._lock:
-      for reporter in self._reporters.values():
+      for reporter in list(self._reporters.values()):
         reporter.handle_log(workunit, level, *msg_elements)
 
   def end_workunit(self, workunit):
     with self._lock:
       self._notify()  # Make sure we flush everything reported until now.
-      for reporter in self._reporters.values():
+      for reporter in list(self._reporters.values()):
         reporter.end_workunit(workunit)
       if workunit.id in self._workunits:
         del self._workunits[workunit.id]
@@ -119,16 +119,16 @@ class Report(object):
     self._emitter_thread.stop()
     with self._lock:
       self._notify()  # One final time.
-      for reporter in self._reporters.values():
+      for reporter in list(self._reporters.values()):
         reporter.close()
 
   def _notify(self):
     # Notify for output in all workunits. Note that output may be coming in from workunits other
     # than the current one, if work is happening in parallel.
     # Assumes self._lock is held by the caller.
-    for workunit in self._workunits.values():
-      for label, output in workunit.outputs().items():
+    for workunit in list(self._workunits.values()):
+      for label, output in list(workunit.outputs().items()):
         s = output.read()
         if len(s) > 0:
-          for reporter in self._reporters.values():
+          for reporter in list(self._reporters.values()):
             reporter.handle_output(workunit, label, s)

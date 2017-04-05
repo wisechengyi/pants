@@ -274,7 +274,7 @@ class IdeGen(IvyTaskMixin, NailgunTask):
     for target in targets:
       mappings = internal_jars.get(target)
       if mappings:
-        for base, jars in mappings.items():
+        for base, jars in list(mappings.items()):
           if len(jars) != 1:
             raise IdeGen.Error('Unexpected mapping, multiple jars for {}: {}'.format(target, jars))
 
@@ -285,7 +285,7 @@ class IdeGen(IvyTaskMixin, NailgunTask):
           cp_source_jar = None
           mappings = internal_source_jars.get(target)
           if mappings:
-            for base, jars in mappings.items():
+            for base, jars in list(mappings.items()):
               if len(jars) != 1:
                 raise IdeGen.Error(
                   'Unexpected mapping, multiple source jars for {}: {}'.format(target, jars)
@@ -323,7 +323,7 @@ class IdeGen(IvyTaskMixin, NailgunTask):
     # Per org.name (aka maven "project"), collect the primary artifact and any extra classified
     # artifacts, taking special note of 'sources' and 'javadoc' artifacts that IDEs handle specially
     # to provide source browsing and javadocs for 3rdparty libs.
-    for cp_entry_by_classifier in cp_entry_by_classifier_by_orgname.values():
+    for cp_entry_by_classifier in list(cp_entry_by_classifier_by_orgname.values()):
       primary_jar = copy_jar(cp_entry_by_classifier.pop(None, None), external_jar_dir)
       sources_jar = copy_jar(cp_entry_by_classifier.pop('sources', None), external_source_jar_dir)
       javadoc_jar = copy_jar(cp_entry_by_classifier.pop('javadoc', None), external_javadoc_jar_dir)
@@ -334,7 +334,7 @@ class IdeGen(IvyTaskMixin, NailgunTask):
 
       # Treat all other jars as opaque with no source or javadoc attachments of their own.  An
       # example are jars with the 'tests' classifier.
-      for jar_entry in cp_entry_by_classifier.values():
+      for jar_entry in list(cp_entry_by_classifier.values()):
         extra_jar = copy_jar(jar_entry, external_jar_dir)
         self._project.external_jars.add(ClasspathEntry(extra_jar))
 
@@ -514,14 +514,10 @@ class Project(object):
       2) If the targets have different settings for resources_only, resources_only = False
       3) If the two non-resource-only targets have different settings for is_test, is_test = True
     """
-    deduped_sources = set(filter(lambda s: not s.resources_only and s.is_test,
-                                 source_set_list))
-    deduped_sources.update(filter(lambda s: not s.resources_only,
-                                  source_set_list))
-    deduped_sources.update(filter(lambda s : s.resources_only and not s.is_test,
-                                  source_set_list))
-    deduped_sources.update(filter(lambda s : s.resources_only and s.is_test,
-                                  source_set_list))
+    deduped_sources = set([s for s in source_set_list if not s.resources_only and s.is_test])
+    deduped_sources.update([s for s in source_set_list if not s.resources_only])
+    deduped_sources.update([s for s in source_set_list if s.resources_only and not s.is_test])
+    deduped_sources.update([s for s in source_set_list if s.resources_only and s.is_test])
 
     # re-sort the list, makes the generated project easier to read.
     return sorted(list(deduped_sources))
@@ -586,7 +582,7 @@ class Project(object):
           for resources in target.resources:
             analyzed_targets.add(resources)
             resources_by_basedir[resources.target_base].update(relative_sources(resources))
-          for basedir, resources in resources_by_basedir.items():
+          for basedir, resources in list(resources_by_basedir.items()):
             self.resource_extensions.update(Project.extract_resource_extensions(resources))
             configure_source_sets(basedir, resources, is_test=target.is_test,
                                   resources_only=True)
@@ -621,7 +617,7 @@ class Project(object):
         def is_sibling(target):
           return source_target(target) and target_dirset.intersection(find_source_basedirs(target))
 
-        return filter(is_sibling, [self.target_util.get(a) for a in candidates if a != target.address])
+        return list(filter(is_sibling, [self.target_util.get(a) for a in candidates if a != target.address]))
 
     resource_targets = []
     for target in self.targets:

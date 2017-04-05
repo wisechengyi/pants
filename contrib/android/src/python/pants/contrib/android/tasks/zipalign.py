@@ -62,7 +62,7 @@ class Zipalign(AndroidTask):
         apks = self.context.products.get('release_apk')
         packages = apks.get(target)
         if packages:
-          for tgts, products in packages.items():
+          for tgts, products in list(packages.items()):
             for prod in products:
               yield os.path.join(tgts, prod)
 

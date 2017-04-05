@@ -121,11 +121,11 @@ def resolve_unhydrated_struct(address_mapper, address_family, address):
       collect_dependencies(value)
 
   def collect_dependencies(item):
-    for key, value in sorted(item._asdict().items(), key=_key_func):
+    for key, value in sorted(list(item._asdict().items()), key=_key_func):
       if not AddressableDescriptor.is_addressable(item, key):
         continue
       if isinstance(value, collections.MutableMapping):
-        for _, v in sorted(value.items(), key=_key_func):
+        for _, v in sorted(list(value.items()), key=_key_func):
           maybe_append(key, v)
       elif isinstance(value, collections.MutableSequence):
         for v in value:
@@ -169,7 +169,7 @@ def hydrate_struct(address_mapper, unhydrated_struct, dependencies):
   # 'zip' the previously-requested dependencies back together as struct fields.
   def consume_dependencies(item, args=None):
     hydrated_args = args or {}
-    for key, value in sorted(item._asdict().items(), key=_key_func):
+    for key, value in sorted(list(item._asdict().items()), key=_key_func):
       if not AddressableDescriptor.is_addressable(item, key):
         hydrated_args[key] = value
         continue
@@ -177,7 +177,7 @@ def hydrate_struct(address_mapper, unhydrated_struct, dependencies):
       if isinstance(value, collections.MutableMapping):
         container_type = type(value)
         hydrated_args[key] = container_type((k, maybe_consume(key, v))
-                                            for k, v in sorted(value.items(), key=_key_func))
+                                            for k, v in sorted(list(value.items()), key=_key_func))
       elif isinstance(value, collections.MutableSequence):
         container_type = type(value)
         hydrated_args[key] = container_type(maybe_consume(key, v) for v in value)
@@ -216,11 +216,11 @@ def identity(v):
 def addresses_from_address_families(address_families, spec):
   """Given a list of AddressFamilies and a Spec, return matching Addresses."""
   if type(spec) in (DescendantAddresses, SiblingAddresses, AscendantAddresses):
-    addresses = tuple(a for af in address_families for a in af.addressables.keys())
+    addresses = tuple(a for af in address_families for a in list(af.addressables.keys()))
   elif type(spec) is SingleAddress:
     addresses = tuple(a
                       for af in address_families
-                      for a in af.addressables.keys() if a.target_name == spec.name)
+                      for a in list(af.addressables.keys()) if a.target_name == spec.name)
   else:
     raise ValueError('Unrecognized Spec type: {}'.format(spec))
   return Addresses(addresses)

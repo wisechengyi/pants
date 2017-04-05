@@ -172,7 +172,7 @@ def _object_encoder(obj, inline):
   if 'type_alias' not in encoded:
     encoded = encoded.copy()
     encoded['type_alias'] = '{}.{}'.format(inspect.getmodule(obj).__name__, type(obj).__name__)
-  return {k: v for k, v in encoded.items() if v}
+  return {k: v for k, v in list(encoded.items()) if v}
 
 
 def encode_json(obj, inline=False, **kwargs):
@@ -209,7 +209,7 @@ class PythonAssignmentsParser(Parser):
       return object_type(type_alias=type_alias, **kwargs)
 
     parse_globals = {}
-    for alias, symbol in symbol_table_cls.table().items():
+    for alias, symbol in list(symbol_table_cls.table().items()):
       parse_globals[alias] = functools.partial(aliased, alias, symbol)
     return parse_globals
 
@@ -222,7 +222,7 @@ class PythonAssignmentsParser(Parser):
     six.exec_(python, parse_globals, symbols)
 
     objects = []
-    for name, obj in symbols.items():
+    for name, obj in list(symbols.items()):
       if isinstance(obj, type):
         # Allow type imports
         continue
@@ -267,7 +267,7 @@ class PythonCallbacksParser(Parser):
         return object_type(type_alias=type_name, **kwargs)
 
     parse_globals = {}
-    for alias, symbol in symbol_table_cls.table().items():
+    for alias, symbol in list(symbol_table_cls.table().items()):
       parse_globals[alias] = functools.partial(registered, alias, symbol)
     return objects, parse_globals
 

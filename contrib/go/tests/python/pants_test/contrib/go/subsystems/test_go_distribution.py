@@ -47,7 +47,7 @@ class GoDistributionTest(unittest.TestCase):
     self.assertEqual(go_env, go_cmd.env)
     self.assertEqual('go', os.path.basename(go_cmd.cmdline[0]))
     self.assertEqual(['env', 'GOPATH'], go_cmd.cmdline[1:])
-    self.assertRegexpMatches(str(go_cmd),
+    self.assertRegex(str(go_cmd),
                              r'^GOROOT=[^ ]+ GOPATH={} .*/go env GOPATH'.format(default_gopath))
     self.assertEqual(default_gopath, go_cmd.check_output().strip())
 
@@ -69,4 +69,4 @@ class GoDistributionTest(unittest.TestCase):
                       'GOPATH': '/tmp/fred'}, go_cmd.env)
     self.assertEqual('go', os.path.basename(go_cmd.cmdline[0]))
     self.assertEqual(['env', 'GOROOT'], go_cmd.cmdline[1:])
-    self.assertRegexpMatches(str(go_cmd), r'^GOROOT=[^ ]+ GOPATH=/tmp/fred .*/go env GOROOT$')
+    self.assertRegex(str(go_cmd), r'^GOROOT=[^ ]+ GOPATH=/tmp/fred .*/go env GOROOT$')

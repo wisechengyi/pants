@@ -5,8 +5,8 @@
 from __future__ import (absolute_import, division, generators, nested_scopes, print_function,
                         unicode_literals, with_statement)
 
-import cPickle as pickle
-import cStringIO as StringIO
+import pickle as pickle
+import io as StringIO
 from binascii import hexlify
 from collections import Counter
 from contextlib import closing
@@ -225,7 +225,7 @@ class Cache(object):
 
   def items(self):
     """Iterate over all cached request, result for testing purpose."""
-    for digest, _ in self._storage._key_mappings.items():
+    for digest, _ in list(self._storage._key_mappings.items()):
       request_key = Key.create_from_digest(digest)
       request = self._storage.get(request_key)
       yield request, self._storage.get(self._storage.get_mapping(self._storage.put(request)))

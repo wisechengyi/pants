@@ -48,7 +48,7 @@ class LocalPantsRunner(object):
 
     # Option values are usually computed lazily on demand,
     # but command line options are eagerly computed for validation.
-    for scope in options.scope_to_flags.keys():
+    for scope in list(options.scope_to_flags.keys()):
       options.for_scope(scope)
 
     # Verify the configs here.

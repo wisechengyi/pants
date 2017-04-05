@@ -37,8 +37,8 @@ class TestAaptBuilder(TestAndroidBase):
         self.set_options(sdk_path=dist)
         task = self.create_task(self.context())
         rendered_args = task._render_args(android_binary, 'res', ['classes.dex'])
-        self.assertEquals(os.path.basename(rendered_args[0]), 'aapt')
-        self.assertEquals(rendered_args[-1], 'classes.dex')
+        self.assertEqual(os.path.basename(rendered_args[0]), 'aapt')
+        self.assertEqual(rendered_args[-1], 'classes.dex')
 
   def test_resource_order_in_args(self):
     with distribution() as dist:

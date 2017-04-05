@@ -7,6 +7,7 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
 
 import logging
 import os
+from functools import reduce
 
 
 logger = logging.getLogger(__name__)
@@ -51,7 +52,7 @@ def normalize_os_name(os_name):
   :API: public
   """
   if os_name not in OS_ALIASES:
-    for proper_name, aliases in OS_ALIASES.items():
+    for proper_name, aliases in list(OS_ALIASES.items()):
       if os_name in aliases:
         return proper_name
     logger.warning('Unknown operating system name: {bad}, known names are: {known}'
@@ -60,4 +61,4 @@ def normalize_os_name(os_name):
 
 
 def known_os_names():
-  return reduce(set.union, OS_ALIASES.values())
+  return reduce(set.union, list(OS_ALIASES.values()))

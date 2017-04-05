@@ -129,7 +129,7 @@ class GoalRunnerFactory(object):
     """Populate the BuildGraph and target list from a set of input specs."""
     with self._run_tracker.new_workunit(name='parse', labels=[WorkUnitLabel.SETUP]):
       def filter_for_tag(tag):
-        return lambda target: tag in map(str, target.tags)
+        return lambda target: tag in list(map(str, target.tags))
 
       tag_filter = wrap_filters(create_filters(self._tag, filter_for_tag))
 

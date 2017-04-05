@@ -94,7 +94,7 @@ class ParseSpecTest(unittest.TestCase):
 
   def test_banned_chars_in_target_name(self):
     # move to do_test_bad_spec_path after deprecation
-    self.assertEquals('c@d', Address(*parse_spec('a/b:c@d')).target_name)
+    self.assertEqual('c@d', Address(*parse_spec('a/b:c@d')).target_name)
 
   def do_test_bad_spec_path(self, spec):
     with self.assertRaises(InvalidSpecPath):
@@ -116,15 +116,15 @@ class ParseSpecTest(unittest.TestCase):
 
     # Ensure that a spec in subprojectA is determined correctly.
     subprojectA_spec = parse('src/python/alib', 'subprojectA/src/python')
-    self.assertEquals(subprojectA_spec, 'subprojectA/src/python/alib')
+    self.assertEqual(subprojectA_spec, 'subprojectA/src/python/alib')
 
     # Ensure that a spec in subprojectB, which is more complex, is correct.
     subprojectB_spec = parse('src/python/blib', 'path/to/subprojectB/src/python')
-    self.assertEquals(subprojectB_spec, 'path/to/subprojectB/src/python/blib')
+    self.assertEqual(subprojectB_spec, 'path/to/subprojectB/src/python/blib')
 
     # Ensure that a spec in the parent project is not mapped.
     parent_spec = parse('src/python/parent', 'src/python')
-    self.assertEquals(parent_spec, 'src/python/parent')
+    self.assertEqual(parent_spec, 'src/python/parent')
 
 
 class BaseAddressTest(unittest.TestCase):

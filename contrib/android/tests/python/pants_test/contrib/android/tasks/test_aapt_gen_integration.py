@@ -63,7 +63,7 @@ class AaptGenIntegrationTest(AndroidIntegrationTest):
 
       # Pulling in google-play-services-v21 from the SDK brings in 20 .aar libraries of which only 6
       # have resources. Add 2 for android_binary and android_library targets = 8 total invocations.
-      self.assertEquals(len(aapt_blocks), 8, 'Expected eight invocations of the aapt tool!'
+      self.assertEqual(len(aapt_blocks), 8, 'Expected eight invocations of the aapt tool!'
                                              '(was :{})\n{}'.format(len(aapt_blocks),
                                                                     pants_run.stderr_data))
 

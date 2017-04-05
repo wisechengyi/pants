@@ -17,6 +17,7 @@ from collections import defaultdict
 from contextlib import contextmanager
 
 from pants.util.strutil import ensure_text
+import collections
 
 
 def longest_dir_prefix(path, prefixes):
@@ -141,7 +142,7 @@ def _mkdtemp_register_cleaner(cleaner):
   global _MKDTEMP_CLEANER
   if not cleaner:
     return
-  assert callable(cleaner)
+  assert isinstance(cleaner, collections.Callable)
   if _MKDTEMP_CLEANER is None:
     atexit.register(cleaner)
     _MKDTEMP_CLEANER = cleaner

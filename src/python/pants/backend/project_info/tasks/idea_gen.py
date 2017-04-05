@@ -55,7 +55,7 @@ class IdeaGen(IdeGen):
     register('--bash', type=bool,
              help='Adds a bash facet to the generated project configuration.')
     register('--scala-language-level',
-             choices=_SCALA_VERSIONS.keys(), default=_SCALA_VERSION_DEFAULT,
+             choices=list(_SCALA_VERSIONS.keys()), default=_SCALA_VERSION_DEFAULT,
              help='Set the scala language level used for IDEA linting.')
     register('--scala-maximum-heap-size-mb', type=int, default=512,
              help='Sets the maximum heap size (in megabytes) for scalac.')

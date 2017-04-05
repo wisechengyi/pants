@@ -90,7 +90,7 @@ class JvmPlatform(Subsystem):
   @memoized_property
   def platforms_by_name(self):
     platforms = self.get_options().platforms or {}
-    return {name: self._parse_platform(name, platform) for name, platform in platforms.items()}
+    return {name: self._parse_platform(name, platform) for name, platform in list(platforms.items())}
 
   @property
   def _fallback_platform(self):

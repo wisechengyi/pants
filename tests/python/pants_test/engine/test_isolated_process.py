@@ -120,8 +120,8 @@ class IsolatedProcessTest(SchedulerTestBase, unittest.TestCase):
                                           [PathGlobs.create('', include=['fs_test/a/b/*'])])
     LocalSerialEngine(scheduler).reduce(request)
 
-    root_entries = scheduler.root_entries(request).items()
-    self.assertEquals(1, len(root_entries))
+    root_entries = list(scheduler.root_entries(request).items())
+    self.assertEqual(1, len(root_entries))
     state = self.assertFirstEntryIsReturn(root_entries, scheduler)
     concatted = state.value
 
@@ -144,8 +144,8 @@ class IsolatedProcessTest(SchedulerTestBase, unittest.TestCase):
       [sources])
     LocalSerialEngine(scheduler).reduce(request)
 
-    root_entries = scheduler.root_entries(request).items()
-    self.assertEquals(1, len(root_entries))
+    root_entries = list(scheduler.root_entries(request).items())
+    self.assertEqual(1, len(root_entries))
     state = self.assertFirstEntryIsReturn(root_entries, scheduler)
     classpath_entry = state.value
     self.assertIsInstance(classpath_entry, ClasspathEntry)
@@ -166,8 +166,8 @@ class IsolatedProcessTest(SchedulerTestBase, unittest.TestCase):
                                           [PathGlobs.create('', include=['fs_test/a/b/*'])])
     LocalSerialEngine(scheduler).reduce(request)
 
-    root_entries = scheduler.root_entries(request).items()
-    self.assertEquals(1, len(root_entries))
+    root_entries = list(scheduler.root_entries(request).items())
+    self.assertEqual(1, len(root_entries))
     self.assertFirstEntryIsThrow(root_entries,
                                  in_msg='Running ShellFailCommand failed with non-zero exit code: 1')
 
@@ -186,8 +186,8 @@ class IsolatedProcessTest(SchedulerTestBase, unittest.TestCase):
                                           [PathGlobs.create('', include=['fs_test/a/b/*'])])
     LocalSerialEngine(scheduler).reduce(request)
 
-    root_entries = scheduler.root_entries(request).items()
-    self.assertEquals(1, len(root_entries))
+    root_entries = list(scheduler.root_entries(request).items())
+    self.assertEqual(1, len(root_entries))
     self.assertFirstEntryIsThrow(root_entries,
                                  in_msg='Failed in output conversion!')
 

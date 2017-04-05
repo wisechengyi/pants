@@ -38,7 +38,7 @@ class ArtifactCacheStats(object):
   def get_all(self):
     """Returns the cache stats as a list of dicts."""
     ret = []
-    for cache_name, stat in self.stats_per_cache.items():
+    for cache_name, stat in list(self.stats_per_cache.items()):
       ret.append({
         'cache_name': cache_name,
         'num_hits': len(stat.hit_targets),

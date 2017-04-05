@@ -53,7 +53,7 @@ class SetupPyIntegrationTest(PantsRunIntegrationTest):
         '/src/pantsbuild.pants.distance_thrift_python.egg-info/top_level.txt'
       ]
     ]
-    self.assertEquals(
+    self.assertEqual(
       sorted(expected_entries),
       sorted(entries)
     )

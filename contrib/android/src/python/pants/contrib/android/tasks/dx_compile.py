@@ -116,7 +116,7 @@ class DxCompile(AndroidTask, NailgunTask):
               raise TaskError("Dependency:\n{}\n\nConflicts\n1: {} "
                               "\n2: {}".format(target, class_location, class_files[class_file]))
           class_files[class_file] = class_location
-    return class_files.values()
+    return list(class_files.values())
 
   def _gather_dex_entries(self, target):
     """Gather relevant dex inputs from a walk of AndroidBinary's dependency graph.
@@ -140,7 +140,7 @@ class DxCompile(AndroidTask, NailgunTask):
       unpacked = unpacked_archives.get(tgt)
       if unpacked:
         # If there are unpacked_archives then we know this target is an AndroidLibrary.
-        for archives in unpacked.values():
+        for archives in list(unpacked.values()):
           for unpacked_dir in archives:
             try:
               gathered_entries.update(self._filter_unpacked_dir(tgt, unpacked_dir, class_files))

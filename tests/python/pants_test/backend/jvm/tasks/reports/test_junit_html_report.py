@@ -42,7 +42,7 @@ class TestJUnitHtmlReport(BaseTest):
     self.assertEqual(0.01, testsuites[0].time)
     self.assertEqual(1, len(testsuites[0].testcases))
     self.assertIsNone(testsuites[0].testcases[0].error)
-    self.assertEquals('java.lang.AssertionError', testsuites[0].testcases[0].failure['type'])
+    self.assertEqual('java.lang.AssertionError', testsuites[0].testcases[0].failure['type'])
     self.assertIn('java.lang.AssertionError', testsuites[0].testcases[0].failure['message'])
 
   def test_errored(self):
@@ -55,7 +55,7 @@ class TestJUnitHtmlReport(BaseTest):
     self.assertEqual(0.32, testsuites[0].time)
     self.assertEqual(1, len(testsuites[0].testcases))
     self.assertIsNone(testsuites[0].testcases[0].failure)
-    self.assertEquals('java.lang.RuntimeException', testsuites[0].testcases[0].error['type'])
+    self.assertEqual('java.lang.RuntimeException', testsuites[0].testcases[0].error['type'])
     self.assertIn('java.lang.RuntimeException', testsuites[0].testcases[0].error['message'])
 
   def test_skipped(self):
@@ -85,9 +85,9 @@ class TestJUnitHtmlReport(BaseTest):
     self.assertEqual(1, len(testsuites))
     self.assertEqual(2, testsuites[0].tests)
     self.assertEqual(2, len(testsuites[0].testcases))
-    self.assertEquals(u'org.pantsbuild.PåssingTest', testsuites[0].name)
-    self.assertEquals(u'testTwö', testsuites[0].testcases[1].name)
-    self.assertIn(u'org.pantsbuild.PåssingTest.testTwö', testsuites[0].testcases[1].error['message'])
+    self.assertEqual('org.pantsbuild.PåssingTest', testsuites[0].name)
+    self.assertEqual('testTwö', testsuites[0].testcases[1].name)
+    self.assertIn('org.pantsbuild.PåssingTest.testTwö', testsuites[0].testcases[1].error['message'])
 
   def test_all(self):
     test_dir = os.path.join(self.real_build_root,
@@ -101,6 +101,6 @@ class TestJUnitHtmlReport(BaseTest):
       self.assertTrue(os.path.exists(output_file))
       with open(output_file) as html_file:
         html_data = ensure_text(html_file.read())
-        self.assertIn(u'</span>&nbsp;org.pantsbuild.PåssingTest', html_data)
-        self.assertIn(u'</span>&nbsp;testTwö</td>', html_data)
-        self.assertIn(u'at org.pantsbuild.PåssingTest.testTwö(ErrorTest.java:29)', html_data)
+        self.assertIn('</span>&nbsp;org.pantsbuild.PåssingTest', html_data)
+        self.assertIn('</span>&nbsp;testTwö</td>', html_data)
+        self.assertIn('at org.pantsbuild.PåssingTest.testTwö(ErrorTest.java:29)', html_data)

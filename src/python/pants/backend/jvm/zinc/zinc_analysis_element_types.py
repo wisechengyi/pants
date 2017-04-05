@@ -90,7 +90,7 @@ class Stamps(ZincAnalysisElement):
            (other.products, other.sources, other.binaries, set(other.classnames.keys()))
 
   def __hash__(self):
-    return hash((self.products, self.sources, self.binaries, self.classnames.keys()))
+    return hash((self.products, self.sources, self.binaries, list(self.classnames.keys())))
 
 
 class APIs(ZincAnalysisElement):

@@ -76,7 +76,7 @@ class JUnitTests(DeprecatedJavaTestsAlias):
 
     if extra_env_vars is None:
       extra_env_vars = {}
-    for key, value in extra_env_vars.items():
+    for key, value in list(extra_env_vars.items()):
       if value is not None:
         extra_env_vars[key] = str(value)
 

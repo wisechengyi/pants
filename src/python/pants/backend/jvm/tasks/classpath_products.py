@@ -235,10 +235,10 @@ class ClasspathProducts(object):
     target_to_classpath = ClasspathUtil.classpath_by_targets(targets, classpath_products)
 
     processed_entries = set()
-    for target, classpath_entries_for_target in target_to_classpath.items():
+    for target, classpath_entries_for_target in list(target_to_classpath.items()):
       if internal_classpath_only:
-        classpath_entries_for_target = filter(ClasspathEntry.is_internal_classpath_entry,
-                                              classpath_entries_for_target)
+        classpath_entries_for_target = list(filter(ClasspathEntry.is_internal_classpath_entry,
+                                              classpath_entries_for_target))
       if len(classpath_entries_for_target) > 0:
         classpath_prefix_for_target = prepare_target_output_folder(basedir, target)
 
@@ -423,9 +423,9 @@ class ClasspathProducts(object):
     """Adds the contents of other to this ClasspathProducts."""
     if self._pants_workdir != other._pants_workdir:
       raise ValueError('Other ClasspathProducts from a different pants workdir {}'.format(other._pants_workdir))
-    for target, products in other._classpaths._products_by_target.items():
+    for target, products in list(other._classpaths._products_by_target.items()):
       self._classpaths.add_for_target(target, products)
-    for target, products in other._excludes._products_by_target.items():
+    for target, products in list(other._excludes._products_by_target.items()):
       self._excludes.add_for_target(target, products)
 
   def _filter_by_excludes(self, classpath_target_tuples, root_targets):
@@ -433,7 +433,7 @@ class ClasspathProducts(object):
     # set of targets was included here, their closure must be included.
     closure = BuildGraph.closure(root_targets, bfs=True)
     excludes = self._excludes.get_for_targets(closure)
-    return filter(_not_excluded_filter(excludes), classpath_target_tuples)
+    return list(filter(_not_excluded_filter(excludes), classpath_target_tuples))
 
   def _add_excludes_for_target(self, target):
     if target.is_exported:

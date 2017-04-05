@@ -21,7 +21,7 @@ function activate_venv() {
 
 function create_venv() {
   rm -rf "$(venv_dir)"
-  "${REPO_ROOT}/build-support/virtualenv" "$(venv_dir)"
+  "${REPO_ROOT}/build-support/virtualenv" "$(venv_dir)" -p python3.6
 }
 
 function activate_pants_venv() {

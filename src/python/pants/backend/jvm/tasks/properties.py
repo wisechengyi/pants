@@ -9,6 +9,7 @@ import re
 from collections import OrderedDict
 
 import six
+import collections
 
 
 class Properties(object):
@@ -34,7 +35,7 @@ class Properties(object):
     :rtype: dict
     """
 
-    if hasattr(data, 'read') and callable(data.read):
+    if hasattr(data, 'read') and isinstance(data.read, collections.Callable):
       contents = data.read()
     elif isinstance(data, six.string_types):
       contents = data
@@ -106,10 +107,10 @@ class Properties(object):
       return re.sub(r'([=:\s])', r'\\\1', token)
 
     def write(out):
-      for k, v in props.items():
+      for k, v in list(props.items()):
         out.write('%s=%s\n' % (escape(str(k)), escape(str(v))))
 
-    if hasattr(output, 'write') and callable(output.write):
+    if hasattr(output, 'write') and isinstance(output.write, collections.Callable):
       write(output)
     elif isinstance(output, six.string_types):
       with open(output, 'w+a') as out:

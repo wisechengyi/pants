@@ -48,7 +48,7 @@ class UnionProducts(object):
     :rtype: :class:`UnionProducts`
     """
     products_by_target = defaultdict(OrderedSet)
-    for key, value in self._products_by_target.items():
+    for key, value in list(self._products_by_target.items()):
       products_by_target[key] = OrderedSet(value)
     return UnionProducts(products_by_target=products_by_target)
 
@@ -116,7 +116,7 @@ class UnionProducts(object):
     :param product: The product to search for
     :return: None if there is no target for the product
     """
-    for target, products in self._products_by_target.items():
+    for target, products in list(self._products_by_target.items()):
       if product in products:
         return target
     return None
@@ -213,14 +213,14 @@ class MultipleRootedProducts(object):
     """
     :API: public
     """
-    for root, products in self._rooted_products_by_root.items():
+    for root, products in list(self._rooted_products_by_root.items()):
       yield root, products.rel_paths()
 
   def abs_paths(self):
     """
     :API: public
     """
-    for root, products in self._rooted_products_by_root.items():
+    for root, products in list(self._rooted_products_by_root.items()):
       yield root, products.abs_paths()
 
   def _get_products_for_root(self, root):
@@ -341,7 +341,7 @@ class Products(object):
       :API: public
       """
       keys = set()
-      for key, mappings in self.by_target.items():
+      for key, mappings in list(self.by_target.items()):
         for mapped in mappings.get(basedir, []):
           if product == mapped:
             keys.add(key)
@@ -351,8 +351,8 @@ class Products(object):
     def __repr__(self):
       return 'ProductMapping({}) {{\n  {}\n}}'.format(self.typename, '\n  '.join(
           '{} => {}\n    {}'.format(str(target), basedir, outputs)
-          for target, outputs_by_basedir in self.by_target.items()
-          for basedir, outputs in outputs_by_basedir.items()))
+          for target, outputs_by_basedir in list(self.by_target.items())
+          for basedir, outputs in list(outputs_by_basedir.items())))
 
     def __bool__(self):
       return not self.empty()
@@ -444,7 +444,7 @@ class Products(object):
       raise ProductError('{} directories in product mapping: requires exactly 1.'
                          .format(len(product_mapping)))
 
-    for _, files in product_mapping.items():
+    for _, files in list(product_mapping.items()):
       if len(files) != 1:
         raise ProductError('{} files in target directory: requires exactly 1.'
                            .format(len(files)))

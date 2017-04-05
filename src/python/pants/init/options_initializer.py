@@ -116,7 +116,7 @@ class OptionsInitializer(object):
 
     # Add scopes for all tasks in all goals.
     for goal in Goal.all():
-      known_scope_infos.extend(filter(None, goal.known_scope_infos()))
+      known_scope_infos.extend([_f for _f in goal.known_scope_infos() if _f])
 
     # Now that we have the known scopes we can get the full options.
     options = options_bootstrapper.get_full_options(known_scope_infos)

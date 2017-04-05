@@ -298,7 +298,7 @@ class BaseTest(unittest.TestCase):
     # Now default the option values and override with any caller-specified values.
     # TODO(benjy): Get rid of the options arg, and require tests to call set_options.
     options = options.copy() if options else {}
-    for s, opts in self.options.items():
+    for s, opts in list(self.options.items()):
       scoped_opts = options.setdefault(s, {})
       scoped_opts.update(opts)
 
@@ -399,8 +399,7 @@ class BaseTest(unittest.TestCase):
                    resources=('resources=["%s"],' % kwargs.get('resources')
                               if 'resources' in kwargs else ''),
                    java_sources=('java_sources=[%s],'
-                                 % ','.join(map(lambda str_target: '"%s"' % str_target,
-                                                kwargs.get('java_sources')))
+                                 % ','.join(['"%s"' % str_target for str_target in kwargs.get('java_sources')])
                                  if 'java_sources' in kwargs else ''),
                    provides=('provides=%s,' % kwargs.get('provides')
                               if 'provides' in kwargs else ''),

@@ -99,7 +99,7 @@ class TestArtifactCache(unittest.TestCase):
       # Check that it was recovered correctly.
       with open(path, 'r') as infile:
         content = infile.read()
-      self.assertEquals(content, TEST_CONTENT1)
+      self.assertEqual(content, TEST_CONTENT1)
 
       # Delete it.
       artifact_cache.delete(key)
@@ -183,16 +183,16 @@ class TestArtifactCache(unittest.TestCase):
     key = CacheKey('muppet_key', 'fake_hash')
 
     with self.setup_local_cache() as cache:
-      self.assertEquals(map(call_use_cached_files, [(cache, key, None)]), [False])
+      self.assertEqual(list(map(call_use_cached_files, [(cache, key, None)])), [False])
       with self.setup_test_file(cache.artifact_root) as path:
-        map(call_insert, [(cache, key, [path], False)])
-      self.assertEquals(map(call_use_cached_files, [(cache, key, None)]), [True])
+        list(map(call_insert, [(cache, key, [path], False)]))
+      self.assertEqual(list(map(call_use_cached_files, [(cache, key, None)])), [True])
 
     with self.setup_rest_cache() as cache:
-      self.assertEquals(map(call_use_cached_files, [(cache, key, None)]), [False])
+      self.assertEqual(list(map(call_use_cached_files, [(cache, key, None)])), [False])
       with self.setup_test_file(cache.artifact_root) as path:
-        map(call_insert, [(cache, key, [path], False)])
-      self.assertEquals(map(call_use_cached_files, [(cache, key, None)]), [True])
+        list(map(call_insert, [(cache, key, [path], False)]))
+      self.assertEqual(list(map(call_use_cached_files, [(cache, key, None)])), [True])
 
   def test_failed_multiproc(self):
     key = CacheKey('muppet_key', 'fake_hash')
@@ -201,7 +201,7 @@ class TestArtifactCache(unittest.TestCase):
     with self.setup_rest_cache(return_failed=True) as cache:
       self.assertFalse(map(call_use_cached_files, [(cache, key, None)])[0])
       with self.setup_test_file(cache.artifact_root) as path:
-        map(call_insert, [(cache, key, [path], False)])
+        list(map(call_insert, [(cache, key, [path], False)]))
       self.assertFalse(map(call_use_cached_files, [(cache, key, None)])[0])
 
   def test_successful_request_cleans_result_dir(self):
@@ -217,8 +217,8 @@ class TestArtifactCache(unittest.TestCase):
     with self.setup_test_file(cache.artifact_root) as path:
       with temporary_dir() as results_dir:
         with temporary_file_path(root_dir=results_dir) as canary:
-          map(call_insert, [(cache, key, [path], False)])
-          map(call_use_cached_files, [(cache, key, results_dir)])
+          list(map(call_insert, [(cache, key, [path], False)]))
+          list(map(call_use_cached_files, [(cache, key, results_dir)]))
           # Results content should have been deleted.
           self.assertFalse(os.path.exists(canary))
 
@@ -227,14 +227,14 @@ class TestArtifactCache(unittest.TestCase):
     with temporary_dir() as results_dir:
       with temporary_file_path(root_dir=results_dir) as canary:
         with self.setup_local_cache() as cache:
-          self.assertEquals(
-            map(call_use_cached_files, [(cache, key, results_dir)]),
+          self.assertEqual(
+            list(map(call_use_cached_files, [(cache, key, results_dir)])),
             [False])
           self.assertTrue(os.path.exists(canary))
 
         with self.setup_rest_cache() as cache:
-          self.assertEquals(
-            map(call_use_cached_files, [(cache, key, results_dir)]),
+          self.assertEqual(
+            list(map(call_use_cached_files, [(cache, key, results_dir)])),
             [False])
           self.assertTrue(os.path.exists(canary))
 

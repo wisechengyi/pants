@@ -308,7 +308,7 @@ class SetupPy(Task):
       for dependency in target.dependencies:
         yield dependency
       if self.is_exported(target):
-        for binary in target.provided_binaries.values():
+        for binary in list(target.provided_binaries.values()):
           yield binary
 
   @classmethod
@@ -328,7 +328,7 @@ class SetupPy(Task):
   @classmethod
   def iter_entry_points(cls, target):
     """Yields the name, entry_point pairs of binary targets in this PythonArtifact."""
-    for name, binary_target in target.provided_binaries.items():
+    for name, binary_target in list(target.provided_binaries.items()):
       concrete_target = binary_target
       if not isinstance(concrete_target, PythonBinary) or concrete_target.entry_point is None:
         raise TargetDefinitionException(target,
@@ -359,10 +359,10 @@ class SetupPy(Task):
   def nearest_subpackage(cls, package, all_packages):
     """Given a package, find its nearest parent in all_packages."""
     def shared_prefix(candidate):
-      zipped = itertools.izip(package.split('.'), candidate.split('.'))
+      zipped = zip(package.split('.'), candidate.split('.'))
       matching = itertools.takewhile(lambda pair: pair[0] == pair[1], zipped)
       return [pair[0] for pair in matching]
-    shared_packages = list(filter(None, map(shared_prefix, all_packages)))
+    shared_packages = list([_f for _f in map(shared_prefix, all_packages) if _f])
     return '.'.join(max(shared_packages, key=len)) if shared_packages else package
 
   @classmethod
@@ -486,7 +486,7 @@ class SetupPy(Task):
           package_dir=package_dir,
           packages=list(sorted(packages)),
           package_data=dict((str(package), list(map(str, rs)))
-                            for (package, rs) in resources.items()))
+                            for (package, rs) in list(resources.items())))
 
     setup_keywords['install_requires'] = list(self.install_requires(reduced_dependencies))
 
@@ -502,7 +502,7 @@ class SetupPy(Task):
     def convert(input):
       if isinstance(input, dict):
         out = dict()
-        for key, value in input.items():
+        for key, value in list(input.items()):
           out[convert(key)] = convert(value)
         return out
       elif isinstance(input, list):
@@ -593,7 +593,7 @@ class SetupPy(Task):
       create(target)
 
     executed = {}  # Collected and returned for tests, processed target -> sdist|setup_dir.
-    for target in reversed(sort_targets(created.keys())):
+    for target in reversed(sort_targets(list(created.keys()))):
       setup_dir = created.get(target)
       if setup_dir:
         if not self._run:

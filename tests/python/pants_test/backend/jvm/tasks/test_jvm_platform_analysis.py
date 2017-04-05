@@ -145,14 +145,14 @@ class JvmPlatformValidateTest(JvmPlatformAnalysisTestMixin, TaskTestBase):
 
   def assert_depmaps_equal(self, expected, received):
     jvm_deps = {target.name: ''.join(sorted({t.name for t in deps}))
-                for target, deps in received.items()}
+                for target, deps in list(received.items())}
     for target, deps in sorted(expected.items()):
       got = jvm_deps.get(target, ())
       self.assertEqual(set(deps), set(got), '{}\n  expected {}\n  got {}\n  \n{}'
                        .format(target, deps, got, '\n'.join(
         '{}: {}'.format(key, val) for key, val in sorted(jvm_deps.items())
       )))
-    self.assertEqual(len(filter(expected.get, expected)), len(filter(jvm_deps.get, jvm_deps)))
+    self.assertEqual(len(list(filter(expected.get, expected))), len(list(filter(jvm_deps.get, jvm_deps))))
 
   def test_non_jvm_transitivity(self):
     """Tests the behavior of jvm_dependency_map."""

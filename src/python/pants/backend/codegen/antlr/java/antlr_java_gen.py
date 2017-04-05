@@ -50,7 +50,7 @@ class AntlrJavaGen(SimpleCodegenTask, NailgunTask):
   @classmethod
   def register_options(cls, register):
     super(AntlrJavaGen, cls).register_options(register)
-    for key, (classpath_spec, classpath) in _DEFAULT_ANTLR_DEPS.items():
+    for key, (classpath_spec, classpath) in list(_DEFAULT_ANTLR_DEPS.items()):
       cls.register_jvm_tool(register, key, classpath=classpath, classpath_spec=classpath_spec)
 
   def is_gentarget(self, target):

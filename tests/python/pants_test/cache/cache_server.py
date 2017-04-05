@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
 
 import os
 import re
-import SocketServer
+import socketserver
 from contextlib import contextmanager
 from multiprocessing import Process, Queue
 
@@ -118,7 +118,7 @@ def _cache_server_process(queue, return_failed, cache_root):
           handler = FailRESTHandler
         else:
           handler = SimpleRESTHandler
-        httpd = SocketServer.TCPServer(('localhost', 0), handler)
+        httpd = socketserver.TCPServer(('localhost', 0), handler)
         port = httpd.server_address[1]
         queue.put(port)
         httpd.serve_forever()

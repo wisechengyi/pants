@@ -65,7 +65,7 @@ class BuildFileParser(object):
   def address_map_from_build_files(self, build_files):
     family_address_map_by_build_file = self.parse_build_files(build_files)
     address_map = {}
-    for build_file, sibling_address_map in family_address_map_by_build_file.items():
+    for build_file, sibling_address_map in list(family_address_map_by_build_file.items()):
       address_map.update(sibling_address_map)
     return address_map
 
@@ -73,8 +73,8 @@ class BuildFileParser(object):
     family_address_map_by_build_file = {}  # {build_file: {address: addressable}}
     for bf in build_files:
       bf_address_map = self.parse_build_file(bf)
-      for address, addressable in bf_address_map.items():
-        for sibling_build_file, sibling_address_map in family_address_map_by_build_file.items():
+      for address, addressable in list(bf_address_map.items()):
+        for sibling_build_file, sibling_address_map in list(family_address_map_by_build_file.items()):
           if address in sibling_address_map:
             raise self.SiblingConflictException(
               "Both {conflicting_file} and {addressable_file} define the same address: "
@@ -157,7 +157,7 @@ class BuildFileParser(object):
 
     logger.debug("{build_file} produced the following Addressables:"
                  .format(build_file=build_file))
-    for address, addressable in address_map.items():
+    for address, addressable in list(address_map.items()):
       logger.debug("  * {address}: {addressable}"
                    .format(address=address,
                            addressable=addressable))

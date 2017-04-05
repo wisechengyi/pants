@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
                         unicode_literals, with_statement)
 
 import re
-from itertools import izip_longest
+from itertools import zip_longest
 
 
 class Revision(object):
@@ -74,7 +74,7 @@ class Revision(object):
     """
     rev = re.sub(r'(\d)([a-zA-Z])', r'\1.\2', rev)
     rev = re.sub(r'([a-zA-Z])(\d)', r'\1.\2', rev)
-    return cls(*map(cls._parse_atom, re.split(r'[.+_\-]', rev)))
+    return cls(*list(map(cls._parse_atom, re.split(r'[.+_\-]', rev))))
 
   def __init__(self, *components):
     self._components = components
@@ -88,7 +88,7 @@ class Revision(object):
     return list(self._components)
 
   def __cmp__(self, other):
-    for ours, theirs in izip_longest(self._components, other._components, fillvalue=0):
+    for ours, theirs in zip_longest(self._components, other._components, fillvalue=0):
       difference = cmp(ours, theirs)
       if difference != 0:
         return difference

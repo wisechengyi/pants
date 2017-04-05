@@ -73,7 +73,7 @@ class TokenTranslator(object):
     self._keep = _default_keep_words if keep is None else keep
 
     # Init from args.
-    for k, v in self._word_map.items():
+    for k, v in list(self._word_map.items()):
       self._translations[k] = v
     for w in self._keep:
       self._translations[w] = w
@@ -109,7 +109,7 @@ class TokenTranslator(object):
         # Join to the rest of the word, if any.
         token = part
         try:
-          token += parts_iter.next()
+          token += next(parts_iter)
         except StopIteration:
           pass
         converted_parts.append(self._convert_single_token(token))
@@ -169,7 +169,7 @@ class TranslationCapturer(TokenTranslator):
     """
     # Look only at translations we generated, ignoring the ones passed in to our ctor.
     generated_translations = dict(self._translations)
-    for k in self._word_map.keys():
+    for k in list(self._word_map.keys()):
       del generated_translations[k]
     for k in self._keep:
       del generated_translations[k]
@@ -177,10 +177,10 @@ class TranslationCapturer(TokenTranslator):
     # Reassign keys to values so that dictionary order is preserved.
     sorted_keys = sorted(generated_translations.keys())
     sorted_values = sorted(generated_translations.values())
-    ordered_translations = dict(zip(sorted_keys, sorted_values))
+    ordered_translations = dict(list(zip(sorted_keys, sorted_values)))
 
     # Add the preset translations back in.
-    for k, v in self._word_map.items():
+    for k, v in list(self._word_map.items()):
       ordered_translations[k] = v
 
     # This anonymizer should only be used on the exact same objects the capture was run on, and

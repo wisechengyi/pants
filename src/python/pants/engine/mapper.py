@@ -127,7 +127,7 @@ class AddressFamily(datatype('AddressFamily', ['namespace', 'objects_by_name']))
     objects_by_name = {}
     for address_map in address_maps:
       current_path = address_map.path
-      for name, obj in address_map.objects_by_name.items():
+      for name, obj in list(address_map.objects_by_name.items()):
         previous = objects_by_name.get(name)
         if previous:
           previous_path, _ = previous
@@ -152,7 +152,7 @@ class AddressFamily(datatype('AddressFamily', ['namespace', 'objects_by_name']))
     """
     return {
       BuildFileAddress(rel_path=path, target_name=name): obj
-      for name, (path, obj) in self.objects_by_name.items()
+      for name, (path, obj) in list(self.objects_by_name.items())
     }
 
   def __eq__(self, other):
@@ -168,7 +168,7 @@ class AddressFamily(datatype('AddressFamily', ['namespace', 'objects_by_name']))
 
   def __repr__(self):
     return 'AddressFamily(namespace={!r}, objects_by_name={!r})'.format(
-        self.namespace, self.objects_by_name.keys())
+        self.namespace, list(self.objects_by_name.keys()))
 
 
 class ResolveError(MappingError):

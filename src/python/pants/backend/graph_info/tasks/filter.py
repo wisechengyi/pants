@@ -93,7 +93,7 @@ class Filter(TargetFilterTaskMixin, ConsoleTask):
         regex = re.compile(tag_regex)
       except re.error as e:
         raise TaskError("Invalid regular expression: {}: {}".format(tag_regex, e))
-      return lambda target: any(map(regex.search, map(str, target.tags)))
+      return lambda target: any(map(regex.search, list(map(str, target.tags))))
     self._filters.extend(create_filters(self.get_options().tag_regex, filter_for_tag_regex))
 
   def console_output(self, _):

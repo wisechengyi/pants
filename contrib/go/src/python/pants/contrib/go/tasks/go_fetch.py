@@ -56,7 +56,7 @@ class GoFetch(GoTask):
       raise TaskError('Failed to resolve transitive Go remote dependencies.')
 
   def _log_undeclared_deps(self, undeclared_deps):
-    for dependee, deps in undeclared_deps.items():
+    for dependee, deps in list(undeclared_deps.items()):
       self.context.log.error('{address} has remote dependencies which require local declaration:'
                              .format(address=dependee.address.reference()))
       for dep_import_path, address in deps:

@@ -209,7 +209,7 @@ class BundleCreate(JvmBinaryTask):
 
     for bundle_counter, bundle in enumerate(app.bundles):
       fileset_empty = True
-      for path, relpath in bundle.filemap.items():
+      for path, relpath in list(bundle.filemap.items()):
         bundle_path = os.path.join(bundle_dir, relpath)
         if os.path.exists(path):
           safe_mkdir(os.path.dirname(bundle_path))

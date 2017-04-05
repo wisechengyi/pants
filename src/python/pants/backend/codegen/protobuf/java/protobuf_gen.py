@@ -122,7 +122,7 @@ class ProtobufGen(SimpleCodegenTask):
     # when trying to resolve imports from the root against the import's source root.
     if self.get_options().import_from_root:
       bases.add('.')
-    bases.update(sources_by_base.keys())
+    bases.update(list(sources_by_base.keys()))
     bases.update(self._proto_path_imports([target]))
 
     gen_flag = '--java_out'

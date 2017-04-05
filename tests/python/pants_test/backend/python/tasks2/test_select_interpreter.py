@@ -75,16 +75,16 @@ class SelectInterpreterTest(TaskTestBase):
     return interpreter.version_string
 
   def test_interpreter_selection(self):
-    self.assertEquals('FakePython-2.77.777', self._select_interpreter([]))
-    self.assertEquals('FakePython-2.77.777', self._select_interpreter([self.tgt1]))
-    self.assertEquals('FakePython-2.88.888', self._select_interpreter([self.tgt2]))
-    self.assertEquals('FakePython-2.99.999', self._select_interpreter([self.tgt3]))
-    self.assertEquals('FakePython-2.77.777', self._select_interpreter([self.tgt4]))
-    self.assertEquals('FakePython-2.88.888', self._select_interpreter([self.tgt20]))
-    self.assertEquals('FakePython-2.99.999', self._select_interpreter([self.tgt30]))
-    self.assertEquals('FakePython-2.77.777', self._select_interpreter([self.tgt40]))
-    self.assertEquals('FakePython-2.99.999', self._select_interpreter([self.tgt2, self.tgt3]))
-    self.assertEquals('FakePython-2.88.888', self._select_interpreter([self.tgt2, self.tgt4]))
+    self.assertEqual('FakePython-2.77.777', self._select_interpreter([]))
+    self.assertEqual('FakePython-2.77.777', self._select_interpreter([self.tgt1]))
+    self.assertEqual('FakePython-2.88.888', self._select_interpreter([self.tgt2]))
+    self.assertEqual('FakePython-2.99.999', self._select_interpreter([self.tgt3]))
+    self.assertEqual('FakePython-2.77.777', self._select_interpreter([self.tgt4]))
+    self.assertEqual('FakePython-2.88.888', self._select_interpreter([self.tgt20]))
+    self.assertEqual('FakePython-2.99.999', self._select_interpreter([self.tgt30]))
+    self.assertEqual('FakePython-2.77.777', self._select_interpreter([self.tgt40]))
+    self.assertEqual('FakePython-2.99.999', self._select_interpreter([self.tgt2, self.tgt3]))
+    self.assertEqual('FakePython-2.88.888', self._select_interpreter([self.tgt2, self.tgt4]))
 
     with self.assertRaises(TaskError) as cm:
       self._select_interpreter([self.tgt3, self.tgt4])
@@ -94,12 +94,12 @@ class SelectInterpreterTest(TaskTestBase):
   def test_interpreter_selection_invalidation(self):
     tgta = self._fake_target('tgta', compatibility=['FakePython>2.77.777'],
                              dependencies=[self.tgt3])
-    self.assertEquals('FakePython-2.99.999',
+    self.assertEqual('FakePython-2.99.999',
                       self._select_interpreter([tgta], should_invalidate=True))
 
     # A new target with different sources, but identical compatibility, shouldn't invalidate.
     self.create_file('tgtb/foo/bar/baz.py', 'fake content')
     tgtb = self._fake_target('tgtb', compatibility=['FakePython>2.77.777'],
                              dependencies=[self.tgt3], sources=['foo/bar/baz.py'])
-    self.assertEquals('FakePython-2.99.999',
+    self.assertEqual('FakePython-2.99.999',
                       self._select_interpreter([tgtb], should_invalidate=False))

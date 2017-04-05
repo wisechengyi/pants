@@ -23,7 +23,7 @@ class JavaAgentTest(BaseTest):
   def create_agent(self, name, **kwargs):
     args = {'name': name, 'sources': []}
     args.update(**kwargs)
-    formatted_args = ', '.join('{name}={value!r}'.format(name=k, value=v) for k, v in args.items())
+    formatted_args = ', '.join('{name}={value!r}'.format(name=k, value=v) for k, v in list(args.items()))
     target = 'java_agent({args})'.format(args=formatted_args)
     self.add_to_build_file('{path}'.format(path=name), target)
     return self.target('{path}:{name}'.format(path=name, name=name))

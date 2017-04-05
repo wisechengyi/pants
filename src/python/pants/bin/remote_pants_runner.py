@@ -47,7 +47,7 @@ class RemotePantsRunner(object):
   @staticmethod
   def _combine_dicts(*dicts):
     """Combine one or more dicts into a new, unified dict (dicts to the right take precedence)."""
-    return {k: v for d in dicts for k, v in d.items()}
+    return {k: v for d in dicts for k, v in list(d.items())}
 
   @contextmanager
   def _trapped_control_c(self, client):

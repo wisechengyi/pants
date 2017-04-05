@@ -98,7 +98,7 @@ class Engine(AbstractClass):
     result = self.execute(request)
     if result.error:
       raise result.error
-    result_items = self._scheduler.root_entries(request).items()
+    result_items = list(self._scheduler.root_entries(request).items())
 
     # State validation.
     unknown_state_types = tuple(

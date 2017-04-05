@@ -136,7 +136,7 @@ class AllTheThingsTestCase(unittest.TestCase):
                                   self.soups,
                                   self.precomputed,
                                   '{{title}}')
-    self.assertEqual(p1_html, u'東京 is Tokyo',
+    self.assertEqual(p1_html, '東京 is Tokyo',
                      """Didn't find correct non-ASCII title""")
 
   def test_page_toc(self):
@@ -199,7 +199,7 @@ class AllTheThingsTestCase(unittest.TestCase):
                                    DEPTH={{depth}} LINK={{link}} TEXT={{text}}
                                    {{/site_toc}}
                                    """)
-    self.assertIn(u'DEPTH=1 LINK=subdir/page1.html TEXT=東京 is Tokyo', rendered)
+    self.assertIn('DEPTH=1 LINK=subdir/page1.html TEXT=東京 is Tokyo', rendered)
     self.assertIn('DEPTH=1 LINK=subdir/page2.html TEXT=Page 2: Electric Boogaloo', rendered)
 
   def test_transform_fixes_up_internal_links(self):

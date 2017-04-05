@@ -24,7 +24,7 @@ class AnalysisTools(object):
     self._analysis_cls = analysis_cls
     self.rebase_mappings = {self._pants_workdir: self._PANTS_WORKDIR_PLACEHOLDER,
                             self._pants_buildroot: self._PANTS_BUILDROOT_PLACEHOLDER}
-    self.localize_mappings = {v:k for k, v in self.rebase_mappings.items()}
+    self.localize_mappings = {v:k for k, v in list(self.rebase_mappings.items())}
 
   def relativize(self, src_analysis, relativized_analysis):
     with temporary_dir() as tmp_analysis_dir:

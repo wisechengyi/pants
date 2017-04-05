@@ -82,11 +82,9 @@ class Scalastyle(NailgunTask):
 
   @classmethod
   def get_non_synthetic_scala_targets(cls, targets):
-    return filter(
-      lambda target: isinstance(target, Target)
+    return [target for target in targets if isinstance(target, Target)
                      and target.has_sources(cls._SCALA_SOURCE_EXTENSION)
-                     and (not target.is_synthetic),
-      targets)
+                     and (not target.is_synthetic)]
 
   @classmethod
   def get_non_excluded_scala_sources(cls, scalastyle_excluder, scala_targets):
@@ -96,12 +94,10 @@ class Scalastyle(NailgunTask):
       scala_sources.extend(target.sources_relative_to_buildroot())
 
     # make sure only the sources with the .scala extension stay.
-    scala_sources = filter(
-      lambda filename: filename.endswith(cls._SCALA_SOURCE_EXTENSION),
-      scala_sources)
+    scala_sources = [filename for filename in scala_sources if filename.endswith(cls._SCALA_SOURCE_EXTENSION)]
 
     # filter out all sources matching exclude patterns, if specified in config.
-    scala_sources = filter(scalastyle_excluder.should_include, scala_sources)
+    scala_sources = list(filter(scalastyle_excluder.should_include, scala_sources))
 
     return scala_sources
 

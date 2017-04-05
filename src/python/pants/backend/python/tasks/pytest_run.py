@@ -146,7 +146,7 @@ class PytestRun(TestRunnerTaskMixin, PythonTask):
       for target in sorted(results):
         self.context.log.info('{0:80}.....{1:>10}'.format(target.id, str(results[target])))
 
-      failed_targets = [target for target, _rv in results.items() if not _rv.success]
+      failed_targets = [target for target, _rv in list(results.items()) if not _rv.success]
       if failed_targets:
         raise TestFailedTaskError(failed_targets=failed_targets)
 
@@ -246,7 +246,7 @@ class PytestRun(TestRunnerTaskMixin, PythonTask):
     # coverage data files into canonical form.
     # See the "[paths]" entry here: http://nedbatchelder.com/code/coverage/config.html for details.
     cp.add_section('paths')
-    for canonical, alternates in source_mappings.items():
+    for canonical, alternates in list(source_mappings.items()):
       key = canonical.replace(os.sep, '.')
       realpaths = set()
       add_realpath(canonical)

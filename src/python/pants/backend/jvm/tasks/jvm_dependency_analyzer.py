@@ -130,7 +130,7 @@ class JvmDependencyAnalyzer(object):
       ret = []
       for d in dirs:
         if os.path.isdir(d):
-          ret.extend(filter(lambda s: s.endswith('.jar'), os.listdir(d)))
+          ret.extend([s for s in os.listdir(d) if s.endswith('.jar')])
       return ret
 
     # Note: assumes HotSpot, or some JVM that supports sun.boot.class.path.
@@ -144,7 +144,7 @@ class JvmDependencyAnalyzer(object):
     extension_jars = find_jars_in_dirs(get_path('java.ext.dirs'))
 
     # Note that this order matters: it reflects the classloading order.
-    bootstrap_jars = filter(os.path.isfile, override_jars + boot_classpath + extension_jars)
+    bootstrap_jars = list(filter(os.path.isfile, override_jars + boot_classpath + extension_jars))
     return bootstrap_jars  # Technically, may include loose class dirs from boot_classpath.
 
   def compute_transitive_deps_by_target(self, targets):
@@ -199,7 +199,7 @@ class JvmDependencyAnalyzer(object):
 
     # Flatten the product deps of this target.
     product_deps = set()
-    for dep_entries in self.product_deps_by_src.get(target, {}).values():
+    for dep_entries in list(self.product_deps_by_src.get(target, {}).values()):
       product_deps.update(dep_entries)
 
     # Determine which of the DEFAULT deps in the declared set of this target were used.

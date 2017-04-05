@@ -91,9 +91,9 @@ class TestRegistry(object):
       return tuple(indexer(tgt) for indexer in indexers)
 
     properties = defaultdict(OrderedSet)
-    for test, target in self._test_to_target.items():
+    for test, target in list(self._test_to_target.items()):
       properties[combined_indexer(target)].add(test)
-    return {prop: tuple(tests) for prop, tests in properties.items()}
+    return {prop: tuple(tests) for prop, tests in list(properties.items())}
 
 
 _JUNIT_XML_MATCHER = re.compile(r'^TEST-.+\.xml$')

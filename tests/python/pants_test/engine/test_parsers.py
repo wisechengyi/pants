@@ -23,7 +23,7 @@ class Bob(object):
     return self._kwargs
 
   def _key(self):
-    return {k: v for k, v in self._kwargs.items() if k != 'type_alias'}
+    return {k: v for k, v in list(self._kwargs.items()) if k != 'type_alias'}
 
   def __eq__(self, other):
     return isinstance(other, Bob) and self._key() == other._key()
@@ -236,7 +236,7 @@ class JsonParserTest(unittest.TestCase):
     actual_lines = [line.rstrip() for line in str(exc.exception).splitlines()]
 
     # This message from the json stdlib varies between python releases, so fuzz the match a bit.
-    self.assertRegexpMatches(actual_lines[0],
+    self.assertRegex(actual_lines[0],
                              r'Expecting (?:,|\',\'|",") delimiter: line 3 column 12 \(char 67\)')
 
     self.assertEqual(dedent("""

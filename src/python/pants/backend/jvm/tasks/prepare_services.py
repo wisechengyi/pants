@@ -34,7 +34,7 @@ class PrepareServices(ResourcesTask):
 
   def find_all_relevant_resources_targets(self):
     def may_have_jvm_services(target):
-      return isinstance(target, JvmTarget) and target.services.values()
+      return isinstance(target, JvmTarget) and list(target.services.values())
     return self.context.targets(predicate=may_have_jvm_services)
 
   def create_invalidation_strategy(self):
@@ -43,7 +43,7 @@ class PrepareServices(ResourcesTask):
     return JvmServiceFingerprintStrategy()
 
   def prepare_resources(self, target, chroot):
-    for service, impls in target.services.items():
+    for service, impls in list(target.services.items()):
       if impls:
         service_provider_configuration_file = os.path.join(chroot, self.service_info_path(service))
         # NB: provider configuration files must be UTF-8 encoded, see the mini-spec:

@@ -56,7 +56,7 @@ class TestNailgunStreamReader(unittest.TestCase):
     mock_select.return_value = ([], [], [self.in_fd])
     self.reader.run()
     self.assertTrue(self.reader.is_stopped)
-    self.assertEquals(mock_select.call_count, 1)
+    self.assertEqual(mock_select.call_count, 1)
 
   @mock.patch('os.read')
   @mock.patch('select.select')
@@ -79,7 +79,7 @@ class TestNailgunStreamReader(unittest.TestCase):
     self.assertTrue(self.reader.is_stopped)
 
     mock_read.assert_called_with(-1, io.DEFAULT_BUFFER_SIZE)
-    self.assertEquals(mock_read.call_count, 2)
+    self.assertEqual(mock_read.call_count, 2)
 
     self.mock_socket.shutdown.assert_called_once_with(socket.SHUT_WR)
 

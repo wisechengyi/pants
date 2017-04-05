@@ -153,11 +153,11 @@ class IdeaIntegrationTest(ResolveJarsTestMixin, PantsRunIntegrationTest):
       remaining = set(expected_paths)
       for sourceFolder in self._get_sourceFolders(dom):
         found_source_content = True
-        self.assertEquals("False", sourceFolder.getAttribute('isTestSource'))
+        self.assertEqual("False", sourceFolder.getAttribute('isTestSource'))
         url = sourceFolder.getAttribute('url')
         # Check is resource attribute is set correctly
         if url in expected_java_resource:
-          self.assertEquals(sourceFolder.getAttribute('type'), IdeaIntegrationTest.RESOURCE,
+          self.assertEqual(sourceFolder.getAttribute('type'), IdeaIntegrationTest.RESOURCE,
                             msg="Type {c_type} does not match expected type {a_type} "
                                 "for {url}".format(c_type=IdeaIntegrationTest.RESOURCE, url=url,
                                                    a_type=sourceFolder.getAttribute('type')))
@@ -287,11 +287,11 @@ class IdeaIntegrationTest(ResolveJarsTestMixin, PantsRunIntegrationTest):
         url = sourceFolder.getAttribute('url')
         is_test_source = sourceFolder.getAttribute('isTestSource')
         if url.endswith("src/main/java") or url.endswith("src/main/resources"):
-          self.assertEquals("False", is_test_source,
+          self.assertEqual("False", is_test_source,
                            msg="wrong test flag: url={url} isTestSource={is_test_source}"
                            .format(url=url, is_test_source=is_test_source))
         elif url.endswith("src/test/java") or url.endswith("src/test/resources"):
-          self.assertEquals("True", is_test_source,
+          self.assertEqual("True", is_test_source,
                           msg="wrong test flag: url={url} isTestSource={is_test_source}"
                           .format(url=url, is_test_source=is_test_source))
         else:
@@ -310,7 +310,7 @@ class IdeaIntegrationTest(ResolveJarsTestMixin, PantsRunIntegrationTest):
       for component in module.getElementsByTagName('component'):
         if component.getAttribute('name') == 'NewModuleRootManager':
           received = component.getAttribute('LANGUAGE_LEVEL')
-          self.assertEquals(expected, received,
+          self.assertEqual(expected, received,
                             'Language level was {0} instead of {1}.'.format(received, expected))
           break
     self._idea_test(targets, check_func=do_check)
@@ -348,7 +348,7 @@ class IdeaIntegrationTest(ResolveJarsTestMixin, PantsRunIntegrationTest):
         url = sourceFolder.getAttribute('url')
         self.assertTrue(url.endswith("testprojects/maven_layout/maven_and_pants/src/main/java"),
                         msg="Unexpected url={url}".format(url=url))
-        self.assertEquals("False", sourceFolder.getAttribute('isTestSource'))
+        self.assertEqual("False", sourceFolder.getAttribute('isTestSource'))
       self.assertTrue(found_source_content)
 
       expected = ["testprojects/maven_layout/protolib-test/target",
@@ -459,14 +459,14 @@ class IdeaIntegrationTest(ResolveJarsTestMixin, PantsRunIntegrationTest):
         url = re.sub(r'^.*/testprojects/', 'testprojects/', url)
         found.add(url)
         if url == 'testprojects/src/java/org/pantsbuild/testproject/idearesourcesonly/code':
-          self.assertEquals('', type_attr)
-          self.assertEquals('False', is_test_source)
+          self.assertEqual('', type_attr)
+          self.assertEqual('False', is_test_source)
         if url == 'testprojects/tests/java/org/pantsbuild/testproject/idearesourcesonly/code':
-          self.assertEquals('', type_attr)
-          self.assertEquals('True', is_test_source)
+          self.assertEqual('', type_attr)
+          self.assertEqual('True', is_test_source)
         if url == 'testprojects/src/java/org/pantsbuild/testproject/idearesourcesonly/resources_only':
-          self.assertEquals('java-resource', type_attr)
-          self.assertEquals('False', is_test_source)
+          self.assertEqual('java-resource', type_attr)
+          self.assertEqual('False', is_test_source)
         # TODO(Eric Ayers) tests/resources/.../idearesourcesonly : this directory has no
         # junit_tests depending on a target, so it is assumed to be plain resources.
         # Since this is under .../tests, humans know this is supposed to be a test only
@@ -474,16 +474,16 @@ class IdeaIntegrationTest(ResolveJarsTestMixin, PantsRunIntegrationTest):
         # that to the idea goal other than inferring from the presence of junit_tests in
         # source_root, which may not be a reliable indicator.
         if url == 'testprojects/tests/java/org/pantsbuild/testproject/idearesourcesonly/resources_only':
-          self.assertEquals('java-resource', type_attr)
-          self.assertEquals('False', is_test_source)
+          self.assertEqual('java-resource', type_attr)
+          self.assertEqual('False', is_test_source)
         if url == 'testprojects/src/resources/org/pantsbuild/testproject/idearesourcesonly':
-          self.assertEquals('java-resource', type_attr)
-          self.assertEquals('False', is_test_source)
+          self.assertEqual('java-resource', type_attr)
+          self.assertEqual('False', is_test_source)
         if url == 'testprojects/tests/resources/org/pantsbuild/testproject/idearesourcesonly':
-          self.assertEquals('java-test-resource', type_attr)
-          self.assertEquals('True', is_test_source)
+          self.assertEqual('java-test-resource', type_attr)
+          self.assertEqual('True', is_test_source)
 
-      self.assertEquals(set([
+      self.assertEqual(set([
         'testprojects/src/resources/org/pantsbuild/testproject/idearesourcesonly',
         'testprojects/src/java/org/pantsbuild/testproject/idearesourcesonly/code',
         'testprojects/tests/resources/org/pantsbuild/testproject/idearesourcesonly',
@@ -523,19 +523,19 @@ class IdeaIntegrationTest(ResolveJarsTestMixin, PantsRunIntegrationTest):
         url = re.sub(r'^.*/testprojects/', 'testprojects/', url)
         found.add(url)
         if url == 'testprojects/src/resources/org/pantsbuild/testproject/ideacodeandresources':
-          self.assertEquals('java-resource', type_attr)
-          self.assertEquals('False', is_test_source)
+          self.assertEqual('java-resource', type_attr)
+          self.assertEqual('False', is_test_source)
         if url == 'testprojects/tests/resources/org/pantsbuild/testproject/ideacodeandresources':
-          self.assertEquals('java-test-resource', type_attr)
-          self.assertEquals('True', is_test_source)
+          self.assertEqual('java-test-resource', type_attr)
+          self.assertEqual('True', is_test_source)
         if url == 'testprojects/src/java/org/pantsbuild/testproject/ideacodeandresources':
-          self.assertEquals('', type_attr)
-          self.assertEquals('False', is_test_source)
+          self.assertEqual('', type_attr)
+          self.assertEqual('False', is_test_source)
         if url == 'testprojects/tests/java/org/pantsbuild/testproject/ideacodeandresources':
-          self.assertEquals('', type_attr)
-          self.assertEquals('True', is_test_source)
+          self.assertEqual('', type_attr)
+          self.assertEqual('True', is_test_source)
 
-      self.assertEquals(set([
+      self.assertEqual(set([
         'testprojects/src/resources/org/pantsbuild/testproject/ideacodeandresources',
         'testprojects/src/java/org/pantsbuild/testproject/ideacodeandresources',
         'testprojects/tests/resources/org/pantsbuild/testproject/ideacodeandresources',
@@ -566,10 +566,10 @@ class IdeaIntegrationTest(ResolveJarsTestMixin, PantsRunIntegrationTest):
         url = re.sub(r'^.*/testprojects/', 'testprojects/', url)
         found.add(url)
         if url == 'testprojects/tests/java/org/pantsbuild/testproject/ideatestsandlib':
-          self.assertEquals('', type_attr)
-          self.assertEquals('True', is_test_source)
+          self.assertEqual('', type_attr)
+          self.assertEqual('True', is_test_source)
 
-      self.assertEquals(set([
+      self.assertEqual(set([
         'testprojects/tests/java/org/pantsbuild/testproject/ideatestsandlib',
       ]), found)
 
@@ -596,19 +596,19 @@ class IdeaIntegrationTest(ResolveJarsTestMixin, PantsRunIntegrationTest):
       annotation_processing = self._get_compiler_configuration(ipr_dom).getElementsByTagName(
         'annotationProcessing')[0]
       profile = annotation_processing.getElementsByTagName('profile')[0]
-      self.assertEquals('True', profile.getAttribute('enabled'))
-      self.assertEquals('true', profile.getAttribute('default'))
-      self.assertEquals('Default', profile.getAttribute('name'))
+      self.assertEqual('True', profile.getAttribute('enabled'))
+      self.assertEqual('true', profile.getAttribute('default'))
+      self.assertEqual('Default', profile.getAttribute('name'))
       processor_path = profile.getElementsByTagName('processorPath')[0]
-      self.assertEquals('true', processor_path.getAttribute('useClasspath'))
+      self.assertEqual('true', processor_path.getAttribute('useClasspath'))
       source_output_dir = profile.getElementsByTagName('sourceOutputDir')[0]
-      self.assertEquals('../../../generated', source_output_dir.getAttribute('name'))
+      self.assertEqual('../../../generated', source_output_dir.getAttribute('name'))
       source_test_output_dir = profile.getElementsByTagName('sourceTestOutputDir')[0]
-      self.assertEquals('../../../generated_tests', source_test_output_dir.getAttribute('name'))
+      self.assertEqual('../../../generated_tests', source_test_output_dir.getAttribute('name'))
       found_processors = set()
       for processor in profile.getElementsByTagName('processor'):
         found_processors.add(processor.getAttribute('name'))
-      self.assertEquals({'com.google.auto.value.processor.AutoAnnotationProcessor',
+      self.assertEqual({'com.google.auto.value.processor.AutoAnnotationProcessor',
                          'com.google.auto.value.processor.AutoValueBuilderProcessor',
                          'com.google.auto.value.processor.AutoValueProcessor'},
                         found_processors)

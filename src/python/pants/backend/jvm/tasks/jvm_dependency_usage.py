@@ -185,7 +185,7 @@ class JvmDependencyUsage(Task):
         try:
           with open(self.nodes_json(vt.results_dir)) as fp:
             return Node.from_cacheable_dict(json.load(fp),
-                                            lambda spec: self.context.resolve(spec).__iter__().next())
+                                            lambda spec: next(self.context.resolve(spec).__iter__()))
         except Exception:
           self.context.log.warn("Can't deserialize json for target {}".format(target))
           return Node(target.concrete_derived_from)
@@ -212,7 +212,7 @@ class JvmDependencyUsage(Task):
         nodes[concrete_target] = node
 
     # Prune any Nodes with 0 products.
-    for concrete_target, node in nodes.items()[:]:
+    for concrete_target, node in list(nodes.items())[:]:
       if node.products_total == 0:
         nodes.pop(concrete_target)
 
@@ -248,7 +248,7 @@ class JvmDependencyUsage(Task):
     # Record the used products and undeclared Edges for this target. Note that some of
     # these may be self edges, which are considered later.
     target_product_deps_by_src = product_deps_by_src.get(target, {})
-    for product_deps in target_product_deps_by_src.values():
+    for product_deps in list(target_product_deps_by_src.values()):
       for product_dep in product_deps:
         for dep_tgt in targets_by_file.get(product_dep, []):
           derived_from = dep_tgt.concrete_derived_from
@@ -300,7 +300,7 @@ class Node(object):
       }
     aliases = {}
 
-    for dep, dep_aliases in self.dep_aliases.items():
+    for dep, dep_aliases in list(self.dep_aliases.items()):
       aliases[dep.address.spec] = [alias.address.spec for alias in dep_aliases]
 
     return {
@@ -387,8 +387,8 @@ class DependencyUsageGraph(object):
 
     # Aggregate inbound edges by their maximum product usage ratio.
     max_target_usage = defaultdict(lambda: 0.0)
-    for target, node in self._nodes.items():
-      for dep_target, edge in node.dep_edges.items():
+    for target, node in list(self._nodes.items()):
+      for dep_target, edge in list(node.dep_edges.items()):
         if target == dep_target:
           continue
         used_ratio = self._used_ratio(dep_target, edge)
@@ -397,7 +397,7 @@ class DependencyUsageGraph(object):
     # Calculate a score for each.
     Score = namedtuple('Score', ('badness', 'max_usage', 'cost_transitive', 'target'))
     scores = []
-    for target, max_usage in max_target_usage.items():
+    for target, max_usage in list(max_target_usage.items()):
       cost_transitive = self._trans_cost(target)
       score = int(cost_transitive / (max_usage if max_usage > 0.0 else 1.0))
       scores.append(Score(score, max_usage, cost_transitive, target.address.spec))
@@ -423,12 +423,12 @@ class DependencyUsageGraph(object):
         'aliases': [alias.address.spec for alias in aliases],
       }
 
-    for node in self._nodes.values():
+    for node in list(self._nodes.values()):
       res_dict[node.concrete_target.address.spec] = {
         'cost': self._cost(node.concrete_target),
         'cost_transitive': self._trans_cost(node.concrete_target),
         'products_total': node.products_total,
         'dependencies': [gen_dep_edge(node, edge, dep_tgt, node.dep_aliases.get(dep_tgt, {}))
-                         for dep_tgt, edge in node.dep_edges.items()],
+                         for dep_tgt, edge in list(node.dep_edges.items())],
       }
     yield json.dumps(res_dict, indent=2, sort_keys=True)

@@ -174,7 +174,7 @@ class PythonChroot(object):
     children = defaultdict(OrderedSet)
 
     def add_dep(trg):
-      for target_type, target_key in self._VALID_DEPENDENCIES.items():
+      for target_type, target_key in list(self._VALID_DEPENDENCIES.items()):
         if isinstance(trg, target_type):
           children[target_key].add(trg)
           return
@@ -221,7 +221,7 @@ class PythonChroot(object):
     distributions = self._resolve_multi(reqs_to_build, find_links)
 
     locations = set()
-    for platform, dist_set in distributions.items():
+    for platform, dist_set in list(distributions.items()):
       for dist in dist_set:
         if dist.location not in locations:
           self._dump_distribution(dist)

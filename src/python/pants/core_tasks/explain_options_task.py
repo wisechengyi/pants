@@ -103,7 +103,7 @@ class ExplainOptionsTask(ConsoleTask):
         yield '  overrode {}'.format(self._format_record(record))
 
   def _force_option_parsing(self):
-    scopes = filter(self._scope_filter, list(self.context.options.known_scope_to_info.keys()))
+    scopes = list(filter(self._scope_filter, list(self.context.options.known_scope_to_info.keys())))
     for scope in scopes:
       self.context.options.for_scope(scope)
 

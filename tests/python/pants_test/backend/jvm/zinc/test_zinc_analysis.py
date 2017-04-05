@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
                         unicode_literals, with_statement)
 
 import os
-import StringIO
+import io
 import unittest
 
 from pants.backend.jvm.tasks.jvm_compile.analysis_tools import AnalysisTools
@@ -29,7 +29,7 @@ class ZincAnalysisTestSimple(unittest.TestCase):
 
       def rebase(analysis_file, java_home=None):
         orig = get_analysis_text(analysis_file)
-        buf = StringIO.StringIO()
+        buf = io.StringIO()
         ZincAnalysisParser().rebase(iter(orig.splitlines(True)), buf,
                                     {b'/src/pants': AnalysisTools._PANTS_BUILDROOT_PLACEHOLDER,
                                      b'/src/pants/.pants.d': AnalysisTools._PANTS_WORKDIR_PLACEHOLDER}, java_home)
@@ -66,9 +66,9 @@ class ZincAnalysisTestSorting(unittest.TestCase):
     def do_test(elem):
       # The values of a single key should be sorted in memory.
       for n in range(0, 9):
-        self.assertEquals(['f0', 'f1', 'f2'], elem.args[0]['{}'.format(n)])
+        self.assertEqual(['f0', 'f1', 'f2'], elem.args[0]['{}'.format(n)])
       # And the keys themselves (and their values) should be sorted when writing.
-      buf = StringIO.StringIO()
+      buf = io.StringIO()
       elem.write(buf)
       output = buf.getvalue()
       self.assertMultiLineEqual(expected, output)

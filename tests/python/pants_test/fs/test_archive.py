@@ -71,7 +71,7 @@ class ArchiveTest(unittest.TestCase):
         archive = archiver('zip').create(fromdir, archivedir, 'archive')
         with temporary_dir() as todir:
           archiver('zip').extract(archive, todir, filter_func=do_filter)
-          self.assertEquals(set(['allowed.txt']), self._listtree(todir, empty_dirs=False))
+          self.assertEqual(set(['allowed.txt']), self._listtree(todir, empty_dirs=False))
 
   def test_tar_dereference(self):
 

@@ -48,6 +48,6 @@ class ListOwners(ConsoleTask):
       if len(sources) > 1:
         raise TaskError('Too many sources specified for {} output format.'
                         .format(self.get_options().output_format))
-      if owner_info.values():
-        for address_spec in owner_info.values()[0]:
+      if list(owner_info.values()):
+        for address_spec in list(owner_info.values())[0]:
           yield address_spec

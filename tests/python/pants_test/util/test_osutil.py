@@ -31,12 +31,12 @@ class OsutilTest(unittest.TestCase):
     yield handler.warning_list
 
   def test_alias_normalization(self):
-    for normal_os, aliases in OS_ALIASES.items():
+    for normal_os, aliases in list(OS_ALIASES.items()):
       for alias in aliases:
         self.assertEqual(normal_os, normalize_os_name(alias))
 
   def test_keys_in_aliases(self):
-    for key in OS_ALIASES.keys():
+    for key in list(OS_ALIASES.keys()):
       self.assertIn(key, known_os_names())
 
   def test_no_warnings_on_known_names(self):

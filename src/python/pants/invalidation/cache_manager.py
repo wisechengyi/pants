@@ -306,7 +306,7 @@ class InvalidationCacheManager(object):
     Callers can inspect these vts and rebuild the invalid ones, for example.
     """
     all_vts = self.wrap_targets(targets, topological_order=topological_order)
-    invalid_vts = filter(lambda vt: not vt.valid, all_vts)
+    invalid_vts = [vt for vt in all_vts if not vt.valid]
     return InvalidationCheck(all_vts, invalid_vts)
 
   @property
@@ -362,4 +362,4 @@ class InvalidationCacheManager(object):
       new_exception = self.CacheValidationError("Problem validating target {} in {}: {}"
                                                 .format(target.id, target.address.spec_path, e))
 
-      raise self.CacheValidationError, new_exception, exc_info[2]
+      raise self.CacheValidationError(new_exception).with_traceback(exc_info[2])

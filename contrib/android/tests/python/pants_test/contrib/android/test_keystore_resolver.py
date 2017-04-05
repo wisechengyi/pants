@@ -52,17 +52,17 @@ class TestKeystoreResolver(unittest.TestCase):
   def test_resolve(self):
     with self.config_file() as config:
       keystores = KeystoreResolver.resolve(config)
-      self.assertEquals(keystores['default-debug'].build_type, 'debug')
+      self.assertEqual(keystores['default-debug'].build_type, 'debug')
 
   def test_resolve_release(self):
     with self.config_file() as config:
       keystores = KeystoreResolver.resolve(config)
-      self.assertEquals(keystores['test-release'].build_type, 'release')
+      self.assertEqual(keystores['test-release'].build_type, 'release')
 
   def test_resolve_mixed_case(self):
     with self.config_file(build_type='ReleASE') as config:
       keystores = KeystoreResolver.resolve(config)
-      self.assertEquals(keystores['test-release'].build_type, 'release')
+      self.assertEqual(keystores['test-release'].build_type, 'release')
 
   def test_bad_build_type(self):
     with self.config_file(build_type='bad-build-type') as config:

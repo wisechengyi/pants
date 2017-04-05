@@ -133,7 +133,7 @@ class JUnitRun(TestRunnerTaskMixin, JvmToolTaskMixin, JvmTask):
   @classmethod
   def register_options(cls, register):
     super(JUnitRun, cls).register_options(register)
-    register('--batch-size', advanced=True, type=int, default=sys.maxint,
+    register('--batch-size', advanced=True, type=int, default=sys.maxsize,
              help='Run at most this many tests in a single test process.')
     register('--test', type=list,
              help='Force running of just these tests.  Tests can be specified using any of: '
@@ -372,7 +372,7 @@ class JUnitRun(TestRunnerTaskMixin, JvmToolTaskMixin, JvmTask):
     classpath_product = self.context.products.get_data('instrument_classpath')
 
     result = 0
-    for properties, tests in tests_by_properties.items():
+    for properties, tests in list(tests_by_properties.items()):
       (workdir, platform, target_jvm_options, target_env_vars, concurrency, threads) = properties
       for batch in self._partition(tests):
         # Batches of test classes will likely exist within the same targets: dedupe them.
@@ -386,7 +386,7 @@ class JUnitRun(TestRunnerTaskMixin, JvmToolTaskMixin, JvmTask):
         distribution = JvmPlatform.preferred_jvm_distribution([platform], self._strict_jvm_version)
 
         # Override cmdline args with values from junit_test() target that specify concurrency:
-        args = self._args(output_dir) + [u'-xmlreport']
+        args = self._args(output_dir) + ['-xmlreport']
 
         if concurrency is not None:
           args = remove_arg(args, '-default-parallel')

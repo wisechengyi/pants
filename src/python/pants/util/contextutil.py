@@ -44,13 +44,13 @@ def environment_as(**kwargs):
       if key in os.environ:
         del os.environ[key]
 
-  for key, val in new_environment.items():
+  for key, val in list(new_environment.items()):
     old_environment[key] = os.environ.get(key)
     setenv(key, val)
   try:
     yield
   finally:
-    for key, val in old_environment.items():
+    for key, val in list(old_environment.items()):
       setenv(key, val)
 
 

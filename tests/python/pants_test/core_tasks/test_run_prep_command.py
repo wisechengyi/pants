@@ -73,7 +73,7 @@ class RunPrepCommandTest(TaskTestBase):
       context = self.context(target_roots=[a])
       task = self.create_task(context=context, workdir=workdir)
       task.execute()
-      self.assertEquals('fleem', os.environ['test_prep_env_var'])
+      self.assertEqual('fleem', os.environ['test_prep_env_var'])
 
   def test_prep_no_command(self):
     with self.assertRaises(TaskError):
@@ -96,36 +96,36 @@ class RunPrepCommandTest(TaskTestBase):
 
   def test_valid_target_default_goals(self):
     prep_command = self.make_target('foo', PrepCommand, prep_executable='foo.sh')
-    self.assertEquals(frozenset(['test']), prep_command.goals)
+    self.assertEqual(frozenset(['test']), prep_command.goals)
 
   def test_valid_target_single_goal(self):
     prep_command = self.make_target('foo', PrepCommand, prep_executable='foo.sh', goal='binary')
-    self.assertEquals(frozenset(['binary']), prep_command.goals)
+    self.assertEqual(frozenset(['binary']), prep_command.goals)
 
   def test_valid_target_multiple_goals(self):
     prep_command = self.make_target('foo', PrepCommand, prep_executable='foo.sh',
                                     goals=['binary', 'test'])
-    self.assertEquals(frozenset(['binary', 'test']), prep_command.goals)
+    self.assertEqual(frozenset(['binary', 'test']), prep_command.goals)
 
   def test_invalid_target_no_executable(self):
-    with self.assertRaisesRegexp(TargetDefinitionException,
+    with self.assertRaisesRegex(TargetDefinitionException,
                                  r'prep_executable must be specified'):
       self.make_target('foo', PrepCommand,)
 
   def test_invalid_target_unrecognized_goal(self):
-    with self.assertRaisesRegexp(TargetDefinitionException,
+    with self.assertRaisesRegex(TargetDefinitionException,
                                  r'.*Got unrecognized goal baloney. Goal must be one of.*'):
       self.make_target('foo', PrepCommand, prep_executable='foo.sh', goal='baloney')
 
   def test_invalid_target_unrecognized_goals(self):
-    with self.assertRaisesRegexp(TargetDefinitionException,
+    with self.assertRaisesRegex(TargetDefinitionException,
                                  r'.*Got unrecognized goals baloney, malarkey. '
                                  r'Goal must be one of.*'):
       self.make_target('foo', PrepCommand, prep_executable='foo.sh',
                        goals=['baloney', 'malarkey', 'test'])
 
   def test_invalid_target_goal_and_goals(self):
-    with self.assertRaisesRegexp(TargetDefinitionException,
+    with self.assertRaisesRegex(TargetDefinitionException,
                                  r'.*Either `goal` or `goals` \(preferred\) should be specified.*'):
       self.make_target('foo', PrepCommand, prep_executable='foo.sh', goal='binary', goals=['test'])
 

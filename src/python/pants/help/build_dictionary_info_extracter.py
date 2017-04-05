@@ -182,7 +182,7 @@ class BuildDictionaryInfoExtracter(object):
 
     if argspec.keywords:
       # Any remaining arg_descriptions are for kwargs.
-      for arg_name, descr in arg_descriptions.items():
+      for arg_name, descr in list(arg_descriptions.items()):
         # Get the default value out of the description, if present.
         mo = cls._get_default_value_re().search(descr)
         default_value = mo.group(1) if mo else None
@@ -225,11 +225,11 @@ class BuildDictionaryInfoExtracter(object):
     return sorted(self._get_target_type_info())
 
   def _get_target_type_info(self):
-    for alias, target_type in self._buildfile_aliases.target_types.items():
+    for alias, target_type in list(self._buildfile_aliases.target_types.items()):
       description, details = self.get_description_from_docstring(target_type)
       description = description or self.ADD_DESCR
       yield BuildSymbolInfo(alias, description, details, self.get_target_args(alias))
-    for alias, target_macro_factory in self._buildfile_aliases.target_macro_factories.items():
+    for alias, target_macro_factory in list(self._buildfile_aliases.target_macro_factories.items()):
       # Take the description from the first target type we encounter that has one.
       target_args = self.get_target_args(alias)
       for target_type in target_macro_factory.target_types:
@@ -244,7 +244,7 @@ class BuildDictionaryInfoExtracter(object):
     return sorted(self._get_object_info())
 
   def _get_object_info(self):
-    for alias, obj in self._buildfile_aliases.objects.items():
+    for alias, obj in list(self._buildfile_aliases.objects.items()):
       description, details = self.get_description_from_docstring(obj)
       description = description or self.ADD_DESCR
       yield BuildSymbolInfo(alias, description, details, self.get_object_args(alias))
@@ -253,7 +253,7 @@ class BuildDictionaryInfoExtracter(object):
     return sorted(self._get_object_factory_info())
 
   def _get_object_factory_info(self):
-    for alias, factory_type in self._buildfile_aliases.context_aware_object_factories.items():
+    for alias, factory_type in list(self._buildfile_aliases.context_aware_object_factories.items()):
       description, details = self.get_description_from_docstring(factory_type)
       description = description or self.ADD_DESCR
       yield BuildSymbolInfo(alias, description, details, self.get_object_factory_args(alias))

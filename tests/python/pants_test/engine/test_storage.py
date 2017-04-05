@@ -37,7 +37,7 @@ class StorageTest(unittest.TestCase):
 
   def test_storage(self):
     key = self.storage.put(self.TEST_PATH)
-    self.assertEquals(self.TEST_PATH, self.storage.get(key))
+    self.assertEqual(self.TEST_PATH, self.storage.get(key))
 
     with self.assertRaises(InvalidKeyError):
       self.assertFalse(self.storage.get(self.TEST_KEY))
@@ -46,7 +46,7 @@ class StorageTest(unittest.TestCase):
     key1 = self.storage.put(self.TEST_PATH)
     key2 = self.storage.put(self.TEST_PATH2)
     self.storage.add_mapping(key1, key2)
-    self.assertEquals(key2, self.storage.get_mapping(key1))
+    self.assertEqual(key2, self.storage.get_mapping(key1))
 
     # key2 isn't mapped to any other key.
     self.assertIsNone(self.storage.get_mapping(key2))
@@ -69,7 +69,7 @@ class CacheTest(unittest.TestCase):
     request_key = self.storage.put_state(self.request)
     self.cache.put(request_key, self.result)
 
-    self.assertEquals(self.result, self.cache.get(self.request)[1])
+    self.assertEqual(self.result, self.cache.get(self.request)[1])
     self._assert_hits_misses(hits=1, misses=1)
 
   def test_failure_to_update_mapping(self):
@@ -82,6 +82,6 @@ class CacheTest(unittest.TestCase):
     self._assert_hits_misses(hits=0, misses=1)
 
   def _assert_hits_misses(self, hits, misses):
-    self.assertEquals(hits, self.cache.get_stats().hits)
-    self.assertEquals(misses, self.cache.get_stats().misses)
-    self.assertEquals(hits+misses, self.cache.get_stats().total)
+    self.assertEqual(hits, self.cache.get_stats().hits)
+    self.assertEqual(misses, self.cache.get_stats().misses)
+    self.assertEqual(hits+misses, self.cache.get_stats().total)

@@ -44,7 +44,7 @@ class UnreadableArtifact(object):
     return False
 
   # For python 2
-  def __nonzero__(self):
+  def __bool__(self):
     return self.__bool__()
 
   def __str__(self):
@@ -87,7 +87,7 @@ class ArtifactCache(object):
                             These must be under the artifact_root.
     :param bool overwrite: Skip check for existing, insert even if already in cache.
     """
-    missing_files = filter(lambda f: not os.path.exists(f), paths)
+    missing_files = [f for f in paths if not os.path.exists(f)]
     if missing_files:
       raise ArtifactCacheError('Tried to cache nonexistent files {0}'.format(missing_files))
 

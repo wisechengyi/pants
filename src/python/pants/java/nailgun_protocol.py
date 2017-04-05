@@ -89,7 +89,7 @@ class NailgunProtocol(object):
     for argument in arguments:
       cls.write_chunk(sock, ChunkType.ARGUMENT, argument)
 
-    for item_tuple in environment.items():
+    for item_tuple in list(environment.items()):
       cls.write_chunk(sock,
                       ChunkType.ENVIRONMENT,
                       cls.ENVIRON_SEP.join(cls._decode_unicode_seq(item_tuple)))

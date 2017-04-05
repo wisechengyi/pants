@@ -36,7 +36,7 @@ class EnsimeGen(IdeGen):
   def register_options(cls, register):
     super(EnsimeGen, cls).register_options(register)
     register('--scala-language-level',
-             choices=_SCALA_VERSIONS.keys(), default=_SCALA_VERSION_DEFAULT,
+             choices=list(_SCALA_VERSIONS.keys()), default=_SCALA_VERSION_DEFAULT,
              help='Set the scala language level used for Ensime linting.')
 
   def __init__(self, *args, **kwargs):
@@ -62,7 +62,7 @@ class EnsimeGen(IdeGen):
         path=source_base
       )
 
-    source_bases = dict(map(create_source_base_template, project.sources))
+    source_bases = dict(list(map(create_source_base_template, project.sources)))
 
     def create_source_template(base_id, includes=None, excludes=None):
       return TemplateData(
@@ -85,7 +85,7 @@ class EnsimeGen(IdeGen):
     source_sets = defaultdict(OrderedSet)  # base_id -> source_set
     for source_set in project.sources:
       source_sets[linked_folder_id(source_set)].add(source_set)
-    sourcepaths = [create_sourcepath(base_id, sources) for base_id, sources in source_sets.items()]
+    sourcepaths = [create_sourcepath(base_id, sources) for base_id, sources in list(source_sets.items())]
 
     libs = []
 
@@ -111,7 +111,7 @@ class EnsimeGen(IdeGen):
         language_level=('1.{}'.format(self.java_language_level))
       ),
       scala=scala,
-      source_bases=source_bases.values(),
+      source_bases=list(source_bases.values()),
       sourcepaths=sourcepaths,
       has_tests=project.has_tests,
       internal_jars=[cp_entry.jar for cp_entry in project.internal_jars],

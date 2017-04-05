@@ -68,7 +68,7 @@ class PythonEval(ResolveRequirementsTaskBase):
       return
 
     targets = self.context.targets() if self.get_options().closure else self.context.target_roots
-    with self.invalidated(filter(self._is_evalable, targets),
+    with self.invalidated(list(filter(self._is_evalable, targets)),
                           invalidate_dependents=True,
                           topological_order=True) as invalidation_check:
       compiled = self._compile_targets(invalidation_check.invalid_vts)
@@ -167,7 +167,7 @@ class PythonEval(ResolveRequirementsTaskBase):
           builder.freeze()
 
       exec_pex = PEX(exec_pex_path, interpreter)
-      extra_pex_paths = [pex.path() for pex in filter(None, [reqs_pex, srcs_pex])]
+      extra_pex_paths = [pex.path() for pex in [_f for _f in [reqs_pex, srcs_pex] if _f]]
       pex = WrappedPEX(exec_pex, extra_pex_paths, interpreter)
 
       with self.context.new_workunit(name='eval',
@@ -224,7 +224,7 @@ class PythonEval(ResolveRequirementsTaskBase):
     reqs_pex_path = os.path.realpath(os.path.join(self.workdir, str(interpreter.identity),
                                                   vt.cache_key.hash))
     if not os.path.isdir(reqs_pex_path):
-      req_libs = filter(has_python_requirements, vt.target.closure())
+      req_libs = list(filter(has_python_requirements, vt.target.closure()))
       with safe_concurrent_creation(reqs_pex_path) as safe_path:
         builder = PEXBuilder(safe_path, interpreter=interpreter, copy=True)
         dump_requirements(builder, interpreter, req_libs, self.context.log)

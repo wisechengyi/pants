@@ -187,7 +187,7 @@ class BundleField(tuple, PayloadField):
     return hasher.hexdigest()
 
   def _compute_fingerprint(self):
-    return combine_hashes(map(BundleField._hash_bundle, self))
+    return combine_hashes(list(map(BundleField._hash_bundle, self)))
 
 
 class JvmApp(Target):
@@ -256,7 +256,7 @@ class JvmApp(Target):
         globs += bundle.fileset.filespec['globs']
       else:
         # NB(nh): filemap is an OrderedDict, so this ordering is stable.
-        globs += [fast_relpath(f, buildroot) for f in bundle.filemap.keys()]
+        globs += [fast_relpath(f, buildroot) for f in list(bundle.filemap.keys())]
     super_globs = super(JvmApp, self).globs_relative_to_buildroot()
     if super_globs:
       globs += super_globs['globs']

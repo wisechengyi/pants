@@ -117,14 +117,14 @@ class TestRunnerTaskMixinTest(TaskTestBase):
     self.set_options(timeouts=True, timeout_default=2)
     task = self.create_task(self.context())
 
-    self.assertEquals(task._timeout_for_targets([targetA, targetB]), 3)
+    self.assertEqual(task._timeout_for_targets([targetA, targetB]), 3)
 
   def test_get_timeouts_with_maximum(self):
     """If a timeout exceeds the maximum, set it to that."""
 
     self.set_options(timeouts=True, timeout_maximum=1)
     task = self.create_task(self.context())
-    self.assertEquals(task._timeout_for_targets([targetC]), 1)
+    self.assertEqual(task._timeout_for_targets([targetC]), 1)
 
   def test_default_maximum_conflict(self):
     """If the default exceeds the maximum, throw an error."""
@@ -284,7 +284,7 @@ class TestRunnerTaskMixinGracefulTimeoutTest(TaskTestBase):
 
       # Ensure that all the calls we want to kill the process gracefully are made.
       self.assertEqual(self.process_handler.call_list,
-                       [[u'process_handler.terminate'], [u'process_handler.poll'], [u'process_handler.kill'], [u'process_handler.wait']])
+                       [['process_handler.terminate'], ['process_handler.poll'], ['process_handler.kill'], ['process_handler.wait']])
 
   def test_graceful_terminate_if_poll_is_zero(self):
     self.process_handler = self.create_process_handler(return_none_first=False)
@@ -306,7 +306,7 @@ class TestRunnerTaskMixinGracefulTimeoutTest(TaskTestBase):
 
       # Ensure that we only call terminate, and not kill.
       self.assertEqual(self.process_handler.call_list,
-                       [[u'process_handler.terminate'], [u'process_handler.poll'], [u'process_handler.wait']])
+                       [['process_handler.terminate'], ['process_handler.poll'], ['process_handler.wait']])
 
 
 class TestRunnerTaskMixinMultipleTargets(TaskTestBase):

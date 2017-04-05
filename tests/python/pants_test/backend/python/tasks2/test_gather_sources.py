@@ -31,7 +31,7 @@ class GatherSourcesTest(TaskTestBase):
       'resources/qux/quux.txt': 'quux_txt_content',
     }
 
-    for rel_path, content in filemap.items():
+    for rel_path, content in list(filemap.items()):
       self.create_file(rel_path, content)
 
     sources1 = self.make_target(spec='//:sources1_tgt', target_type=PythonLibrary,
@@ -43,10 +43,10 @@ class GatherSourcesTest(TaskTestBase):
     pex = self._gather_sources([sources1, sources2, resources])
     pex_root = pex.cmdline()[1]
 
-    for rel_path, expected_content in filemap.items():
+    for rel_path, expected_content in list(filemap.items()):
       with open(os.path.join(pex_root, rel_path)) as infile:
         content = infile.read()
-      self.assertEquals(expected_content, content)
+      self.assertEqual(expected_content, content)
 
   def _gather_sources(self, target_roots):
     context = self.context(target_roots=target_roots, for_subsystems=[PythonSetup, PythonRepos])

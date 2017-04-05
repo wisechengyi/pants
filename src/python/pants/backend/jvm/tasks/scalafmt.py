@@ -89,11 +89,9 @@ class ScalaFmt(NailgunTask, AbstractClass):
     """
 
   def get_non_synthetic_scala_targets(self, targets):
-    return filter(
-      lambda target: isinstance(target, self._formatted_target_types)
+    return [target for target in targets if isinstance(target, self._formatted_target_types)
                      and target.has_sources(self._SCALA_SOURCE_EXTENSION)
-                     and (not target.is_synthetic),
-      targets)
+                     and (not target.is_synthetic)]
 
   def calculate_sources(self, targets):
     sources = set()

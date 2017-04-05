@@ -29,7 +29,7 @@ class BuildGraphTest(BaseTest):
 
     Returns the parsed Address for the root_spec.
     """
-    for src, targets in graph_dict.items():
+    for src, targets in list(graph_dict.items()):
       src_path, src_name = parse_spec(src)
       if not src_path:
         # The target is located in the root.
@@ -84,10 +84,10 @@ class BuildGraphTest(BaseTest):
   def test_get_target_from_spec(self):
     a = self.make_target('foo:a')
     result = self.build_graph.get_target_from_spec('foo:a')
-    self.assertEquals(a, result)
+    self.assertEqual(a, result)
     b = self.make_target('foo:b')
     result = self.build_graph.get_target_from_spec(':b', relative_to='foo')
-    self.assertEquals(b, result)
+    self.assertEqual(b, result)
 
   def test_walk_graph(self):
     # Make sure that BuildGraph.walk_transitive_dependency_graph() and
@@ -97,14 +97,14 @@ class BuildGraphTest(BaseTest):
       self.build_graph.walk_transitive_dependency_graph([target.address],
                                                          lambda x: targets.append(x),
                                                         postorder=postorder)
-      self.assertEquals(results, targets)
+      self.assertEqual(results, targets)
 
     def assertDependeeWalk(target, results, postorder=False):
       targets = []
       self.build_graph.walk_transitive_dependee_graph([target.address],
                                                         lambda x: targets.append(x),
                                                         postorder=postorder)
-      self.assertEquals(results, targets)
+      self.assertEqual(results, targets)
 
     a = self.make_target('a')
     b = self.make_target('b', dependencies=[a])
@@ -148,33 +148,33 @@ class BuildGraphTest(BaseTest):
 
   def test_target_closure(self):
     a = self.make_target('a')
-    self.assertEquals([a], a.closure())
+    self.assertEqual([a], a.closure())
     b = self.make_target('b', dependencies=[a])
-    self.assertEquals([b, a], b.closure())
+    self.assertEqual([b, a], b.closure())
     c = self.make_target('c', dependencies=[b])
-    self.assertEquals([c, b, a], c.closure())
+    self.assertEqual([c, b, a], c.closure())
     d = self.make_target('d', dependencies=[a, c])
-    self.assertEquals([d, a, c, b], d.closure())
+    self.assertEqual([d, a, c, b], d.closure())
 
   def test_closure(self):
-    self.assertEquals([], BuildGraph.closure([]))
+    self.assertEqual([], BuildGraph.closure([]))
     a = self.make_target('a')
-    self.assertEquals([a], BuildGraph.closure([a]))
+    self.assertEqual([a], BuildGraph.closure([a]))
     b = self.make_target('b', dependencies=[a])
-    self.assertEquals([b, a], BuildGraph.closure([b]))
+    self.assertEqual([b, a], BuildGraph.closure([b]))
     c = self.make_target('c', dependencies=[b])
-    self.assertEquals([c, b, a], BuildGraph.closure([c]))
+    self.assertEqual([c, b, a], BuildGraph.closure([c]))
     d = self.make_target('d', dependencies=[a, c])
-    self.assertEquals([d, a, c, b], BuildGraph.closure([d]))
+    self.assertEqual([d, a, c, b], BuildGraph.closure([d]))
 
     def d_gen():
       yield d
-    self.assertEquals([d, a, c, b], BuildGraph.closure(d_gen()))
+    self.assertEqual([d, a, c, b], BuildGraph.closure(d_gen()))
 
     def empty_gen():
       return
       yield
-    self.assertEquals([], BuildGraph.closure(empty_gen()))
+    self.assertEqual([], BuildGraph.closure(empty_gen()))
 
   def test_closure_bfs(self):
     root = self.inject_graph('a', {
@@ -189,9 +189,9 @@ class BuildGraphTest(BaseTest):
     })
 
     bfs_closure = BuildGraph.closure([self.build_graph.get_target(root)], bfs=True)
-    self.assertEquals(
+    self.assertEqual(
         [t.address.target_name for t in bfs_closure],
-        [str(six.unichr(x)) for x in six.moves.xrange(ord('a'), ord('o') + 1)],
+        [str(six.chr(x)) for x in six.moves.xrange(ord('a'), ord('o') + 1)],
     )
 
   def test_transitive_subgraph_of_addresses_bfs(self):
@@ -206,9 +206,9 @@ class BuildGraphTest(BaseTest):
       'h': [], 'i': [], 'j': [], 'k': [], 'l': [], 'm': [], 'n': [], 'o': [],
     })
 
-    self.assertEquals(
+    self.assertEqual(
         [t.address.target_name for t in self.build_graph.transitive_subgraph_of_addresses_bfs([root])],
-        [str(six.unichr(x)) for x in six.moves.xrange(ord('a'), ord('o') + 1)],
+        [str(six.chr(x)) for x in six.moves.xrange(ord('a'), ord('o') + 1)],
     )
 
   def test_transitive_subgraph_of_addresses_bfs_predicate(self):
@@ -221,13 +221,13 @@ class BuildGraphTest(BaseTest):
     predicate = lambda t: t.address.target_name != 'b'
     filtered = self.build_graph.transitive_subgraph_of_addresses_bfs([root], predicate=predicate)
 
-    self.assertEquals([t.address.target_name for t in filtered], ['a', 'c'])
+    self.assertEqual([t.address.target_name for t in filtered], ['a', 'c'])
 
   def test_target_walk(self):
     def assertWalk(expected, target):
       results = []
       target.walk(lambda x: results.append(x))
-      self.assertEquals(expected, results)
+      self.assertEqual(expected, results)
 
     a = self.make_target('a')
     assertWalk([a], a)
@@ -247,14 +247,14 @@ class BuildGraphTest(BaseTest):
     self.build_graph.inject_address_closure(Address.parse(spec))
 
   def test_invalid_address(self):
-    with self.assertRaisesRegexp(AddressLookupError, '^.* does not contain any BUILD files.$'):
+    with self.assertRaisesRegex(AddressLookupError, '^.* does not contain any BUILD files.$'):
       self.inject_address_closure('//:a')
 
     self.add_to_build_file('BUILD',
                            'target(name="a", '
                            '  dependencies=["non-existent-path:b"],'
                            ')')
-    with self.assertRaisesRegexp(BuildGraph.TransitiveLookupError,
+    with self.assertRaisesRegex(BuildGraph.TransitiveLookupError,
                                  '^.*/non-existent-path does not contain any BUILD files.'
                                  '\s+when translating spec non-existent-path:b'
                                  '\s+referenced from //:a$'):
@@ -269,7 +269,7 @@ class BuildGraphTest(BaseTest):
                            'target(name="b", '
                            '  dependencies=["non-existent-path:c"],'
                            ')')
-    with self.assertRaisesRegexp(BuildGraph.TransitiveLookupError,
+    with self.assertRaisesRegex(BuildGraph.TransitiveLookupError,
                                  '^.*/non-existent-path does not contain any BUILD files.'
                                  '\s+when translating spec non-existent-path:c'
                                  '\s+referenced from goodpath:b'
@@ -299,7 +299,7 @@ class BuildGraphTest(BaseTest):
                            'target(name="c", '
                            '  dependencies=["non-existent-path:d"],'
                            ')')
-    with self.assertRaisesRegexp(BuildGraph.TransitiveLookupError,
+    with self.assertRaisesRegex(BuildGraph.TransitiveLookupError,
                                  '^.*/non-existent-path does not contain any BUILD files.'
                                  '\s+when translating spec non-existent-path:d'
                                  '\s+referenced from goodpath:c'
@@ -317,7 +317,7 @@ class BuildGraphTest(BaseTest):
     self.add_to_build_file('other/BUILD',
                            'target(name="b")')
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         BuildGraph.TransitiveLookupError,
         '^Addresses in dependencies must be unique. \'other:b\' is referenced more than once.'
         '\s+referenced from //:a$'):
@@ -340,11 +340,11 @@ class BuildGraphTest(BaseTest):
           return True
 
         result = func([t.address for t in roots], predicate=predicate_sees, **kwargs)
-        self.assertEquals(set(expected), set(result))
-        if any(ct > 1 for ct in seen_targets.values()):
+        self.assertEqual(set(expected), set(result))
+        if any(ct > 1 for ct in list(seen_targets.values())):
           self.fail('func {} visited {} more than once.'.format(
             func,
-            ', '.join(t.address for t, ct in seen_targets.items() if ct > 1))
+            ', '.join(t.address for t, ct in list(seen_targets.items()) if ct > 1))
           )
 
     def only_roots(_, __):

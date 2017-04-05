@@ -112,7 +112,7 @@ class OptionsFingerprinter(object):
     """
     # Dicts are wrapped in singleton lists. See the "For simplicity..." comment in `fingerprint()`.
     option_val = option_val[0]
-    return stable_json_sha1({k: self._expand_possible_file_value(v) for k, v in option_val.items()})
+    return stable_json_sha1({k: self._expand_possible_file_value(v) for k, v in list(option_val.items())})
 
   def _expand_possible_file_value(self, value):
     """If the value is a file, returns its contents. Otherwise return the original value."""

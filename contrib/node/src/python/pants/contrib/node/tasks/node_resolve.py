@@ -24,7 +24,7 @@ class NodeResolve(NodeTask):
   def prepare(cls, options, round_manager):
     """Allow each resolver to declare additional product requirements."""
     super(NodeResolve, cls).prepare(options, round_manager)
-    for resolver in cls._resolver_by_type.values():
+    for resolver in list(cls._resolver_by_type.values()):
       resolver.prepare(options, round_manager)
 
   @property

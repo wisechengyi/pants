@@ -5,10 +5,10 @@
 from __future__ import (absolute_import, division, generators, nested_scopes, print_function,
                         unicode_literals, with_statement)
 
-import BaseHTTPServer
+import http.server
 import json
 import threading
-import urlparse
+import urllib.parse
 
 from pants.goal.run_tracker import RunTracker
 from pants.util.contextutil import temporary_file_path
@@ -19,15 +19,15 @@ class RunTrackerTest(BaseTest):
   def test_upload_stats(self):
     stats = {'stats': {'foo': 'bar', 'baz': 42}}
 
-    class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
+    class Handler(http.server.BaseHTTPRequestHandler):
       def do_POST(handler):
         try:
-          self.assertEquals('/upload', handler.path)
-          self.assertEquals('application/x-www-form-urlencoded', handler.headers['Content-type'])
+          self.assertEqual('/upload', handler.path)
+          self.assertEqual('application/x-www-form-urlencoded', handler.headers['Content-type'])
           length = int(handler.headers['Content-Length'])
-          post_data = urlparse.parse_qs(handler.rfile.read(length).decode('utf-8'))
-          decoded_post_data = {k: json.loads(v[0]) for k, v in post_data.items()}
-          self.assertEquals(stats, decoded_post_data)
+          post_data = urllib.parse.parse_qs(handler.rfile.read(length).decode('utf-8'))
+          decoded_post_data = {k: json.loads(v[0]) for k, v in list(post_data.items())}
+          self.assertEqual(stats, decoded_post_data)
           handler.send_response(200)
         except Exception:
           handler.send_response(400)  # Ensure the main thread knows the test failed.
@@ -35,7 +35,7 @@ class RunTrackerTest(BaseTest):
 
 
     server_address = ('', 0)
-    server = BaseHTTPServer.HTTPServer(server_address, Handler)
+    server = http.server.HTTPServer(server_address, Handler)
     host, port = server.server_address
 
     server_thread = threading.Thread(target=server.serve_forever)
@@ -56,4 +56,4 @@ class RunTrackerTest(BaseTest):
       self.assertTrue(RunTracker.write_stats_to_json(file_name, stats))
       with open(file_name) as f:
         result = json.load(f)
-        self.assertEquals(stats, result)
+        self.assertEqual(stats, result)

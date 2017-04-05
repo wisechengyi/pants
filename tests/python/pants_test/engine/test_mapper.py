@@ -49,7 +49,7 @@ class Thing(object):
     return self._kwargs
 
   def _key(self):
-    return {k: v for k, v in self._kwargs.items() if k != 'type_alias'}
+    return {k: v for k, v in list(self._kwargs.items()) if k != 'type_alias'}
 
   def __eq__(self, other):
     return isinstance(other, Thing) and self._key() == other._key()
@@ -204,7 +204,7 @@ class AddressFamilyTest(unittest.TestCase):
   def test_create_empty(self):
     # Case where directory exists but is empty.
     address_family = AddressFamily.create('name/space', [])
-    self.assertEquals(dict(), address_family.addressables)
+    self.assertEqual(dict(), address_family.addressables)
 
   def test_mismatching_paths(self):
     with self.assertRaises(DifferingFamiliesError):
@@ -254,7 +254,7 @@ class AddressMapperTest(unittest.TestCase, SchedulerTestBase):
       raise result.error
 
     # Expect a single root.
-    state, = result.root_products.values()
+    state, = list(result.root_products.values())
     if type(state) is Throw:
       raise Exception(state.exc)
     return state.value

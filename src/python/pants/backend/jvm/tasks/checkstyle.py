@@ -119,7 +119,7 @@ class Checkstyle(NailgunTask):
     if self.get_options().properties:
       properties_file = os.path.join(self.workdir, 'checkstyle.properties')
       with safe_open(properties_file, 'w') as pf:
-        for k, v in self.get_options().properties.items():
+        for k, v in list(self.get_options().properties.items()):
           pf.write('{key}={value}\n'.format(key=k, value=v))
       args.extend(['-p', properties_file])
 

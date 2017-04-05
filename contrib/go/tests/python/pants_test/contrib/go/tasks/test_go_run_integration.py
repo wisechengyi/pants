@@ -22,4 +22,4 @@ class GoRunIntegrationTest(PantsRunIntegrationTest):
     args = ['-q', 'run', 'contrib/go/examples/src/go/cgo']
     pants_run = self.run_pants(args)
     self.assert_success(pants_run)
-    self.assertRegexpMatches(pants_run.stdout_data.strip(), r'^Random from C: \d+$')
+    self.assertRegex(pants_run.stdout_data.strip(), r'^Random from C: \d+$')

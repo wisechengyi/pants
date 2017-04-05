@@ -96,7 +96,7 @@ class PythonTarget(Target):
     for spec in super(PythonTarget, self).traversable_specs:
       yield spec
     if self._provides:
-      for spec in self._provides._binaries.values():
+      for spec in list(self._provides._binaries.values()):
         address = Address.parse(spec, relative_to=self.address.spec_path)
         yield address.spec
 
@@ -118,7 +118,7 @@ class PythonTarget(Target):
   def provided_binaries(self):
     def binary_iter():
       if self.payload.provides:
-        for key, binary_spec in self.payload.provides.binaries.items():
+        for key, binary_spec in list(self.payload.provides.binaries.items()):
           address = Address.parse(binary_spec, relative_to=self.address.spec_path)
           yield (key, self._build_graph.get_target(address))
     return dict(binary_iter())
@@ -138,7 +138,7 @@ class PythonTarget(Target):
 
   def walk(self, work, predicate=None):
     super(PythonTarget, self).walk(work, predicate)
-    for binary in self.provided_binaries.values():
+    for binary in list(self.provided_binaries.values()):
       binary.walk(work, predicate)
 
   @memoized_property

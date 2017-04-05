@@ -15,9 +15,9 @@ class TestSubprocessProcessHandler(unittest.TestCase):
   def test_exit_1(self):
     process = subprocess.Popen(["/bin/sh", "-c", "exit 1"])
     process_handler = SubprocessProcessHandler(process)
-    self.assertEquals(process_handler.wait(), 1)
+    self.assertEqual(process_handler.wait(), 1)
 
   def test_exit_0(self):
     process = subprocess.Popen(["/bin/sh", "-c", "exit 0"])
     process_handler = SubprocessProcessHandler(process)
-    self.assertEquals(process_handler.wait(), 0)
+    self.assertEqual(process_handler.wait(), 0)

@@ -368,7 +368,7 @@ class BuildFileManipulator(object):
     of all dependencies, plus dependencies hand forced by a user comment.
     """
     self._dependencies_by_address = dict(
-      (address, dep) for address, dep in self._dependencies_by_address.items()
+      (address, dep) for address, dep in list(self._dependencies_by_address.items())
       if dep.has_comment()
     )
 
@@ -377,7 +377,7 @@ class BuildFileManipulator(object):
 
     If there are no dependencies, this returns an empty list.
     """
-    deps = sorted(self._dependencies_by_address.values(), key=lambda d: d.spec)
+    deps = sorted(list(self._dependencies_by_address.values()), key=lambda d: d.spec)
     def dep_lines():
       yield '  dependencies = ['
       for dep in deps:

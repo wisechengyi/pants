@@ -35,7 +35,7 @@ class GoTest(GoWorkspaceTask):
   def execute(self):
     # Only executes the tests from the package specified by the target roots, so
     # we don't run the tests for _all_ dependencies of said package.
-    targets = filter(self.is_local_src, self.context.target_roots)
+    targets = list(filter(self.is_local_src, self.context.target_roots))
     for target in targets:
       self.ensure_workspace(target)
       self._go_test(target)

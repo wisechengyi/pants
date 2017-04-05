@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
 
 import os
 import threading
-from Queue import Empty, Queue
+from queue import Empty, Queue
 
 from pants.task.console_task import ConsoleTask
 from pants_test.tasks.task_test_base import TaskTestBase

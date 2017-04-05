@@ -146,7 +146,7 @@ class Depmap(ConsoleTask):
 
       dep_class = dep.__class__.__name__
       if dep_class not in color_by_type:
-        color_by_type[dep_class] = len(color_by_type.keys()) + 1
+        color_by_type[dep_class] = len(list(color_by_type.keys())) + 1
 
       return line_fmt.format(id=dep_id, internal=int_shape, color=color_by_type[dep_class])
 

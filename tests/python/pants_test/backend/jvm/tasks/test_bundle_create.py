@@ -38,7 +38,7 @@ class TestBundleCreate(JvmBinaryTaskTestBase):
     safe_mkdir(target_dir)
     entry_path = safe_mkdtemp(dir=target_dir)
     classpath_dir = safe_mkdtemp(dir=target_dir)
-    for rel_path, content in files_dict.items():
+    for rel_path, content in list(files_dict.items()):
       safe_file_dump(os.path.join(entry_path, rel_path), content)
 
     # Create Jar to mimic consolidate classpath behavior.
@@ -179,9 +179,9 @@ class TestBundleCreate(JvmBinaryTaskTestBase):
   def _check_products(self, products, product_fullname):
     self.assertIsNotNone(products)
     product_data = products.get(self.app_target)
-    product_basedir = product_data.keys()[0]
+    product_basedir = list(product_data.keys())[0]
     self.assertIn(self.pants_workdir, product_basedir)
-    self.assertEquals(product_data[product_basedir], [product_fullname])
+    self.assertEqual(product_data[product_basedir], [product_fullname])
     product_path = os.path.join(product_basedir, product_fullname)
     return product_path
 

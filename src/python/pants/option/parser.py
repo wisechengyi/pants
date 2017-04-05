@@ -220,7 +220,7 @@ class Parser(object):
     # See if there are any unconsumed flags remaining.
     if flag_value_map:
       raise ParseError('Unrecognized command line flags on {}: {}'.format(
-        self._scope_str(), ', '.join(flag_value_map.keys())))
+        self._scope_str(), ', '.join(list(flag_value_map.keys()))))
 
     return namespace
 
@@ -541,13 +541,13 @@ class Parser(object):
           [rv.value for rv in ranked_vals if rv.value is not None]).val
       merged_val = [self._convert_member_type(kwargs.get('member_type', str), x)
                     for x in merged_val]
-      map(check, merged_val)
+      list(map(check, merged_val))
       ret = RankedValue(merged_rank, merged_val)
     elif is_dict_option(kwargs):
       merged_rank = ranked_vals[-1].rank
       merged_val = DictValueComponent.merge(
           [rv.value for rv in ranked_vals if rv.value is not None]).val
-      map(check, merged_val)
+      list(map(check, merged_val))
       ret = RankedValue(merged_rank, merged_val)
     else:
       ret = ranked_vals[-1]

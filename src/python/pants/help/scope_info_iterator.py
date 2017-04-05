@@ -49,7 +49,7 @@ class ScopeInfoIterator(object):
     Returns the requested scopes, plus the added tasks, sorted by scope name.
     """
     expanded_scopes = set(scopes)
-    for scope, info in self._scope_to_info.items():
+    for scope, info in list(self._scope_to_info.items()):
       if info.category == ScopeInfo.TASK:
         outer = enclosing_scope(scope)
         while outer != GLOBAL_SCOPE:
@@ -77,7 +77,7 @@ class ScopeInfoIterator(object):
         # we would, but might as well be robust.
         if issubclass(scope_info.optionable_cls, GlobalOptionsRegistrar):
           # We were asked for global help, so also yield for all global subsystems.
-          for scope, info in self._scope_to_info.items():
+          for scope, info in list(self._scope_to_info.items()):
             if info.category == ScopeInfo.SUBSYSTEM and enclosing_scope(scope) == GLOBAL_SCOPE:
               yield info
               for subsys_dep in subsys_deps(info.optionable_cls):

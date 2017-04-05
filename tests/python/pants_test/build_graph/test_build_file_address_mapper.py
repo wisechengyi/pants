@@ -46,7 +46,7 @@ class BuildFileAddressMapperTest(BaseTest):
     subdir_suffix_build_file = self.add_to_build_file('subdir/BUILD.suffix', 'target(name="baz")')
     with open(os.path.join(self.build_root, 'BUILD.invalid.suffix'), 'w') as invalid_build_file:
       invalid_build_file.write('target(name="foobar")')
-    self.assertEquals({BuildFileAddress(build_file=root_build_file, target_name='foo'),
+    self.assertEqual({BuildFileAddress(build_file=root_build_file, target_name='foo'),
                        BuildFileAddress(build_file=subdir_build_file, target_name='bar'),
                        BuildFileAddress(build_file=subdir_suffix_build_file, target_name='baz')},
                       self.address_mapper.scan_addresses())
@@ -56,7 +56,7 @@ class BuildFileAddressMapperTest(BaseTest):
     subdir_build_file = self.add_to_build_file('subdir/BUILD', 'target(name="bar")')
     subdir_suffix_build_file = self.add_to_build_file('subdir/BUILD.suffix', 'target(name="baz")')
     subdir = os.path.join(self.build_root, 'subdir')
-    self.assertEquals({BuildFileAddress(build_file=subdir_build_file, target_name='bar'),
+    self.assertEqual({BuildFileAddress(build_file=subdir_build_file, target_name='bar'),
                        BuildFileAddress(build_file=subdir_suffix_build_file, target_name='baz')},
                       self.address_mapper.scan_addresses(root=subdir))
 
@@ -66,11 +66,11 @@ class BuildFileAddressMapperTest(BaseTest):
 
   def test_raises_invalid_build_file_reference(self):
     # reference a BUILD file that doesn't exist
-    with self.assertRaisesRegexp(BuildFileAddressMapper.InvalidBuildFileReference,
+    with self.assertRaisesRegex(BuildFileAddressMapper.InvalidBuildFileReference,
                                  '^.*/non-existent-path does not contain any BUILD files.'
                                  '\s+when translating spec //non-existent-path:a'):
       self.address_mapper.spec_to_address('//non-existent-path:a')
-    with self.assertRaisesRegexp(BuildFileAddressMapper.InvalidBuildFileReference,
+    with self.assertRaisesRegex(BuildFileAddressMapper.InvalidBuildFileReference,
                                  '^Spec : has no name part\s+when translating spec :'):
       self.address_mapper.spec_to_address(':')
 
@@ -79,7 +79,7 @@ class BuildFileAddressMapperTest(BaseTest):
 
     # Create an address that doesn't exist in an existing BUILD file
     address = Address.parse(':bar')
-    with self.assertRaisesRegexp(BuildFileAddressMapper.AddressNotInBuildFile,
+    with self.assertRaisesRegex(BuildFileAddressMapper.AddressNotInBuildFile,
                                  '^bar was not found in BUILD files from .*. '
                                  'Perhaps you meant:'
                                  '\s+:foo$'):
@@ -91,7 +91,7 @@ class BuildFileAddressMapperTest(BaseTest):
 
     # Create an address that doesn't exist in an existing BUILD file
     address = Address.parse(':bar')
-    with self.assertRaisesRegexp(BuildFileAddressMapper.AddressNotInBuildFile,
+    with self.assertRaisesRegex(BuildFileAddressMapper.AddressNotInBuildFile,
                                  '^bar was not found in BUILD files from .*. '
                                  'Perhaps you meant one of:'
                                  '\s+:foo1 \(from BUILD.1\)'
@@ -116,7 +116,7 @@ class BuildFileAddressMapperTest(BaseTest):
   def test_raises_wrong_dependencies_type(self):
     self.add_to_build_file('BUILD', 'target(name="foo", dependencies="bar")')
     address = Address.parse(':foo')
-    with self.assertRaisesRegexp(AddressLookupError,
+    with self.assertRaisesRegex(AddressLookupError,
                                  '^Invalid target.*foo.*.'
                                  'dependencies passed to Target constructors must be a sequence of strings'):
       self.address_mapper.resolve(address)
@@ -130,7 +130,7 @@ class BuildFileAddressMapperWithIgnoreTest(BaseTest):
   def test_scan_from_address_mapper(self):
     root_build_file = self.add_to_build_file('BUILD', 'target(name="foo")')
     self.add_to_build_file('subdir/BUILD', 'target(name="bar")')
-    self.assertEquals(
+    self.assertEqual(
       {BuildFileAddress(build_file=root_build_file, target_name='foo')},
       self.address_mapper.scan_addresses())
 
@@ -138,7 +138,7 @@ class BuildFileAddressMapperWithIgnoreTest(BaseTest):
     self.add_to_build_file('BUILD', 'target(name="foo")')
     self.add_to_build_file('subdir/BUILD', 'target(name="bar")')
     graph = self.context().scan()
-    self.assertEquals([target.address.spec for target in graph.targets()], ['//:foo'])
+    self.assertEqual([target.address.spec for target in graph.targets()], ['//:foo'])
 
 
 class BuildFileAddressMapperScanTest(BaseTest):
@@ -176,14 +176,14 @@ Invalid BUILD files for \[::\]$""", re.DOTALL)
     self.add_to_build_file('bad/a', 'a_is_bad')
     self.add_to_build_file('bad/b', 'b_is_bad')
 
-    with self.assertRaisesRegexp(AddressLookupError, self.NO_FAIL_FAST_RE):
+    with self.assertRaisesRegex(AddressLookupError, self.NO_FAIL_FAST_RE):
       list(self.address_mapper.scan_specs([DescendantAddresses('')], fail_fast=False))
 
   def test_bad_build_files_fail_fast(self):
     self.add_to_build_file('bad/a', 'a_is_bad')
     self.add_to_build_file('bad/b', 'b_is_bad')
 
-    with self.assertRaisesRegexp(AddressLookupError, self.FAIL_FAST_RE):
+    with self.assertRaisesRegex(AddressLookupError, self.FAIL_FAST_RE):
       list(self.address_mapper.scan_specs([DescendantAddresses('')], fail_fast=True))
 
   def test_normal(self):

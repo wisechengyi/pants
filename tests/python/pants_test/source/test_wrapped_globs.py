@@ -58,7 +58,7 @@ class FilesetRelPathWrapperTest(BaseTest):
     self.add_to_build_file('y/BUILD', 'dummy_target(name="y", sources={})'.format(spec))
     graph = self.context().scan()
     globs = graph.get_target_from_spec('y').globs_relative_to_buildroot()
-    self.assertEquals(expected, globs)
+    self.assertEqual(expected, globs)
 
   def test_glob_to_spec(self):
     self._spec_test('globs("*.java")',
@@ -112,7 +112,7 @@ class FilesetRelPathWrapperTest(BaseTest):
     self.add_to_build_file('y/BUILD', dedent("""
       dummy_target(name="y", sources=globs("*.java", exclude="fleem.java"))
       """))
-    with self.assertRaisesRegexp(AddressLookupError, 'Expected exclude parameter.*'):
+    with self.assertRaisesRegex(AddressLookupError, 'Expected exclude parameter.*'):
       self.context().scan()
 
   def test_glob_exclude_string_in_list(self):
@@ -250,4 +250,4 @@ class FilesetWithSpecTest(BaseTest):
   def test_iter_relative_paths(self):
     efws = EagerFilesetWithSpec('test_root', {'globs': []}, files=['a', 'b', 'c'], files_hash='deadbeef')
     result = list(efws.iter_relative_paths())
-    self.assertEquals(result, ['test_root/a', 'test_root/b', 'test_root/c'])
+    self.assertEqual(result, ['test_root/a', 'test_root/b', 'test_root/c'])

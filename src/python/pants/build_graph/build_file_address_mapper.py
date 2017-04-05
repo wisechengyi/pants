@@ -96,13 +96,13 @@ class BuildFileAddressMapper(AddressMapper):
         raise AddressLookupError("{message}\n Loading addresses from '{spec_path}' failed."
                                  .format(message=e, spec_path=spec_path))
 
-      address_map = {address: (address, addressed) for address, addressed in mapping.items()}
+      address_map = {address: (address, addressed) for address, addressed in list(mapping.items())}
       self._spec_path_to_address_map_map[spec_path] = address_map
     return self._spec_path_to_address_map_map[spec_path]
 
   def addresses_in_spec_path(self, spec_path):
     """Returns only the addresses gathered by `address_map_from_spec_path`, with no values."""
-    return self._address_map_from_spec_path(spec_path).keys()
+    return list(self._address_map_from_spec_path(spec_path).keys())
 
   def spec_to_address(self, spec, relative_to=''):
     """A helper method for mapping a spec to the correct build file address.

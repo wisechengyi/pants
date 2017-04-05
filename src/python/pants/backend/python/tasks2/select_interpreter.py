@@ -88,7 +88,7 @@ class SelectInterpreter(Task):
     safe_mkdir_for(interpreter_path_file)
     with open(interpreter_path_file, 'w') as outfile:
       outfile.write(b'{}\t{}\n'.format(interpreter.binary, str(interpreter.identity)))
-      for dist, location in interpreter.extras.items():
+      for dist, location in list(interpreter.extras.items()):
         dist_name, dist_version = dist
         outfile.write(b'{}\t{}\t{}\n'.format(dist_name, dist_version, location))
 

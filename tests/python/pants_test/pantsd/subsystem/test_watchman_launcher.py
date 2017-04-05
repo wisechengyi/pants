@@ -64,4 +64,4 @@ class TestWatchmanLauncher(BaseTest):
     expected_path = '/a/shorter/path'
     options = {WatchmanLauncher.Factory.options_scope: {'socket_path': expected_path}}
     wl = self.watchman_launcher(options)
-    self.assertEquals(wl.watchman._sock_file, expected_path)
+    self.assertEqual(wl.watchman._sock_file, expected_path)

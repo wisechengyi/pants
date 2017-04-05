@@ -77,7 +77,7 @@ class GoWorkspaceTask(GoTask):
     source_list = [os.path.join(get_buildroot(), src)
                    for src in go_local_src.sources_relative_to_buildroot()]
     rel_list = go_local_src.sources_relative_to_target_base()
-    source_iter = zip(source_list, rel_list)
+    source_iter = list(zip(source_list, rel_list))
     return self._symlink_lib(gopath, go_local_src, source_iter, required_links)
 
   def _symlink_remote_lib(self, gopath, go_remote_lib, required_links):

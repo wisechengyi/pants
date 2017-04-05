@@ -33,7 +33,7 @@ class InterpreterSelectionIntegrationTest(PantsRunIntegrationTest):
       echo = self._echo_version(version)
       v = echo.split('.')  # E.g., 2.6.8 .
       self.assertTrue(len(v) > 2, 'Not a valid version string: {}'.format(v))
-      self.assertEquals(version, '{}.{}'.format(v[0], v[1]))
+      self.assertEqual(version, '{}.{}'.format(v[0], v[1]))
     else:
       print('No python {} found. Skipping.'.format(version))
       self.skipTest('No python {} on system'.format(version))

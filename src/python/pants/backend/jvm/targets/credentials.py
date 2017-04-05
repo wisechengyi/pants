@@ -13,6 +13,7 @@ from pants.build_graph.target import Target
 from pants.util.memo import memoized_method
 from pants.util.meta import AbstractClass
 from pants.util.netrc import Netrc
+import collections
 
 
 class Credentials(Target, AbstractClass):
@@ -45,7 +46,7 @@ class LiteralCredentials(Credentials):
     """
     super(LiteralCredentials, self).__init__(**kwargs)
 
-    if callable(username) or callable(password):
+    if isinstance(username, collections.Callable) or isinstance(password, collections.Callable):
       raise TargetDefinitionException(self, 'The username and password arguments to credentials() '
                                             'cannot be callable. Use netrc_credentials() instead.')
 

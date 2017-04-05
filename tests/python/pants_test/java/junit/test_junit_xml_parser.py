@@ -63,7 +63,7 @@ class TestTestRegistry(unittest.TestCase):
   def _assert_index(self, expected, actual):
     def sorted_values(index):
       # Eliminate unimportant ordering differences in the index values.
-      return {key: sorted(values) for key, values in index.items()}
+      return {key: sorted(values) for key, values in list(index.items())}
 
     self.assertEqual(sorted_values(expected), sorted_values(actual))
 

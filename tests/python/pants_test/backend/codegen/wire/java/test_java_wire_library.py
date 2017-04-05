@@ -37,10 +37,10 @@ class JavaWireLibraryTest(BaseTest):
     target = self.make_target('//:wire_service_options', JavaWireLibrary,
                               service_writer='com.squareup.wire.RetrofitServiceWriter',
                               service_writer_options=['foo', 'bar', 'baz'])
-    self.assertEquals(['foo', 'bar', 'baz'], target.payload.service_writer_options)
+    self.assertEqual(['foo', 'bar', 'baz'], target.payload.service_writer_options)
 
   def test_invalid_service_writer_opts(self):
-    with self.assertRaisesRegexp(TargetDefinitionException,
+    with self.assertRaisesRegex(TargetDefinitionException,
                                  r'service_writer_options requires setting service_writer'):
       self.make_target('invalid:service_writer_opts', JavaWireLibrary,
                        service_writer_options=['one', 'two'])

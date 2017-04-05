@@ -16,7 +16,7 @@ class StructTest(unittest.TestCase):
     files = Files(spec_path='')
     self.assertEqual({'exclude':[], 'globs':[]}, files.filespecs)
     files = Files(exclude=['*.md'], spec_path='')
-    self.assertEqual({'exclude':[{u'globs': [u'*.md']}], 'globs':[]}, files.filespecs)
+    self.assertEqual({'exclude':[{'globs': ['*.md']}], 'globs':[]}, files.filespecs)
 
   def test_excludes_of_wrong_type(self):
     with self.assertRaises(ValueError) as cm:

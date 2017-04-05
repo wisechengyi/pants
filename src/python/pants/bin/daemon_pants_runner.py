@@ -121,7 +121,7 @@ class DaemonPantsRunner(ProcessManager):
         # Expect `_deferred_exception` to be a 3-item tuple of the values returned by sys.exc_info().
         # This permits use the 3-arg form of the `raise` statement to preserve the original traceback.
         exc_type, exc_value, exc_traceback = self._deferred_exception
-        raise exc_type, exc_value, exc_traceback
+        raise exc_type(exc_value).with_traceback(exc_traceback)
       except ValueError:
         # If `_deferred_exception` isn't a 3-item tuple, treat it like a bare exception.
         raise self._deferred_exception

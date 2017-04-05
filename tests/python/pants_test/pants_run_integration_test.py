@@ -5,7 +5,7 @@
 from __future__ import (absolute_import, division, generators, nested_scopes, print_function,
                         unicode_literals, with_statement)
 
-import ConfigParser
+import configparser
 import os
 import shutil
 import subprocess
@@ -178,10 +178,10 @@ class PantsRunIntegrationTest(unittest.TestCase):
 
     if config:
       config_data = config.copy()
-      ini = ConfigParser.ConfigParser(defaults=config_data.pop('DEFAULT', None))
-      for section, section_config in config_data.items():
+      ini = configparser.ConfigParser(defaults=config_data.pop('DEFAULT', None))
+      for section, section_config in list(config_data.items()):
         ini.add_section(section)
-        for key, value in section_config.items():
+        for key, value in list(section_config.items()):
           ini.set(section, key, value)
       ini_file_name = os.path.join(workdir, 'pants.ini')
       with safe_open(ini_file_name, mode='w') as fp:
@@ -308,7 +308,7 @@ class PantsRunIntegrationTest(unittest.TestCase):
 
         stdout, _ = java_run.communicate()
       java_returncode = java_run.returncode
-      self.assertEquals(java_returncode, 0)
+      self.assertEqual(java_returncode, 0)
       return stdout
 
   def assert_success(self, pants_run, msg=None):

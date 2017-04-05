@@ -84,7 +84,7 @@ class BundleIntegrationTest(PantsRunIntegrationTest):
                                       cwd=path)
           java_retcode = java_run.wait()
           java_out = java_run.stdout.read()
-          self.assertEquals(java_retcode, 0)
+          self.assertEqual(java_retcode, 0)
           self.assertTrue(expected in java_out, "Expected '{output}' from {jar}, not '{stdout}'."
                                                 .format(output=expected, jar=jar, stdout=java_out))
 
@@ -143,4 +143,4 @@ class BundleIntegrationTest(PantsRunIntegrationTest):
        'testprojects/src/java/org/pantsbuild/testproject/bundle:bundle-resource-ordering']
     )
     self.assert_success(pants_run)
-    self.assertEquals(pants_run.stdout_data, 'Hello world from Foo\n\n')
+    self.assertEqual(pants_run.stdout_data, 'Hello world from Foo\n\n')

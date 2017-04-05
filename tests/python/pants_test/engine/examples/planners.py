@@ -106,7 +106,7 @@ class JVMPackageName(datatype('JVMPackageName', ['name'])):
 def select_package_address(jvm_package_name, address_families):
   """Return the Address from the given AddressFamilies which provides the given package."""
   addresses = [address for address_family in address_families
-                       for address in address_family.addressables.keys()]
+                       for address in list(address_family.addressables.keys())]
   if len(addresses) == 0:
     raise ValueError('No targets existed in {} to provide {}'.format(
       address_families, jvm_package_name))

@@ -25,7 +25,7 @@ class attrdict(dict):
   """
 
   def __getattr__(self, key):
-    if self.has_key(key):
+    if key in self:
       return self[key]
     return None
 
@@ -124,8 +124,8 @@ class TestBase(BaseTest):
 
   def _assert_calls(self, call_collection, frm, to):
     calls_for_target = call_collection[self.pants_workdir + frm]
-    self.assertEquals(len(calls_for_target), 1, "Should be 1 call for the_target's path.")
-    self.assertEquals(calls_for_target[0], self.pants_workdir + to,
+    self.assertEqual(len(calls_for_target), 1, "Should be 1 call for the_target's path.")
+    self.assertEqual(calls_for_target[0], self.pants_workdir + to,
                       'Should copy from/to correct paths.')
 
   def _assert_target_copy(self, coverage, frm, to):
@@ -153,11 +153,11 @@ class TestBase(BaseTest):
       [self.jar_lib, self.binary_target, self.app_target, self.java_target],
       classpath_products)
 
-    self.assertEquals(len(coverage.copy2_calls), 1,
+    self.assertEqual(len(coverage.copy2_calls), 1,
                       'Should only be 1 call for the single java_library target.')
     self._assert_target_copy(coverage, '/java/target/classpath.jar',
                              '/coverage/classes/foo.foo-java/0')
-    self.assertEquals(len(coverage.copytree_calls), 0,
+    self.assertEqual(len(coverage.copytree_calls), 0,
                       'Should be no copytree calls when targets are not coverage targets.')
 
   def test_target_with_multiple_path_entries(self):
@@ -176,7 +176,7 @@ class TestBase(BaseTest):
 
     coverage.initialize_instrument_classpath([self.java_target], classpath_products)
 
-    self.assertEquals(len(coverage.copy2_calls), 3,
+    self.assertEqual(len(coverage.copy2_calls), 3,
                       'Should be 3 call for the single java_library target.')
     self._assert_target_copy(coverage, '/java/target/first.jar', '/coverage/classes/foo.foo-java/0')
     self._assert_target_copy(coverage, '/java/target/second.jar',
@@ -184,7 +184,7 @@ class TestBase(BaseTest):
     self._assert_target_copy(coverage, '/java/target/third.jar',
                              '/coverage/classes/foo.foo-java/2')
 
-    self.assertEquals(len(coverage.copytree_calls), 0,
+    self.assertEqual(len(coverage.copytree_calls), 0,
                       'Should be no copytree calls when targets are not coverage targets.')
 
   def test_target_annotation_processor(self):
@@ -201,6 +201,6 @@ class TestBase(BaseTest):
 
     coverage.initialize_instrument_classpath([self.annotation_target], classpath_products)
 
-    self.assertEquals(len(coverage.copy2_calls), 0,
+    self.assertEqual(len(coverage.copy2_calls), 0,
                       'Should be 0 call for the single annotation target.')
     self._assert_target_copytree(coverage, '/anno/target/dir', '/coverage/classes/foo.foo-anno/0')

@@ -47,7 +47,7 @@ class CppBinaryCreate(CppTask):
 
   def _create_binary(self, target, binary_path):
     objects = []
-    for basedir, objs in self.context.products.get('objs').get(target).items():
+    for basedir, objs in list(self.context.products.get('objs').get(target).items()):
       objects.extend([os.path.join(basedir, obj) for obj in objs])
     self._link_binary(target, binary_path, objects)
     self.context.log.info('Built c++ binary: {0}'.format(binary_path))
@@ -69,7 +69,7 @@ class CppBinaryCreate(CppTask):
     def add_library(target):
       product_map = self.context.products.get('lib').get(target)
       if product_map:
-        for dir, libs in product_map.items():
+        for dir, libs in list(product_map.items()):
           library_dirs.append(dir)
           libraries.extend((self._libname(l) for l in libs))
 

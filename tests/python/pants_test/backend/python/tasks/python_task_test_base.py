@@ -31,7 +31,7 @@ class PythonTaskTestBase(InterpreterCacheTestMixin, TaskTestBase):
     """
     :API: public
     """
-    sources = None if source_contents_map is None else ['__init__.py'] + source_contents_map.keys()
+    sources = None if source_contents_map is None else ['__init__.py'] + list(source_contents_map.keys())
     sources_strs = ["'{0}'".format(s) for s in sources] if sources else None
     self.create_file(relpath=self.build_path(relpath), contents=dedent("""
     python_library(
@@ -49,7 +49,7 @@ class PythonTaskTestBase(InterpreterCacheTestMixin, TaskTestBase):
       provides_clause='provides={0},'.format(provides) if provides else ''))
     if source_contents_map:
       self.create_file(relpath=os.path.join(relpath, '__init__.py'))
-      for source, contents in source_contents_map.items():
+      for source, contents in list(source_contents_map.items()):
         self.create_file(relpath=os.path.join(relpath, source), contents=contents)
     return self.target(Address(relpath, name).spec)
 

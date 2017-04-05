@@ -81,7 +81,7 @@ class PantsDaemon(ProcessManager):
 
   def shutdown(self, service_thread_map):
     """Gracefully terminate all services and kill the main PantsDaemon loop."""
-    for service, service_thread in service_thread_map.items():
+    for service, service_thread in list(service_thread_map.items()):
       self._logger.info('terminating pantsd service: {}'.format(service))
       service.terminate()
       service_thread.join()
@@ -137,7 +137,7 @@ class PantsDaemon(ProcessManager):
     service_thread_map = {service: threading.Thread(target=service.run) for service in services}
 
     # Start services.
-    for service, service_thread in service_thread_map.items():
+    for service, service_thread in list(service_thread_map.items()):
       self._logger.info('starting service {}'.format(service))
       try:
         service_thread.start()
@@ -147,7 +147,7 @@ class PantsDaemon(ProcessManager):
 
     # Monitor services.
     while not self.is_killed:
-      for service, service_thread in service_thread_map.items():
+      for service, service_thread in list(service_thread_map.items()):
         if not service_thread.is_alive():
           self.shutdown(service_thread_map)
           raise self.RuntimeFailure('service failure for {}, shutting down!'.format(service))
@@ -157,7 +157,7 @@ class PantsDaemon(ProcessManager):
 
   def _write_named_sockets(self, socket_map):
     """Write multiple named sockets using a socket mapping."""
-    for socket_name, socket_info in socket_map.items():
+    for socket_name, socket_info in list(socket_map.items()):
       self.write_named_socket(socket_name, socket_info)
 
   def _run(self):

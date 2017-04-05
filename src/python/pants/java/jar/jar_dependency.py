@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, generators, nested_scopes, pr
                         unicode_literals, with_statement)
 
 import os
-import urlparse
+import urllib.parse
 
 from pants.base.build_environment import get_buildroot
 from pants.base.payload_field import stable_json_sha1
@@ -116,7 +116,7 @@ class JarDependency(datatype('JarDependency', [
   @memoized_method
   def get_url(self, relative=False):
     if self.url:
-      parsed_url = urlparse.urlparse(self.url)
+      parsed_url = urllib.parse.urlparse(self.url)
       if parsed_url.scheme == 'file':
         if relative and os.path.isabs(parsed_url.path):
           relative_path = os.path.relpath(parsed_url.path,
@@ -135,7 +135,7 @@ class JarDependency(datatype('JarDependency', [
     """Returns a clone of this JarDependency with the given replacements kwargs overlaid."""
     cls = type(self)
     kwargs = self._asdict()
-    for key, val in replacements.items():
+    for key, val in list(replacements.items()):
       if key == 'excludes':
         val = JarDependency._prepare_excludes(val)
       kwargs[key] = val

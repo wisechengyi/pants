@@ -30,7 +30,7 @@ class OptionValueContainer(object):
   def get_explicit_keys(self):
     """Returns the keys for any values that were set explicitly (via flag, config, or env var)."""
     ret = []
-    for k, v in self._value_map.items():
+    for k, v in list(self._value_map.items()):
       if v.rank > RankedValue.HARDCODED:
         ret.append(k)
     return ret
@@ -83,7 +83,7 @@ class OptionValueContainer(object):
 
     :param OptionValueContainer other: Augment our values with this object's values.
     """
-    for k, v in other._value_map.items():
+    for k, v in list(other._value_map.items()):
       self._set(k, v)
 
   def _get_underlying_value(self, key):

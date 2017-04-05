@@ -70,7 +70,7 @@ def load_config(json_path):
 def load_soups(config):
   """Generate BeautifulSoup AST for each page listed in config."""
   soups = {}
-  for page, path in config['sources'].items():
+  for page, path in list(config['sources'].items()):
     with open(path, 'rb') as orig_file:
       soups[page] = beautiful_soup(orig_file.read().decode('utf-8'))
   return soups
@@ -113,7 +113,7 @@ def precompute_pantsrefs(soups):
   { "foo": "path/to/foo.html#fooref", "bar": "other/page.html#barref", ...}
   """
   accumulator = {}
-  for (page, soup) in soups.items():
+  for (page, soup) in list(soups.items()):
     existing_anchors = find_existing_anchors(soup)
     count = 100
     for tag in soup.find_all('a'):
@@ -145,7 +145,7 @@ def precompute(config, soups):
   show_toc = config.get('show_toc', {})
   page = {}
   pantsrefs = precompute_pantsrefs(soups)
-  for p, soup in soups.items():
+  for p, soup in list(soups.items()):
     title = get_title(soup) or p
     page[p] = PrecomputedPageInfo(title=title, show_toc=show_toc.get(p, True))
   return Precomputed(page=page, pantsref=pantsrefs)
@@ -160,9 +160,9 @@ def fixup_internal_links(config, soups):
   # Pages can come from different dirs; they can go to different dirs.
   # Thus, there's some relative-path-computing here.
   reverse_directory = {}
-  for d, s in config['sources'].items():
+  for d, s in list(config['sources'].items()):
     reverse_directory[s] = d
-  for name, soup in soups.items():
+  for name, soup in list(soups.items()):
     old_src_dir = os.path.dirname(config['sources'][name])
     for tag in soup.find_all(True):
       if not 'href' in tag.attrs: continue
@@ -200,7 +200,7 @@ def ensure_headings_linkable(soups):
 
   Enables tables of contents.
   """
-  for soup in soups.values():
+  for soup in list(soups.values()):
     # To avoid re-assigning an existing id, note 'em down.
     # Case-insensitve because distinguishing links #Foo and #foo would be weird.
     existing_anchors = find_existing_anchors(soup)
@@ -219,7 +219,7 @@ def ensure_headings_linkable(soups):
 
 def link_pantsrefs(soups, precomputed):
   """Transorm soups: <a pantsref="foo"> becomes <a href="../foo_page.html#foo">"""
-  for (page, soup) in soups.items():
+  for (page, soup) in list(soups.items()):
     for a in soup.find_all('a'):
       if a.has_attr('pantsref'):
         pantsref = a['pantsref']
@@ -291,7 +291,7 @@ def hdepth(tag):
 
 
 def generate_page_tocs(soups, precomputed):
-  for name, soup in soups.items():
+  for name, soup in list(soups.items()):
     if precomputed.page[name].show_toc:
       precomputed.page[name].toc = generate_page_toc(soup)
 
@@ -359,7 +359,7 @@ def write_en_pages(config, soups, precomputed, template):
 def copy_extras(config):
   """copy over "extra" files named in config json: stylesheets, logos, ..."""
   outdir = config['outdir']
-  for dst, src in config['extras'].items():
+  for dst, src in list(config['extras'].items()):
     dst_path = os.path.join(outdir, dst)
     dst_dir = os.path.dirname(dst_path)
     if not os.path.isdir(dst_dir):

@@ -416,11 +416,11 @@ class AddressableDict(AddressableDescriptor):
     if not isinstance(value, collections.MutableMapping):
       raise TypeError('The {} property of {} must be a dict, given {} of type {}'
                       .format(self._name, instance, value, type(value).__name__))
-    return {k: super(AddressableDict, self)._checked_value(instance, v) for k, v in value.items()}
+    return {k: super(AddressableDict, self)._checked_value(instance, v) for k, v in list(value.items())}
 
   def _resolve_value(self, instance, value):
     return {k: super(AddressableDict, self)._resolve_value(instance, v)
-            for k, v in value.items()} if value else {}
+            for k, v in list(value.items())} if value else {}
 
 
 def addressable_dict(type_constraint):

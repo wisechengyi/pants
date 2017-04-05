@@ -83,7 +83,7 @@ class ErrorProne(NailgunTask):
     if self.get_options().transitive:
       targets = self.context.targets(self._is_errorprone_target)
     else:
-      targets = filter(self._is_errorprone_target, self.context.target_roots)
+      targets = list(filter(self._is_errorprone_target, self.context.target_roots))
 
     targets = list(set(targets))
 

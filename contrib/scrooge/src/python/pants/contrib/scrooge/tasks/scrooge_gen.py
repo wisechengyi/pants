@@ -88,7 +88,7 @@ class ScroogeGen(SimpleCodegenTask, NailgunTask):
   def _resolve_deps(self, depmap):
     """Given a map of gen-key=>target specs, resolves the target specs into references."""
     deps = defaultdict(lambda: OrderedSet())
-    for category, depspecs in depmap.items():
+    for category, depspecs in list(depmap.items()):
       dependencies = deps[category]
       for depspec in depspecs:
         dep_address = Address.parse(depspec)
@@ -104,7 +104,7 @@ class ScroogeGen(SimpleCodegenTask, NailgunTask):
     if language not in self._registered_language_aliases():
       raise TargetDefinitionException(
           target,
-          'language {} not supported: expected one of {}.'.format(language, self._registered_language_aliases().keys()))
+          'language {} not supported: expected one of {}.'.format(language, list(self._registered_language_aliases().keys())))
     return language
 
   def _validate_rpc_style(self, target):
@@ -235,7 +235,7 @@ class ScroogeGen(SimpleCodegenTask, NailgunTask):
 
     mismatched_compiler_configs = defaultdict(set)
 
-    for target in filter(lambda t: isinstance(t, JavaThriftLibrary), targets):
+    for target in [t for t in targets if isinstance(t, JavaThriftLibrary)]:
       mycompilerconfig = compiler_config(target)
 
       def collect(dep):

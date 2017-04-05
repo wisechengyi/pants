@@ -108,5 +108,5 @@ class InvalidationReport(object):
         writer.write(
           'invocation_id,task_name,targets_hash,target_id,cache_key_id,cache_key_hash,phase,valid'
           + '\n')
-        for task_report in self._task_reports.values():
+        for task_report in list(self._task_reports.values()):
           task_report.report(writer)

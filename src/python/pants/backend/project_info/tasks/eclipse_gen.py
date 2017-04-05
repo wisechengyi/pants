@@ -74,10 +74,10 @@ class EclipseGen(IdeGen):
         path=source_base
       )
 
-    source_bases = dict(map(create_source_base_template, project.sources))
+    source_bases = dict(list(map(create_source_base_template, project.sources)))
     if project.has_python:
-      source_bases.update(map(create_source_base_template, project.py_sources))
-      source_bases.update(map(create_source_base_template, project.py_libs))
+      source_bases.update(list(map(create_source_base_template, project.py_sources)))
+      source_bases.update(list(map(create_source_base_template, project.py_libs)))
 
     def create_source_template(base_id, includes=None, excludes=None):
       return TemplateData(
@@ -114,7 +114,7 @@ class EclipseGen(IdeGen):
       ),
       python=project.has_python,
       scala=project.has_scala and not project.skip_scala,
-      source_bases=source_bases.values(),
+      source_bases=list(source_bases.values()),
       pythonpaths=pythonpaths,
       debug_port=project.debug_port,
     )
@@ -125,7 +125,7 @@ class EclipseGen(IdeGen):
     source_sets = defaultdict(OrderedSet)  # base_id -> source_set
     for source_set in project.sources:
       source_sets[linked_folder_id(source_set)].add(source_set)
-    sourcepaths = [create_sourcepath(base_id, sources) for base_id, sources in source_sets.items()]
+    sourcepaths = [create_sourcepath(base_id, sources) for base_id, sources in list(source_sets.items())]
 
     libs = list(project.internal_jars)
     libs.extend(project.external_jars)

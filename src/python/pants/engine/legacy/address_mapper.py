@@ -42,7 +42,7 @@ class LegacyAddressMapper(AddressMapper):
       raise result.error
 
     build_files_set = set()
-    for state in result.root_products.values():
+    for state in list(result.root_products.values()):
       for build_files in state.value:
         build_files_set.update(f.path for f in build_files.files_content.dependencies)
 
@@ -78,7 +78,7 @@ class LegacyAddressMapper(AddressMapper):
     root_entries = self._scheduler.root_entries(request)
 
     addresses = set()
-    for (spec, _), state in root_entries.items():
+    for (spec, _), state in list(root_entries.items()):
       if missing_is_fatal and not state.value.dependencies:
         raise self.BuildFileScanError(
           'Spec `{}` does not match any targets.'.format(spec.to_spec_string()))

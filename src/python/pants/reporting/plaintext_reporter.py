@@ -92,24 +92,24 @@ class PlainTextReporter(PlainTextReporterBase):
 
   def __init__(self, run_tracker, settings):
     super(PlainTextReporter, self).__init__(run_tracker, settings)
-    for key, value in settings.label_format.items():
-      if key not in WorkUnitLabel.keys():
+    for key, value in list(settings.label_format.items()):
+      if key not in list(WorkUnitLabel.keys()):
         self.emit('*** Got invalid key {} for --reporting-console-label-format. Expected one of {}\n'
-                  .format(key, WorkUnitLabel.keys()))
-      if value not in LabelFormat.keys():
+                  .format(key, list(WorkUnitLabel.keys())))
+      if value not in list(LabelFormat.keys()):
         self.emit('*** Got invalid value {} for --reporting-console-label-format. Expected one of {}\n'
-                  .format(value, LabelFormat.keys()))
-    for key, value in settings.tool_output_format.items():
-      if key not in WorkUnitLabel.keys():
+                  .format(value, list(LabelFormat.keys())))
+    for key, value in list(settings.tool_output_format.items()):
+      if key not in list(WorkUnitLabel.keys()):
         self.emit('*** Got invalid key {} for --reporting-console-tool-output-format. Expected one of {}\n'
-                  .format(key, WorkUnitLabel.keys()))
-      if value not in ToolOutputFormat.keys():
+                  .format(key, list(WorkUnitLabel.keys())))
+      if value not in list(ToolOutputFormat.keys()):
         self.emit('*** Got invalid value {} for --reporting-console-tool-output-format. Expected one of {}\n'
-                  .format(value, ToolOutputFormat.keys()))
+                  .format(value, list(ToolOutputFormat.keys())))
 
     # Mix in the new settings with the defaults.
-    self.LABEL_FORMATTING.update(settings.label_format.items())
-    self.TOOL_OUTPUT_FORMATTING.update(settings.tool_output_format.items())
+    self.LABEL_FORMATTING.update(list(settings.label_format.items()))
+    self.TOOL_OUTPUT_FORMATTING.update(list(settings.tool_output_format.items()))
 
   def open(self):
     """Implementation of Reporter callback."""
@@ -149,7 +149,7 @@ class PlainTextReporter(PlainTextReporterBase):
       # Emit the suppressed workunit output, if any, to aid in debugging the problem.
       if self._get_label_format(workunit) != LabelFormat.FULL:
         self._emit_indented_workunit_label(workunit)
-      for name, outbuf in workunit.outputs().items():
+      for name, outbuf in list(workunit.outputs().items()):
         self.emit(self._prefix(workunit, b'\n==== {} ====\n'.format(name)))
         self.emit(self._prefix(workunit, outbuf.read_from(0)))
         self.flush()
@@ -187,7 +187,7 @@ class PlainTextReporter(PlainTextReporterBase):
     self.settings.outfile.flush()
 
   def _get_label_format(self, workunit):
-    for label, label_format in self.LABEL_FORMATTING.items():
+    for label, label_format in list(self.LABEL_FORMATTING.items()):
       if workunit.has_label(label):
         return label_format
 
@@ -202,7 +202,7 @@ class PlainTextReporter(PlainTextReporterBase):
     return LabelFormat.FULL
 
   def _get_tool_output_format(self, workunit):
-    for label, tool_output_format in self.TOOL_OUTPUT_FORMATTING.items():
+    for label, tool_output_format in list(self.TOOL_OUTPUT_FORMATTING.items()):
       if workunit.has_label(label):
         return tool_output_format
 

@@ -49,7 +49,7 @@ IMPORT_CHUNKS = {
 
 
 def strip_newline(stmt):
-  return textwrap.dedent('\n'.join(filter(None, stmt.splitlines())))
+  return textwrap.dedent('\n'.join([_f for _f in stmt.splitlines() if _f]))
 
 
 def stitch_chunks(newlines, *chunks):
@@ -77,7 +77,7 @@ class ImportOrderTest(CheckstylePluginTestBase):
                      self.get_import_chunk_types(ImportType.THIRD_PARTY))
 
   def test_classify_import(self):
-    for import_type, chunk in IMPORT_CHUNKS.items():
+    for import_type, chunk in list(IMPORT_CHUNKS.items()):
       io = self.get_plugin(chunk)
       import_chunks = list(io.iter_import_chunks())
       self.assertEqual(1, len(import_chunks))

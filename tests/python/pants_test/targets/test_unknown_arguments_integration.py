@@ -25,7 +25,7 @@ class TestUnknownArgumentsIntegration(PantsRunIntegrationTest):
             {parameters}
           )
         ''').format(name=spec, parameters=''.join('\n    {}="{}",'.format(key, val)
-                                                  for key, val in kwargs.items())))
+                                                  for key, val in list(kwargs.items()))))
       yield spec
 
   def test_future_params(self):

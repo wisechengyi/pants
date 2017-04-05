@@ -59,7 +59,7 @@ class AaptBuilderIntegrationTest(AndroidIntegrationTest):
 
       aapt_blocks = list(find_aapt_blocks(pants_run.stderr_data.split('\n')))
       # Only one apk is built, so only one aapt invocation here, for any number of dependent libs.
-      self.assertEquals(len(aapt_blocks), 1, 'Expected one invocation of the aapt tool! '
+      self.assertEqual(len(aapt_blocks), 1, 'Expected one invocation of the aapt tool! '
                                              '(was: {})\n{}'.format(len(aapt_blocks),
                                                                     pants_run.stderr_data))
 
@@ -69,6 +69,6 @@ class AaptBuilderIntegrationTest(AndroidIntegrationTest):
         self.assertEqual(resource_dirs[0], 'contrib/android/examples/src/android/hello_with_library/main/res')
         self.assertEqual(resource_dirs[1], 'contrib/android/examples/src/android/example_library/res')
         # The other six are google-play-services v21 resource_dirs. Their presence is enough.
-        self.assertEquals(len(resource_dirs), 8, 'Expected eight resource dirs to be included '
+        self.assertEqual(len(resource_dirs), 8, 'Expected eight resource dirs to be included '
                                                  'when calling aapt on hello_with_library apk.'
                                                  ' (was: {})\n'.format(resource_dirs))

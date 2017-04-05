@@ -33,7 +33,7 @@ class BootstrapOptionsTest(unittest.TestCase):
     with temporary_file() as fp:
       fp.write('[DEFAULT]\n')
       if config:
-        for k, v in config.items():
+        for k, v in list(config.items()):
           fp.write('{0}: {1}\n'.format(k, v))
       fp.close()
 
@@ -42,7 +42,7 @@ class BootstrapOptionsTest(unittest.TestCase):
       vals = bootstrapper.get_bootstrap_options().for_global_scope()
 
       vals_dict = {k: getattr(vals, k) for k in expected_entries}
-      self.assertEquals(expected_entries, vals_dict)
+      self.assertEqual(expected_entries, vals_dict)
 
   def test_bootstrap_option_values(self):
     # Check all defaults.
@@ -131,8 +131,8 @@ class BootstrapOptionsTest(unittest.TestCase):
 
       opts.register('foo', '--bar')
       opts.register('fruit', '--apple')
-    self.assertEquals('/qux/baz', opts.for_scope('foo').bar)
-    self.assertEquals('/pear/banana', opts.for_scope('fruit').apple)
+    self.assertEqual('/qux/baz', opts.for_scope('foo').bar)
+    self.assertEqual('/pear/banana', opts.for_scope('fruit').apple)
 
   def test_create_bootstrapped_multiple_config_override(self):
     # check with multiple config files, the latest values always get taken
@@ -162,8 +162,8 @@ class BootstrapOptionsTest(unittest.TestCase):
       opts_single_config.register('compile.apt', '--worker-count')
       opts_single_config.register('fruit', '--apple')
 
-      self.assertEquals('1', opts_single_config.for_scope('compile.apt').worker_count)
-      self.assertEquals('red', opts_single_config.for_scope('fruit').apple)
+      self.assertEqual('1', opts_single_config.for_scope('compile.apt').worker_count)
+      self.assertEqual('red', opts_single_config.for_scope('fruit').apple)
 
       with temporary_file() as fp2:
         fp2.write(dedent("""
@@ -188,8 +188,8 @@ class BootstrapOptionsTest(unittest.TestCase):
         opts_double_config.register('compile.apt', '--worker-count')
         opts_double_config.register('fruit', '--apple')
 
-        self.assertEquals('2', opts_double_config.for_scope('compile.apt').worker_count)
-        self.assertEquals('red', opts_double_config.for_scope('fruit').apple)
+        self.assertEqual('2', opts_double_config.for_scope('compile.apt').worker_count)
+        self.assertEqual('red', opts_double_config.for_scope('fruit').apple)
 
   def test_full_options_caching(self):
     with temporary_file_path() as config:

@@ -32,7 +32,7 @@ class FileExcluder(object):
       log.debug('No excludes file specified. All python sources will be checked.')
 
   def should_include(self, source_filename, plugin):
-    for exclude_rule in self.excludes.values():
+    for exclude_rule in list(self.excludes.values()):
       if exclude_rule['regex'].match(source_filename) and (
         (exclude_rule['plugins'] == ['.*']) or (plugin in exclude_rule['plugins'])
       ):

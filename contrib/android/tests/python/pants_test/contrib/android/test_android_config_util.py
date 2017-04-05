@@ -43,7 +43,7 @@ class TestAndroidConfigUtil(unittest.TestCase):
   def test_setup_keystore_config(self):
     with temporary_file() as config:
       AndroidConfigUtil.setup_keystore_config(config.name)
-      self.assertEquals(config.read(), self.contents())
+      self.assertEqual(config.read(), self.contents())
 
   def test_no_permission_keystore_config(self):
     with temporary_file() as temp:

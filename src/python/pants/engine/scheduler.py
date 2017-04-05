@@ -128,7 +128,7 @@ class WrappedNativeScheduler(object):
     Singleton tasks are those that are the default for a particular type(product). Like
     intrinsics, singleton tasks create Runnables that are not cacheable.
     """
-    for product_type, rule in singletons.items():
+    for product_type, rule in list(singletons.items()):
       self._native.lib.singleton_task_add(self._scheduler,
                                           Function(self._to_id(rule.func)),
                                           self._to_constraint(product_type))
@@ -139,7 +139,7 @@ class WrappedNativeScheduler(object):
     Intrinsic tasks are those that are the default for a particular type(subject), type(product)
     pair. By default, intrinsic tasks create Runnables that are not cacheable.
     """
-    for (subject_type, product_type), rule in intrinsics.items():
+    for (subject_type, product_type), rule in list(intrinsics.items()):
       self._native.lib.intrinsic_task_add(self._scheduler,
                                           Function(self._to_id(rule.func)),
                                           TypeId(self._to_id(subject_type)),
@@ -149,7 +149,7 @@ class WrappedNativeScheduler(object):
   def _register_tasks(self, tasks):
     """Register the given tasks dict with the native scheduler."""
     registered = set()
-    for output_type, rules in tasks.items():
+    for output_type, rules in list(tasks.items()):
       output_constraint = self._to_constraint(output_type)
       for rule in rules:
         # TODO: The task map has heterogeneous keys, so we normalize them to type constraints

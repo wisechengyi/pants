@@ -97,7 +97,7 @@ class GoFetchTest(TaskTestBase):
 
     Packages are placed in src, and their zipped contents are placed in zipdir.
     """
-    for t, deps in dep_graph.items():
+    for t, deps in list(dep_graph.items()):
       self._create_package(src, t, deps)
       self._create_zip(src, zipdir, t)
       self._create_remote_lib(t)
