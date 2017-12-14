@@ -1,8 +1,14 @@
 // Copyright 2017 Pants project contributors (see CONTRIBUTORS.md).
 // Licensed under the Apache License, Version 2.0 (see LICENSE).
 
-pub mod hash;
-pub mod store;
+mod hash;
+pub use hash::Fingerprint;
+mod snapshot;
+pub use snapshot::{GetFileDigest, Snapshot};
+mod store;
+pub use store::{Digest, Store};
+mod pool;
+pub use pool::ResettablePool;
 
 extern crate bazel_protos;
 extern crate boxfuture;
@@ -12,6 +18,7 @@ extern crate futures_cpupool;
 extern crate glob;
 extern crate hex;
 extern crate ignore;
+extern crate itertools;
 #[macro_use]
 extern crate lazy_static;
 extern crate lmdb;
@@ -24,20 +31,20 @@ extern crate tempdir;
 use std::collections::HashSet;
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Component, Path, PathBuf};
-use std::sync::{Arc, Mutex, RwLock, RwLockReadGuard};
+use std::sync::{Arc, Mutex};
 use std::{fmt, fs};
 use std::io::{self, Read};
 use std::cmp::min;
 
 use futures::future::{self, Future};
-use futures_cpupool::{CpuFuture, CpuPool};
+use futures_cpupool::CpuFuture;
 use glob::Pattern;
 use ignore::gitignore::{Gitignore, GitignoreBuilder};
 use ordermap::OrderMap;
 use tempdir::TempDir;
 
 use boxfuture::{Boxable, BoxFuture};
-use hash::{Fingerprint, WriterHasher};
+use hash::WriterHasher;
 
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
@@ -115,6 +122,8 @@ lazy_static! {
 
   static ref DOUBLE_STAR: &'static str = "**";
   static ref DOUBLE_STAR_GLOB: Pattern = Pattern::new("**").unwrap();
+
+  static ref EMPTY_IGNORE: Arc<Gitignore> = Arc::new(Gitignore::empty());
 }
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
@@ -293,15 +302,29 @@ impl PathGlob {
 #[derive(Debug)]
 pub struct PathGlobs {
   include: Vec<PathGlob>,
-  exclude: Vec<PathGlob>,
+  exclude: Arc<Gitignore>,
 }
 
 impl PathGlobs {
   pub fn create(include: &[String], exclude: &[String]) -> Result<PathGlobs, String> {
+    let ignore_for_exclude = if exclude.is_empty() {
+      EMPTY_IGNORE.clone()
+    } else {
+      Arc::new(create_ignore(exclude).map_err(|e| {
+        format!("Could not parse glob excludes {:?}: {:?}", exclude, e)
+      })?)
+    };
     Ok(PathGlobs {
       include: PathGlob::create(include)?,
-      exclude: PathGlob::create(exclude)?,
+      exclude: ignore_for_exclude,
     })
+  }
+
+  pub fn from_globs(include: Vec<PathGlob>) -> PathGlobs {
+    PathGlobs {
+      include: include,
+      exclude: EMPTY_IGNORE.clone(),
+    }
   }
 }
 
@@ -310,10 +333,32 @@ struct PathGlobsExpansion<T: Sized> {
   context: T,
   // Globs that have yet to be expanded, in order.
   todo: Vec<PathGlob>,
+  // Paths to exclude.
+  exclude: Arc<Gitignore>,
   // Globs that have already been expanded.
   completed: HashSet<PathGlob>,
   // Unique Paths that have been matched, in order.
   outputs: OrderMap<PathStat, ()>,
+}
+
+fn create_ignore(patterns: &[String]) -> Result<Gitignore, ignore::Error> {
+  let mut ignore_builder = GitignoreBuilder::new("");
+  for pattern in patterns {
+    ignore_builder.add_line(None, pattern.as_str())?;
+  }
+  ignore_builder.build()
+}
+
+fn is_ignored(ignore: &Gitignore, stat: &Stat) -> bool {
+  let is_dir = match stat {
+    &Stat::Dir(_) => true,
+    _ => false,
+  };
+  match ignore.matched(stat.path(), is_dir) {
+    ignore::Match::None |
+    ignore::Match::Whitelist(_) => false,
+    ignore::Match::Ignore(_) => true,
+  }
 }
 
 ///
@@ -321,13 +366,16 @@ struct PathGlobsExpansion<T: Sized> {
 ///
 pub struct PosixFS {
   root: Dir,
-  // The pool needs to be reinitialized after a fork, so it is protected by a lock.
-  pool: RwLock<Option<CpuPool>>,
+  pool: Arc<ResettablePool>,
   ignore: Gitignore,
 }
 
 impl PosixFS {
-  pub fn new<P: AsRef<Path>>(root: P, ignore_patterns: Vec<String>) -> Result<PosixFS, String> {
+  pub fn new<P: AsRef<Path>>(
+    root: P,
+    pool: Arc<ResettablePool>,
+    ignore_patterns: Vec<String>,
+  ) -> Result<PosixFS, String> {
     let root: &Path = root.as_ref();
     let canonical_root = root
       .canonicalize()
@@ -347,31 +395,18 @@ impl PosixFS {
         format!("Could not canonicalize root {:?}: {:?}", root, e)
       })?;
 
-    let ignore = PosixFS::create_ignore(&canonical_root, &ignore_patterns)
-      .map_err(|e| {
-        format!(
-          "Could not parse build ignore inputs {:?}: {:?}",
-          ignore_patterns,
-          e
-        )
-      })?;
+    let ignore = create_ignore(&ignore_patterns).map_err(|e| {
+      format!(
+        "Could not parse build ignore inputs {:?}: {:?}",
+        ignore_patterns,
+        e
+      )
+    })?;
     Ok(PosixFS {
       root: canonical_root,
-      pool: RwLock::new(None),
+      pool: pool,
       ignore: ignore,
     })
-  }
-
-  fn create_pool() -> CpuPool {
-    futures_cpupool::Builder::new().name_prefix("vfs-").create()
-  }
-
-  fn create_ignore(root: &Dir, patterns: &Vec<String>) -> Result<Gitignore, ignore::Error> {
-    let mut ignore_builder = GitignoreBuilder::new(root.0.as_path());
-    for pattern in patterns {
-      ignore_builder.add_line(None, pattern.as_str())?;
-    }
-    ignore_builder.build()
   }
 
   fn scandir_sync(root: PathBuf, dir_relative_to_root: Dir) -> Result<Vec<Stat>, io::Error> {
@@ -393,43 +428,15 @@ impl PosixFS {
     Ok(stats)
   }
 
-  fn pool(&self) -> RwLockReadGuard<Option<CpuPool>> {
-    {
-      let pool = self.pool.read().unwrap();
-      if pool.is_some() {
-        return pool;
-      }
-    }
-    // If we get to here, the pool is None and needs re-initializing.
-    {
-      let mut pool = self.pool.write().unwrap();
-      if pool.is_none() {
-        *pool = Some(PosixFS::create_pool());
-      }
-    }
-    self.pool.read().unwrap()
-  }
-
-  pub fn pre_fork(&self) {
-    let mut pool = self.pool.write().unwrap();
-    *pool = None;
-  }
-
-  pub fn ignore<P: AsRef<Path>>(&self, path: P, is_dir: bool) -> bool {
-    match self.ignore.matched(path, is_dir) {
-      ignore::Match::None |
-      ignore::Match::Whitelist(_) => false,
-      ignore::Match::Ignore(_) => true,
-    }
+  pub fn is_ignored(&self, stat: &Stat) -> bool {
+    is_ignored(&self.ignore, stat)
   }
 
   pub fn read_file(&self, file: &File) -> BoxFuture<FileContent, io::Error> {
     let path = file.path.clone();
     let path_abs = self.root.0.join(&file.path);
     self
-      .pool()
-      .as_ref()
-      .expect("Uninitialized CpuPool!")
+      .pool
       .spawn_fn(move || {
         std::fs::File::open(&path_abs).and_then(|mut f| {
           let mut content = Vec::new();
@@ -443,10 +450,8 @@ impl PosixFS {
   pub fn read_link(&self, link: &Link) -> BoxFuture<PathBuf, io::Error> {
     let link_parent = link.0.parent().map(|p| p.to_owned());
     let link_abs = self.root.0.join(link.0.as_path()).to_owned();
-    let pool = self.pool();
-    pool
-      .as_ref()
-      .expect("Uninitialized CpuPool!")
+    self
+      .pool
       .spawn_fn(move || {
         link_abs.read_link().and_then(
           |path_buf| if path_buf.is_absolute() {
@@ -536,10 +541,8 @@ impl PosixFS {
   pub fn scandir(&self, dir: &Dir) -> BoxFuture<Vec<Stat>, io::Error> {
     let dir = dir.to_owned();
     let root = self.root.0.clone();
-    let pool = self.pool();
-    pool
-      .as_ref()
-      .expect("Uninitialized CpuPool!")
+    self
+      .pool
       .spawn_fn(move || PosixFS::scandir_sync(root, dir))
       .to_boxed()
   }
@@ -554,8 +557,8 @@ impl VFS<io::Error> for Arc<PosixFS> {
     PosixFS::scandir(self, &dir)
   }
 
-  fn ignore<P: AsRef<Path>>(&self, path: P, is_dir: bool) -> bool {
-    PosixFS::ignore(self, path, is_dir)
+  fn is_ignored(&self, stat: &Stat) -> bool {
+    PosixFS::is_ignored(self, stat)
   }
 
   fn mk_error(msg: &str) -> io::Error {
@@ -569,7 +572,7 @@ impl VFS<io::Error> for Arc<PosixFS> {
 pub trait VFS<E: Send + Sync + 'static>: Clone + Send + Sync + 'static {
   fn read_link(&self, link: Link) -> BoxFuture<PathBuf, E>;
   fn scandir(&self, dir: Dir) -> BoxFuture<Vec<Stat>, E>;
-  fn ignore<P: AsRef<Path>>(&self, path: P, is_dir: bool) -> bool;
+  fn is_ignored(&self, stat: &Stat) -> bool;
   fn mk_error(msg: &str) -> E;
 
   ///
@@ -578,7 +581,7 @@ pub trait VFS<E: Send + Sync + 'static>: Clone + Send + Sync + 'static {
   ///
   /// Skips ignored paths both before and after expansion.
   ///
-  /// TODO: Should handle symlink loops (which would exhibit as an infinite loop in expand_multi).
+  /// TODO: Should handle symlink loops (which would exhibit as an infinite loop in expand).
   ///
   fn canonicalize(&self, symbolic_path: PathBuf, link: Link) -> BoxFuture<Option<PathStat>, E> {
     // Read the link, which may result in PathGlob(s) that match 0 or 1 Path.
@@ -590,12 +593,14 @@ pub trait VFS<E: Send + Sync + 'static>: Clone + Send + Sync + 'static {
         dest_path
           .to_str()
           .and_then(|dest_str| {
-            let escaped = Pattern::escape(dest_str);
-            PathGlob::create(&[escaped]).ok()
+            // Escape any globs in the parsed dest, which should guarantee one output PathGlob.
+            PathGlob::create(&[Pattern::escape(dest_str)]).ok()
           })
           .unwrap_or_else(|| vec![])
       })
-      .and_then(move |link_globs| context.expand_multi(link_globs))
+      .and_then(move |link_globs| {
+        context.expand(PathGlobs::from_globs(link_globs))
+      })
       .map(|mut path_stats| {
         // Since we've escaped any globs in the parsed path, expect either 0 or 1 destination.
         path_stats.pop().map(|ps| match ps {
@@ -611,9 +616,12 @@ pub trait VFS<E: Send + Sync + 'static>: Clone + Send + Sync + 'static {
     canonical_dir: Dir,
     symbolic_path: PathBuf,
     wildcard: Pattern,
+    exclude: &Arc<Gitignore>,
   ) -> BoxFuture<Vec<PathStat>, E> {
     // List the directory.
     let context = self.clone();
+    let exclude = exclude.clone();
+
     self
       .scandir(canonical_dir)
       .and_then(move |dir_listing| {
@@ -638,31 +646,21 @@ pub trait VFS<E: Send + Sync + 'static>: Clone + Send + Sync + 'static {
                 .map(|symbolic_stat_path| (symbolic_stat_path, stat))
             })
             .map(|(stat_symbolic_path, stat)| {
-              // Canonicalize matched PathStats, and filter ignored paths. Note that we ignore
-              // links both before and after expansion.
-              match stat {
-                Stat::Link(l) => {
-                  if context.ignore(l.0.as_path(), false) {
-                    future::ok(None).to_boxed()
-                  } else {
-                    context.canonicalize(stat_symbolic_path, l)
+              // Canonicalize matched PathStats, and filter paths that are ignored by either the
+              // context, or by local excludes. Note that we apply context ignore patterns to both
+              // the symbolic and canonical names of Links, but only apply local excludes to their
+              // symbolic names.
+              if context.is_ignored(&stat) || is_ignored(&exclude, &stat) {
+                future::ok(None).to_boxed()
+              } else {
+                match stat {
+                  Stat::Link(l) => context.canonicalize(stat_symbolic_path, l),
+                  Stat::Dir(d) => {
+                    future::ok(Some(PathStat::dir(stat_symbolic_path.to_owned(), d))).to_boxed()
                   }
-                }
-                Stat::Dir(d) => {
-                  let res = if context.ignore(d.0.as_path(), true) {
-                    None
-                  } else {
-                    Some(PathStat::dir(stat_symbolic_path.to_owned(), d))
-                  };
-                  future::ok(res).to_boxed()
-                }
-                Stat::File(f) => {
-                  let res = if context.ignore(f.path.as_path(), false) {
-                    None
-                  } else {
-                    Some(PathStat::file(stat_symbolic_path.to_owned(), f))
-                  };
-                  future::ok(res).to_boxed()
+                  Stat::File(f) => {
+                    future::ok(Some(PathStat::file(stat_symbolic_path.to_owned(), f))).to_boxed()
+                  }
                 }
               }
             })
@@ -679,46 +677,27 @@ pub trait VFS<E: Send + Sync + 'static>: Clone + Send + Sync + 'static {
   ///
   /// Recursively expands PathGlobs into PathStats while applying excludes.
   ///
-  /// TODO: Eventually, it would be nice to be able to apply excludes as we go, to
-  /// avoid walking into directories that aren't relevant.
-  ///
   fn expand(&self, path_globs: PathGlobs) -> BoxFuture<Vec<PathStat>, E> {
-    self
-      .expand_multi(path_globs.include)
-      .join(self.expand_multi(path_globs.exclude))
-      .map(|(include, exclude)| {
-        // Exclude matched paths.
-        let exclude_set: HashSet<_> = exclude.into_iter().collect();
-        include
-          .into_iter()
-          .filter(|i| !exclude_set.contains(i))
-          .collect()
-      })
-      .to_boxed()
-  }
-
-  ///
-  /// Recursively expands PathGlobs into PathStats.
-  ///
-  fn expand_multi(&self, path_globs: Vec<PathGlob>) -> BoxFuture<Vec<PathStat>, E> {
-    if path_globs.is_empty() {
+    if path_globs.include.is_empty() {
       return future::ok(vec![]).to_boxed();
     }
 
     let init = PathGlobsExpansion {
       context: self.clone(),
-      todo: path_globs,
+      todo: path_globs.include,
+      exclude: path_globs.exclude,
       completed: HashSet::default(),
       outputs: OrderMap::default(),
     };
     future::loop_fn(init, |mut expansion| {
       // Request the expansion of all outstanding PathGlobs as a batch.
       let round = future::join_all({
+        let exclude = &expansion.exclude;
         let context = &expansion.context;
         expansion
           .todo
           .drain(..)
-          .map(|path_glob| context.expand_single(path_glob))
+          .map(|path_glob| context.expand_single(path_glob, exclude))
           .collect::<Vec<_>>()
       });
       round.map(move |paths_and_globs| {
@@ -754,16 +733,20 @@ pub trait VFS<E: Send + Sync + 'static>: Clone + Send + Sync + 'static {
   /// Apply a PathGlob, returning PathStats and additional PathGlobs that are needed for the
   /// expansion.
   ///
-  fn expand_single(&self, path_glob: PathGlob) -> BoxFuture<(Vec<PathStat>, Vec<PathGlob>), E> {
+  fn expand_single(
+    &self,
+    path_glob: PathGlob,
+    exclude: &Arc<Gitignore>,
+  ) -> BoxFuture<(Vec<PathStat>, Vec<PathGlob>), E> {
     match path_glob {
       PathGlob::Wildcard { canonical_dir, symbolic_path, wildcard } =>
         // Filter directory listing to return PathStats, with no continuation.
-        self.directory_listing(canonical_dir, symbolic_path, wildcard)
+        self.directory_listing(canonical_dir, symbolic_path, wildcard, exclude)
           .map(|path_stats| (path_stats, vec![]))
           .to_boxed(),
       PathGlob::DirWildcard { canonical_dir, symbolic_path, wildcard, remainder } =>
         // Filter directory listing and request additional PathGlobs for matched Dirs.
-        self.directory_listing(canonical_dir, symbolic_path, wildcard)
+        self.directory_listing(canonical_dir, symbolic_path, wildcard, exclude)
           .and_then(move |path_stats| {
             path_stats.into_iter()
               .filter_map(|ps| match ps {
@@ -812,26 +795,9 @@ impl fmt::Debug for FileContent {
   }
 }
 
-#[derive(Clone)]
-pub struct Snapshot {
-  pub fingerprint: Fingerprint,
-  pub path_stats: Vec<PathStat>,
-}
-
-impl fmt::Debug for Snapshot {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(
-      f,
-      "Snapshot({}, entries={})",
-      self.fingerprint.to_hex(),
-      self.path_stats.len()
-    )
-  }
-}
-
 // Like std::fs::create_dir_all, except handles concurrent calls among multiple
 // threads or processes. Originally lifted from rustc.
-fn safe_create_dir_all_ioerror(path: &Path) -> Result<(), io::Error> {
+pub fn safe_create_dir_all_ioerror(path: &Path) -> Result<(), io::Error> {
   match fs::create_dir(path) {
     Ok(()) => return Ok(()),
     Err(ref e) if e.kind() == io::ErrorKind::AlreadyExists => return Ok(()),
@@ -1036,24 +1002,22 @@ impl Snapshots {
       "Couldn't get the next temp path.",
     );
 
-    let pool = fs.pool();
-    pool.as_ref().expect("Uninitialized CpuPool!").spawn_fn(
-      move || {
-        // Write the tar deterministically to a temporary file while fingerprinting.
-        let fingerprint = Snapshots::tar_create_fingerprinted(temp_path.as_path(), &paths, &root)?;
+    fs.pool.spawn_fn(move || {
+      // Write the tar deterministically to a temporary file while fingerprinting.
+      let fingerprint = Snapshots::tar_create_fingerprinted(temp_path.as_path(), &paths, &root)?;
 
-        // Rename to the final path if it does not already exist.
-        Snapshots::finalize(
-          temp_path.as_path(),
-          Snapshots::path_under_for(&dest_dir, &fingerprint).as_path(),
-        )?;
+      // Rename to the final path if it does not already exist.
+      Snapshots::finalize(
+        temp_path.as_path(),
+        Snapshots::path_under_for(&dest_dir, &fingerprint).as_path(),
+      )?;
 
-        Ok(Snapshot {
-          fingerprint: fingerprint,
-          path_stats: paths,
-        })
-      },
-    )
+      Ok(Snapshot {
+        fingerprint: fingerprint,
+        digest: None,
+        path_stats: paths,
+      })
+    })
   }
 
   fn contents_for_sync(snapshot: Snapshot, path: PathBuf) -> Result<Vec<FileContent>, io::Error> {
@@ -1085,28 +1049,26 @@ impl Snapshots {
     snapshot: Snapshot,
   ) -> CpuFuture<Vec<FileContent>, String> {
     let archive_path = self.path_for(&snapshot.fingerprint);
-    let pool = fs.pool();
-    pool.as_ref().expect("Uninitialized CpuPool!").spawn_fn(
-      move || {
-        let snapshot_str = format!("{:?}", snapshot);
-        Snapshots::contents_for_sync(snapshot, archive_path).map_err(|e| {
-          format!("Failed to open Snapshot {}: {:?}", snapshot_str, e)
-        })
-      },
-    )
+    fs.pool.spawn_fn(move || {
+      let snapshot_str = format!("{:?}", snapshot);
+      Snapshots::contents_for_sync(snapshot, archive_path).map_err(|e| {
+        format!("Failed to open Snapshot {}: {:?}", snapshot_str, e)
+      })
+    })
   }
 }
 
 #[cfg(test)]
 mod posixfs_test {
   extern crate tempdir;
+  extern crate testutil;
 
-  use super::{Dir, File, Link, PosixFS, Stat};
+  use super::{Dir, File, Link, PosixFS, Stat, ResettablePool};
   use futures::Future;
+  use self::testutil::make_file;
   use std;
-  use std::io::Write;
-  use std::os::unix::fs::PermissionsExt;
   use std::path::{Path, PathBuf};
+  use std::sync::Arc;
 
   #[test]
   fn is_executable_false() {
@@ -1132,7 +1094,7 @@ mod posixfs_test {
       &content,
       0o600,
     );
-    let fs = PosixFS::new(&dir.path(), vec![]).unwrap();
+    let fs = new_posixfs(&dir.path());
     let file_content = fs.read_file(&File {
       path: path.clone(),
       is_executable: false,
@@ -1145,8 +1107,7 @@ mod posixfs_test {
   #[test]
   fn read_file_missing() {
     let dir = tempdir::TempDir::new("posixfs").unwrap();
-    PosixFS::new(&dir.path(), vec![])
-      .unwrap()
+    new_posixfs(&dir.path())
       .read_file(&File {
         path: PathBuf::from("marmosets"),
         is_executable: false,
@@ -1158,7 +1119,7 @@ mod posixfs_test {
   #[test]
   fn stat_executable_file() {
     let dir = tempdir::TempDir::new("posixfs").unwrap();
-    let posix_fs = PosixFS::new(&dir.path(), vec![]).unwrap();
+    let posix_fs = new_posixfs(&dir.path());
     let path = PathBuf::from("photograph_marmosets");
     make_file(&dir.path().join(&path), &[], 0o700);
     assert_eq!(
@@ -1173,7 +1134,7 @@ mod posixfs_test {
   #[test]
   fn stat_nonexecutable_file() {
     let dir = tempdir::TempDir::new("posixfs").unwrap();
-    let posix_fs = PosixFS::new(&dir.path(), vec![]).unwrap();
+    let posix_fs = new_posixfs(&dir.path());
     let path = PathBuf::from("marmosets");
     make_file(&dir.path().join(&path), &[], 0o600);
     assert_eq!(
@@ -1188,7 +1149,7 @@ mod posixfs_test {
   #[test]
   fn stat_dir() {
     let dir = tempdir::TempDir::new("posixfs").unwrap();
-    let posix_fs = PosixFS::new(&dir.path(), vec![]).unwrap();
+    let posix_fs = new_posixfs(&dir.path());
     let path = PathBuf::from("enclosure");
     std::fs::create_dir(dir.path().join(&path)).unwrap();
     assert_eq!(
@@ -1200,7 +1161,7 @@ mod posixfs_test {
   #[test]
   fn stat_symlink() {
     let dir = tempdir::TempDir::new("posixfs").unwrap();
-    let posix_fs = PosixFS::new(&dir.path(), vec![]).unwrap();
+    let posix_fs = new_posixfs(&dir.path());
     let path = PathBuf::from("marmosets");
     make_file(&dir.path().join(&path), &[], 0o600);
 
@@ -1214,8 +1175,7 @@ mod posixfs_test {
 
   #[test]
   fn stat_other() {
-    let posix_fs = PosixFS::new("/dev", vec![]).unwrap();
-    posix_fs.stat(PathBuf::from("null")).expect_err(
+    new_posixfs("/dev").stat(PathBuf::from("null")).expect_err(
       "Want error",
     );
   }
@@ -1223,7 +1183,7 @@ mod posixfs_test {
   #[test]
   fn stat_missing() {
     let dir = tempdir::TempDir::new("posixfs").unwrap();
-    let posix_fs = PosixFS::new(&dir.path(), vec![]).unwrap();
+    let posix_fs = new_posixfs(&dir.path());
     posix_fs.stat(PathBuf::from("no_marmosets")).expect_err(
       "Want error",
     );
@@ -1232,7 +1192,7 @@ mod posixfs_test {
   #[test]
   fn scandir_empty() {
     let dir = tempdir::TempDir::new("posixfs").unwrap();
-    let posix_fs = PosixFS::new(&dir.path(), vec![]).unwrap();
+    let posix_fs = new_posixfs(&dir.path());
     let path = PathBuf::from("empty_enclosure");
     std::fs::create_dir(dir.path().join(&path)).unwrap();
     assert_eq!(posix_fs.scandir(&Dir(path)).wait().unwrap(), vec![]);
@@ -1241,7 +1201,7 @@ mod posixfs_test {
   #[test]
   fn scandir() {
     let dir = tempdir::TempDir::new("posixfs").unwrap();
-    let posix_fs = PosixFS::new(&dir.path(), vec![]).unwrap();
+    let posix_fs = new_posixfs(&dir.path());
     let path = PathBuf::from("enclosure");
     std::fs::create_dir(dir.path().join(&path)).unwrap();
 
@@ -1291,7 +1251,7 @@ mod posixfs_test {
   #[test]
   fn scandir_missing() {
     let dir = tempdir::TempDir::new("posixfs").unwrap();
-    let posix_fs = PosixFS::new(&dir.path(), vec![]).unwrap();
+    let posix_fs = new_posixfs(&dir.path());
     posix_fs
       .scandir(&Dir(PathBuf::from("no_marmosets_here")))
       .wait()
@@ -1299,7 +1259,7 @@ mod posixfs_test {
   }
 
   fn assert_only_file_is_executable(path: &Path, want_is_executable: bool) {
-    let fs = PosixFS::new(path, vec![]).unwrap();
+    let fs = new_posixfs(path);
     let stats = fs.scandir(&Dir(PathBuf::from("."))).wait().unwrap();
     assert_eq!(stats.len(), 1);
     match stats.get(0).unwrap() {
@@ -1308,11 +1268,11 @@ mod posixfs_test {
     }
   }
 
-  fn make_file(path: &Path, contents: &[u8], mode: u32) {
-    let mut file = std::fs::File::create(&path).unwrap();
-    file.write(contents).unwrap();
-    let mut permissions = std::fs::metadata(path).unwrap().permissions();
-    permissions.set_mode(mode);
-    file.set_permissions(permissions).unwrap();
+  fn new_posixfs<P: AsRef<Path>>(dir: P) -> PosixFS {
+    PosixFS::new(
+      dir.as_ref(),
+      Arc::new(ResettablePool::new("test-pool-".to_string())),
+      vec![],
+    ).unwrap()
   }
 }
