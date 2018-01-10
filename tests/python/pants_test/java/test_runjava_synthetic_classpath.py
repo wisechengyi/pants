@@ -66,4 +66,3 @@ class SyntheticClasspathTest(JvmToolTaskTestBase):
         main='coursier.echo.Echo',
         args=['Hello World'],
         create_synthetic_jar=True))
-
