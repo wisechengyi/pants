@@ -264,7 +264,7 @@ matrix:
         # https://github.com/pantsbuild/pex/issues/523
         - PANTS_PYTHON_SETUP_INTERPRETER_CONSTRAINTS="['CPython>2.7.10,<3']"
       before_install:
-        - brew tap caskroom/cask && brew update && brew cask install osxfuse
+        - brew tap caskroom/cask && brew update && brew cask install osxfuse git
       before_script:
         - ulimit -c unlimited
         - ulimit -n 8192
