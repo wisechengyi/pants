@@ -263,6 +263,9 @@ matrix:
         # deal with this. Can be removed when this issue is resolved:
         # https://github.com/pantsbuild/pex/issues/523
         - PANTS_PYTHON_SETUP_INTERPRETER_CONSTRAINTS="['CPython>2.7.10,<3']"
+      git_config:
+        - name: submodule.fetchJobs
+          value: 1
       before_install:
         - brew tap caskroom/cask && brew update && brew cask install osxfuse && brew upgrade git
       before_script:
