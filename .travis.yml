@@ -40,7 +40,7 @@ before_cache:
   - rm -rf ${HOME}/.cache/pants/lmdb_store
   # Render a summary of what is left in the home directory, to assist with further pruning of
   # the cache.
-  - du -d2 ${HOME} | sort -r -n
+  - du -d2 ${HOME} | sort -h
 
 cache:
   directories:
