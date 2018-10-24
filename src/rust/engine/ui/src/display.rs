@@ -77,15 +77,15 @@ impl EngineDisplay {
   }
 
   fn initialize(&mut self, display_worker_count: usize) {
-      self.start();
-      self.render();
-      let worker_ids: Vec<String> = (0..display_worker_count)
-        .map(|s| format!("{}", s))
-        .collect();
-      for worker_id in worker_ids {
-        self.add_worker(worker_id);
-      }
-      self.render();
+    self.start();
+    self.render();
+    let worker_ids: Vec<String> = (0..display_worker_count)
+      .map(|s| format!("{}", s))
+      .collect();
+    for worker_id in worker_ids {
+      self.add_worker(worker_id);
+    }
+    self.render();
   }
 
   pub fn for_stdout(indent_level: u16) -> EngineDisplay {
