@@ -205,11 +205,11 @@ class RscCompile(ZincCompile, MirroredTargetOptionMixin):
         ),
       ],
       custom_rules=[
-        Shader.exclude_package('scala', recursive=True),
-        Shader.exclude_package('xsbt', recursive=True),
-        Shader.exclude_package('xsbti', recursive=True),
-        # Unfortunately, is loaded reflectively by the compiler.
-        Shader.exclude_package('org.apache.logging.log4j', recursive=True),
+        Shader.exclude_package('scala', recursive=True), 
+        Shader.exclude_package('xsbt', recursive=True), 
+        Shader.exclude_package('xsbti', recursive=True), 
+        # Unfortunately, is loaded reflectively by the compiler. 
+        Shader.exclude_package('org.apache.logging.log4j', recursive=True), 
       ]
     )
 
@@ -735,7 +735,7 @@ class RscCompile(ZincCompile, MirroredTargetOptionMixin):
 
   def _runtool_hermetic(self, main, tool_name, distribution, input_digest, ctx):
     use_youtline = tool_name == 'scalac-outliner'
-
+    
     tool_classpath_abs = self._scalac_classpath if use_youtline else self._rsc_classpath
     tool_classpath = fast_relpath_collection(tool_classpath_abs)
 
