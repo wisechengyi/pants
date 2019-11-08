@@ -338,8 +338,11 @@ class ExportTask(ResolveRequirementsTaskBase, IvyTaskMixin, CoursierMixin):
         targets_map[t.address.spec]['libraries'] = [t.id]
         jar_products = runtime_classpath.get_for_target(t)
         for conf, jar_entry in jar_products:
-          if 'z.jar' in jar_entry:
+          # z.jar
+          if os.path.exists(jar_entry):
             graph_info['libraries'][t.id][conf] = jar_entry
+          else:
+            graph_info['libraries'][t.id][conf] = os.path.join(os.path.dirname(os.path.dirname(jar_entry)), 'rsc/m.jar')
 
     if python_interpreter_targets_mapping:
       # NB: We've selected a python interpreter compatible with each python target individually into
