@@ -197,8 +197,7 @@ class Workspace:
   _scheduler: Any
 
   def materialize_directories(self, directories_to_materialize: Tuple[DirectoryToMaterialize, ...]) -> MaterializeDirectoriesResult:
-    result: MaterializeDirectoriesResult = self._scheduler.materialize_directories(directories_to_materialize)
-    return result
+    return self._scheduler.materialize_directories(directories_to_materialize)
 
 
 # TODO: don't recreate this in python, get this from fs::EMPTY_DIGEST somehow.

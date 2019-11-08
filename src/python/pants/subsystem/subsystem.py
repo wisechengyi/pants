@@ -2,7 +2,6 @@
 # Licensed under the Apache License, Version 2.0 (see LICENSE).
 
 import inspect
-from typing import Dict, Tuple
 
 from pants.option.optionable import Optionable
 from pants.option.scope import ScopeInfo
@@ -39,10 +38,9 @@ class Subsystem(SubsystemClientMixin, Optionable):
 
   class UninitializedSubsystemError(SubsystemError):
     def __init__(self, class_name, scope):
-      super().__init__(
-        f'Subsystem "{class_name}" not initialized for scope "{scope}". Is subsystem missing'
-        'from subsystem_dependencies() in a task? '
-      )
+      super(Subsystem.UninitializedSubsystemError, self).__init__(
+        'Subsystem "{}" not initialized for scope "{}". '
+        'Is subsystem missing from subsystem_dependencies() in a task? '.format(class_name, scope))
 
   @classmethod
   def is_subsystem_type(cls, obj):
@@ -80,26 +78,29 @@ class Subsystem(SubsystemClientMixin, Optionable):
     return cls._options is not None
 
   # A cache of (cls, scope) -> the instance of cls tied to that scope.
-  _scoped_instances: Dict[Tuple["Subsystem", str], "Subsystem"] = {}
+  _scoped_instances = {}
 
   @classmethod
-  def global_instance(cls) -> "Subsystem":
+  def global_instance(cls):
     """Returns the global instance of this subsystem.
 
     :API: public
 
     :returns: The global subsystem instance.
+    :rtype: :class:`pants.subsystem.subsystem.Subsystem`
     """
-    return cls._instance_for_scope(cls.options_scope)  # type: ignore
+    return cls._instance_for_scope(cls.options_scope)
 
   @classmethod
-  def scoped_instance(cls, optionable: Optionable) -> "Subsystem":
+  def scoped_instance(cls, optionable):
     """Returns an instance of this subsystem for exclusive use by the given `optionable`.
 
     :API: public
 
     :param optionable: An optionable type or instance to scope this subsystem under.
+    :type: :class:`pants.option.optionable.Optionable`
     :returns: The scoped subsystem instance.
+    :rtype: :class:`pants.subsystem.subsystem.Subsystem`
     """
     if not isinstance(optionable, Optionable) and not issubclass(optionable, Optionable):
       raise TypeError('Can only scope an instance against an Optionable, given {} of type {}.'
@@ -107,7 +108,7 @@ class Subsystem(SubsystemClientMixin, Optionable):
     return cls._instance_for_scope(cls.subscope(optionable.options_scope))
 
   @classmethod
-  def _instance_for_scope(cls, scope: str) -> "Subsystem":
+  def _instance_for_scope(cls, scope):
     if cls._options is None:
       raise cls.UninitializedSubsystemError(cls.__name__, scope)
     key = (cls, scope)
@@ -125,7 +126,7 @@ class Subsystem(SubsystemClientMixin, Optionable):
       cls._options = None
     cls._scoped_instances = {}
 
-  def __init__(self, scope: str, scoped_options) -> None:
+  def __init__(self, scope, scoped_options):
     """Note: A subsystem has no access to options in scopes other than its own.
 
     TODO: We'd like that to be true of Tasks some day. Subsystems will help with that.
@@ -140,11 +141,8 @@ class Subsystem(SubsystemClientMixin, Optionable):
     self._scoped_options = scoped_options
     self._fingerprint = None
 
-  # It's safe to override the signature from Optionable because we validate
-  # that every Optionable has `options_scope` defined as a `str` in the __init__. This code is
-  # complex, though, and may be worth refactoring.
   @property
-  def options_scope(self) -> str:  # type: ignore
+  def options_scope(self):
     return self._scope
 
   @property
