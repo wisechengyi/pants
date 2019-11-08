@@ -8,7 +8,7 @@ jar_library(name = 'cli',
 
 jar_library(name = 'compiler',
   jars = [
-    jar(org='org.scala-js', name='scalajs-compiler_2.12.8', rev=SCALAJS_REV),
+    jar(org='org.scala-js', name='scalajs-compiler_2.12.10', rev=SCALAJS_REV),
   ],
 )
 

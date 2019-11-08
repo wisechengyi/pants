@@ -11,7 +11,7 @@ jar_library(
 SEMANTICDB_REV='4.1.1'
 jar_library(name = 'semanticdb-scalac',
             jars = [
-              jar(org = 'org.scalameta', name = 'semanticdb-scalac_2.12.8', rev = SEMANTICDB_REV),
+              jar(org = 'org.scalameta', name = 'semanticdb-scalac_2.12.10', rev = SEMANTICDB_REV),
             ])
 
 jar_library(name = 'semanticdb',
