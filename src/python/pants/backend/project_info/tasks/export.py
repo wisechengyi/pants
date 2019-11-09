@@ -3,11 +3,13 @@
 
 import json
 import os
+import subprocess
 from collections import defaultdict
 
 from twitter.common.collections import OrderedSet
 
 from pants.backend.jvm.subsystems.jvm_platform import JvmPlatform
+from pants.backend.jvm.subsystems.jvm_tool_mixin import JvmToolMixin
 from pants.backend.jvm.subsystems.resolve_subsystem import JvmResolveSubsystem
 from pants.backend.jvm.subsystems.scala_platform import ScalaPlatform
 from pants.backend.jvm.targets.jar_library import JarLibrary
@@ -18,6 +20,7 @@ from pants.backend.jvm.targets.scala_library import ScalaLibrary
 from pants.backend.jvm.tasks.classpath_products import ClasspathProducts
 from pants.backend.jvm.tasks.coursier_resolve import CoursierMixin
 from pants.backend.jvm.tasks.ivy_task_mixin import IvyTaskMixin
+from pants.backend.jvm.tasks.nailgun_task import NailgunTask, NailgunTaskBase
 from pants.backend.python.interpreter_cache import PythonInterpreterCache
 from pants.backend.python.subsystems.pex_build_util import has_python_requirements
 from pants.backend.python.targets.python_requirement_library import PythonRequirementLibrary
@@ -31,14 +34,14 @@ from pants.build_graph.target import Target
 from pants.invalidation.cache_manager import VersionedTargetSet
 from pants.java.distribution.distribution import DistributionLocator
 from pants.java.executor import SubprocessExecutor
+from pants.java.jar.jar_dependency import JarDependency
 from pants.java.jar.jar_dependency_utils import M2Coordinate
 from pants.task.console_task import ConsoleTask
 from pants.util.memo import memoized_property
 
-
 # Changing the behavior of this task may affect the IntelliJ Pants plugin.
 # Please add @yic to reviews for this file.
-class ExportTask(ResolveRequirementsTaskBase, IvyTaskMixin, CoursierMixin):
+class ExportTask(ResolveRequirementsTaskBase, IvyTaskMixin, CoursierMixin, JvmToolMixin):
   """Base class for generating a json-formattable blob of data about the target graph.
 
   Subclasses can invoke the generate_targets_map method to get a dictionary of plain datastructures
@@ -111,6 +114,18 @@ class ExportTask(ResolveRequirementsTaskBase, IvyTaskMixin, CoursierMixin):
              help='Causes output to be a single line of JSON.')
     register('--jvm-options', type=list, metavar='<option>...',
              help='Run the JVM 3rdparty resolver with these jvm options.')
+    cls.register_jvm_tool(
+      register,
+      'sigtoclass',
+      classpath=[
+        JarDependency(
+          org='com.twitter',
+          name='rsc_2.12',
+          rev='0.0.0-835-4df51cf0',
+        ),
+      ],
+    )
+
 
   @classmethod
   def prepare(cls, options, round_manager):
@@ -337,12 +352,24 @@ class ExportTask(ResolveRequirementsTaskBase, IvyTaskMixin, CoursierMixin):
         targets_map[t.address.spec]['pants_target_type'] = 'jar_library'
         targets_map[t.address.spec]['libraries'] = [t.id]
         jar_products = runtime_classpath.get_for_target(t)
+
+
+        # x = DummyTask(self.context, self.get_options().pants_workdir)
         for conf, jar_entry in jar_products:
-          # z.jar
-          if os.path.exists(jar_entry):
+          m_jar = os.path.join(os.path.dirname(os.path.dirname(jar_entry)), 'rsc/m.jar')
+          m_jar2 = os.path.join(os.path.dirname(os.path.dirname(jar_entry)), 'rsc/m2.jar')
+          if os.path.exists(m_jar):
+            products = self.tool_classpath_from_products(self.context.products, 'sigtoclass', scope=self.options_scope)
+
+            args = ['java', '-cp', ':'.join(products), 'rsc.cli.SigToClass', *[m_jar2, m_jar]]
+            print(' '.join(args))
+            subprocess.check_output(args)
+
+            # self.runjava(tool_classpath('sigtoclass'), 'rsc.cli.SigToClass', [m_jar, m_jar])
+            graph_info['libraries'][t.id][conf] = m_jar2
+          elif 'z.jar' in jar_entry:
             graph_info['libraries'][t.id][conf] = jar_entry
-          else:
-            graph_info['libraries'][t.id][conf] = os.path.join(os.path.dirname(os.path.dirname(jar_entry)), 'rsc/m.jar')
+
 
     if python_interpreter_targets_mapping:
       # NB: We've selected a python interpreter compatible with each python target individually into

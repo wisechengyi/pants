@@ -613,8 +613,7 @@ class RscCompile(ZincCompile, MirroredTargetOptionMixin):
       self.JvmCompileWorkflowType.rsc_and_zinc: lambda: rsc_jobs.append(make_outline_job(compile_target, invalid_dependencies)),
       self.JvmCompileWorkflowType.outline_and_zinc: lambda: rsc_jobs.append(make_outline_job(compile_target, invalid_dependencies)),
     })()
-    def do_nothing():
-      pass
+
     # Create the zinc compile jobs.
     # - Scala zinc compile jobs depend on the results of running rsc on the scala target.
     # - Java zinc compile jobs depend on the zinc compiles of their dependencies, because we can't
@@ -655,7 +654,15 @@ class RscCompile(ZincCompile, MirroredTargetOptionMixin):
           dep_keys=list(all_zinc_rsc_invalid_dep_keys(invalid_dependencies)),
         )),
       # Should be the same as 'rsc-and-zinc' case
-      self.JvmCompileWorkflowType.outline_and_zinc: lambda: do_nothing,
+      self.JvmCompileWorkflowType.outline_and_zinc: lambda: zinc_jobs.append(
+        make_zinc_job(
+          compile_target,
+          input_product_key='rsc_mixed_compile_classpath',
+          output_products=[
+            runtime_classpath_product,
+          ],
+          dep_keys=list(all_zinc_rsc_invalid_dep_keys(invalid_dependencies)),
+        )),
     })()
 
     compile_jobs = rsc_jobs + zinc_jobs
