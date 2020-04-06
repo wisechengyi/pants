@@ -6,6 +6,7 @@ python_library(
   dependencies = [
     'src/python/pants/backend/codegen/antlr/java',
     'src/python/pants/backend/codegen/antlr/python',
+    'src/python/pants/backend/codegen/antlr4/python',
     'src/python/pants/backend/codegen/jaxb',
     'src/python/pants/backend/codegen/protobuf/java',
     'src/python/pants/backend/codegen/ragel/java',

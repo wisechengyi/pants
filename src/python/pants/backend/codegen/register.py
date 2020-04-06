@@ -5,6 +5,8 @@ from pants.backend.codegen.antlr.java.antlr_java_gen import AntlrJavaGen
 from pants.backend.codegen.antlr.java.java_antlr_library import JavaAntlrLibrary
 from pants.backend.codegen.antlr.python.antlr_py_gen import AntlrPyGen
 from pants.backend.codegen.antlr.python.python_antlr_library import PythonAntlrLibrary
+from pants.backend.codegen.antlr4.python.antlr_py_gen import Antlr4PyGen
+from pants.backend.codegen.antlr4.python.python_antlr4_library import PythonAntlr4Library
 from pants.backend.codegen.grpcio.python.grpcio_prep import GrpcioPrep
 from pants.backend.codegen.grpcio.python.grpcio_run import GrpcioRun
 from pants.backend.codegen.grpcio.python.python_grpcio_library import PythonGrpcioLibrary
@@ -33,6 +35,7 @@ def build_file_aliases():
             "java_thrift_library": JavaThriftLibrary,
             "java_wire_library": JavaWireLibrary,
             "python_antlr_library": PythonAntlrLibrary,
+            "python_antlr4_library": PythonAntlr4Library,
             "python_thrift_library": PythonThriftLibrary,
             "python_grpcio_library": PythonGrpcioLibrary,
             "jaxb_library": JaxbLibrary,
@@ -48,6 +51,7 @@ def register_goals():
     task(name="protoc", action=ProtobufGen).install("gen")
     task(name="antlr-java", action=AntlrJavaGen).install("gen")
     task(name="antlr-py", action=AntlrPyGen).install("gen")
+    task(name="antlr4-py", action=Antlr4PyGen).install("gen")
     task(name="ragel", action=RagelGen).install("gen")
     task(name="jaxb", action=JaxbGen).install("gen")
     task(name="wire", action=WireGen).install("gen")

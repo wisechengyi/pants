@@ -292,6 +292,7 @@ class GlobalOptions(Subsystem):
                 "pants.backend.native",
                 "pants.backend.codegen.antlr.java",
                 "pants.backend.codegen.antlr.python",
+                "pants.backend.codegen.antlr4.python",
                 "pants.backend.codegen.jaxb",
                 "pants.backend.codegen.protobuf.java",
                 "pants.backend.codegen.ragel.java",
