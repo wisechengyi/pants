@@ -373,7 +373,6 @@ def test_url_assets(asset_type) -> None:
             run.Run,
             args=[
                 "app/app.py",
-                f"--use-deprecated-pex-binary-run-semantics={asset_type == 'file'}",
             ],
             env_inherit={"PATH", "PYENV_ROOT", "HOME"},
         )
